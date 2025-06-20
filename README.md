@@ -1,3 +1,3 @@
 # ethos-webapp
 
-https://docs.google.com/document/d/1bzo7ga1XYT_Le3YFAvk3t977xr58N3oL9ckaDCvDBLE/edit?usp=sharing
+https://docs.google.com/document/d/1XPkxzNqDZSjmAe3mZZBTWoLqsxGSK4jRLh1rWzs6v48/edit?usp=sharing
