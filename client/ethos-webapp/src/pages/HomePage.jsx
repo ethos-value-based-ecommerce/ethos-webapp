@@ -43,7 +43,7 @@ const HomePage = () => {
   ];
   // Function to render the home page, including the header, navigation bar, discover section, categories section, and featured section
   return (
-    <>
+    <main className='main-page'>
      <header className='website-header'>
         <h1>ETHOS</h1>
      </header>
@@ -91,8 +91,8 @@ const HomePage = () => {
                 ))}
         </div>
      </section>
+</main>
 
-    </>
   )
 
 }

@@ -3,7 +3,6 @@ import React from 'react';
 // Function to render the Brand Card
 function BrandCard({ brandImage, brandTitle, brandDescription, brandMission, brandWebsite, brandLinkText, alt }) {
     return (
-        <>
         <article className="brand-card">
             <div className="brand-card_image">
                 <img src={brandImage} alt={alt} />
@@ -17,7 +16,6 @@ function BrandCard({ brandImage, brandTitle, brandDescription, brandMission, bra
                 </a>
             </div>
         </article>
-        </>
 )}
 
 

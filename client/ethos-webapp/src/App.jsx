@@ -7,14 +7,14 @@ import LoginPage from './pages/LoginPage';
 
 function App() {
   return (
-    <>
+
       <Router>
         <Routes>
           <Route index element={<HomePage />} />
           <Route path='/login' element={<LoginPage />} />
         </Routes>
       </Router>
-    </>
+
   )
 }
 

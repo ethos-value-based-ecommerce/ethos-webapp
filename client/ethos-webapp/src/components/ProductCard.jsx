@@ -3,7 +3,6 @@ import React from 'react';
 // Function to render the product card
 function ProductCard({productImage, productTitle, productPrice, productDescription, productWebsite, productLinkText}) {
     return (
-        <>
         <article className="product-card">
             <div className="product-card_image">
                 <img src={productImage} alt={alt} />
@@ -17,7 +16,6 @@ function ProductCard({productImage, productTitle, productPrice, productDescripti
                 </a>
             </div>
         </article>
-        </>
 )}
 
 

@@ -17,8 +17,8 @@ const LoginPage = () => {
     };
 
    return(
-       <>
-       <main>
+
+       <section className="login-page">
            <div className="login-welcome">
            <h1>ETHOS</h1>
            <h2> Welcome Back!</h2>
@@ -56,8 +56,8 @@ const LoginPage = () => {
 
             </form>
         </div>
-    </main>
-       </>
+    </section>
+
    )
 }
 
