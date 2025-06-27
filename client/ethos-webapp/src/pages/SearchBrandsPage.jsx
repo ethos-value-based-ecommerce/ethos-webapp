@@ -14,7 +14,7 @@ const SearchBrandsPage = ({ brands, topTags }) => {
 
 // Function to handle search
  const handleSearch = () => {
-  const lowerSearch = brandSearch.toLowerCase();
+  const lowerSearch = brandSearch.toLowerCase().trim();
   const results = brands.filter((brand) =>
     brand.name.toLowerCase().includes(lowerSearch) ||
     (brand.categories && brand.categories.some((cat) => cat.toLowerCase().includes(lowerSearch)))

@@ -16,7 +16,7 @@ function BrandCard({ brand, onTagClick}) {
       
 
         <div className="brand-tags">
-          {brand.categories && brand.categories.map((tag, index) => (
+          {brand.categories?.map((tag, index) => (
             <ValuesTag key={index} label={tag} onClick={() => onTagClick(tag)}/>
           ))}
         </div>

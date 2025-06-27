@@ -13,7 +13,7 @@ function ProductCard({productImage, productTitle, productPrice, productDescripti
                 <p className="product-card-description">{productDescription}</p>
                 
                 {showLink && productWebsite && (
-                    <a href={productWebsite} onClick={(e) => e.stopPropagation()}>
+                    <a href={productWebsite}>
                     <button>{"Shop Now"}</button>
                     </a>
                 )}
