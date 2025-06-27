@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
+import {Link} from 'react-router-dom';
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
 import Footer from '../components/Footer.jsx';
 
+
+// Function to handle the Search Brands Page
 const SearchBrandsPage = ({ brands, topTags }) => {
   const [brandSearch, setBrandSearch] = useState('');
   const [filteredBrands, setFilteredBrands] = useState(brands);
 
-  // Function to handle search
-  const handleSearch = () => {
-    const results = brands.filter((brand) =>
-      brand.name.toLowerCase().includes(brandSearch.toLowerCase())
-    );
-    setFilteredBrands(results);
-  };
+
+
+// Function to handle search
+ const handleSearch = () => {
+  const lowerSearch = brandSearch.toLowerCase();
+  const results = brands.filter((brand) =>
+    brand.name.toLowerCase().includes(lowerSearch) ||
+    (brand.categories && brand.categories.some((cat) => cat.toLowerCase().includes(lowerSearch)))
+  );
+  setFilteredBrands(results);
+};
 
   // Funciton to handle clearing search
   const handleClear = () => {
@@ -21,15 +28,15 @@ const SearchBrandsPage = ({ brands, topTags }) => {
     setFilteredBrands(brands);
   };
 
-  // TO DO: FIX FILTERING BY TAGS
-  const handleTagClick = (tag) => {
-    setBrandSearch(tag);
-    const results = brands.filter((brand) =>
-      brand.name.toLowerCase().includes(tag.toLowerCase())
-    );
-    setFilteredBrands(results);
-  };
-  
+  // Function to handle filtering by categories
+ const handleTagClick = (tag) => {
+  const results = brands.filter((brand) =>
+    brand.categories && brand.categories.some((category) => category.toLowerCase() === tag.toLowerCase())
+  );
+  setFilteredBrands(results);
+};
+
+
   return (
     <main className='search-brands-page'>
       <NavBar />
@@ -66,7 +73,9 @@ const SearchBrandsPage = ({ brands, topTags }) => {
           <ul>
             {filteredBrands.map((brand) => (
               <li key={brand.id}>
+                <Link to={`/brands/${brand.id}`}>
                 <BrandCard key={brand.id} brand={brand} />
+                </Link>
               </li>
             ))}
           </ul>

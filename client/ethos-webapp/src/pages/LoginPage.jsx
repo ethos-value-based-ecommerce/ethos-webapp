@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+// Function to render a basic login page
 const LoginPage = () => {
     const [formData, setFormData] = useState({username: "", password: ""})
 

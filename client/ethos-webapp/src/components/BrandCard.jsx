@@ -1,8 +1,8 @@
 import React from 'react';
 import ValuesTag from './ValuesTag.jsx';
 
-// Function to render the Brand Card
-function BrandCard({ brand }) {
+// Function to render the Brand Card with brand name, image, mission, description, website, and tags
+function BrandCard({ brand, onTagClick}) {
   return (
     <article className="brand-card">
       <div className="brand-card_image">
@@ -17,7 +17,7 @@ function BrandCard({ brand }) {
 
         <div className="brand-tags">
           {brand.categories && brand.categories.map((tag, index) => (
-            <ValuesTag key={index} label={tag} />
+            <ValuesTag key={index} label={tag} onClick={() => onTagClick(tag)}/>
           ))}
         </div>
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+// Function to render the navigation bar
 const NavBar = () => {
     return (
       <nav className='navigation-bar'>

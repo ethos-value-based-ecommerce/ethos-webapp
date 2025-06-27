@@ -33,7 +33,9 @@ const HomePage = ({ brands, categories }) => {
         <h2>Featured Brands</h2>
         <div className='featured-brands-grid'>
           {brands.slice(0, 6).map((brand) => (
+            <Link to={`/brands/${brand.id}`}>
             <BrandCard key={brand.id} brand={brand}/>
+            </Link>
           ))}
         </div>
       </section>

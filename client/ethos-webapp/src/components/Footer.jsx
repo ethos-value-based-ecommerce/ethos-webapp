@@ -1,4 +1,6 @@
 import React from 'react';
+
+// Function to render the footer
 const Footer = () => {
     return(
         <footer>

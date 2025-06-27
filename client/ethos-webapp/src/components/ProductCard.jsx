@@ -1,9 +1,9 @@
 import React from 'react';
 
-// Function to render the product card
-function ProductCard({productImage, productTitle, productPrice, productDescription, productWebsite, productLinkText}) {
+// Function to render the product card with product title, image, price, description, website
+function ProductCard({productImage, productTitle, productPrice, productDescription, productWebsite, alt, onClick, showLink = true}) {
     return (
-        <article className="product-card">
+        <article className="product-card" onClick={onClick}>
             <div className="product-card_image">
                 <img src={productImage} alt={alt} />
             </div>
@@ -11,9 +11,12 @@ function ProductCard({productImage, productTitle, productPrice, productDescripti
                 <h3 className="product-card-title">{productTitle}</h3>
                 <p className="product-card-price">{productPrice}</p>
                 <p className="product-card-description">{productDescription}</p>
-                <a href={productWebsite}>
-                    <button>Visit Website</button>
-                </a>
+                
+                {showLink && productWebsite && (
+                    <a href={productWebsite} onClick={(e) => e.stopPropagation()}>
+                    <button>{"Shop Now"}</button>
+                    </a>
+                )}
             </div>
         </article>
 )};
