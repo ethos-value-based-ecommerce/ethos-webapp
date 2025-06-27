@@ -16,7 +16,7 @@ function ProductCard({productImage, productTitle, productPrice, productDescripti
                 </a>
             </div>
         </article>
-)}
+)};
 
 
 export default ProductCard;
