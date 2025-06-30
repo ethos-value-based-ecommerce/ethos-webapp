@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {Layout, Typography, Input, Button, Row, Col, Tag} from 'antd';
 
 import NavBar from '../components/NavBar.jsx';
@@ -15,6 +16,30 @@ const { Header, Content, Footer: AntFooter } = Layout;
 const SearchBrandsPage = ({ brands, topTags }) => {
   const [brandSearch, setBrandSearch] = useState('');
   const [filteredBrands, setFilteredBrands] = useState(brands);
+  const location = useLocation();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  // Function to handle filtering by categories
+  const handleTagClick = (tag) => {
+    const results = brands.filter(
+      (brand) =>
+        brand.categories &&
+        brand.categories.some(
+          (category) => category.toLowerCase() === tag.toLowerCase()
+        )
+    );
+    setFilteredBrands(results);
+    setSelectedCategory(tag);
+  };
+
+  // Check for selectedCategory from navigation state and filter
+  useEffect(() => {
+    if (location.state?.selectedCategory) {
+      const category = location.state.selectedCategory;
+      setSelectedCategory(category);
+      handleTagClick(category);
+    }
+  }, [location.state, brands]);
 
 // Function to handle search
   const handleSearch = () => {
@@ -34,18 +59,7 @@ const SearchBrandsPage = ({ brands, topTags }) => {
   const handleClear = () => {
     setBrandSearch('');
     setFilteredBrands(brands);
-  };
-
-  // Function to handle filtering by categories
-  const handleTagClick = (tag) => {
-    const results = brands.filter(
-      (brand) =>
-        brand.categories &&
-        brand.categories.some(
-          (category) => category.toLowerCase() === tag.toLowerCase()
-        )
-    );
-    setFilteredBrands(results);
+    setSelectedCategory(null);
   };
 
   return (
@@ -91,8 +105,12 @@ const SearchBrandsPage = ({ brands, topTags }) => {
             {topTags.slice(0, 10).map((tag, index) => (
               <Tag
                 key={index}
-                color="cyan"
-                style={{ marginBottom: '0.5rem', cursor: 'pointer' }}
+                color={selectedCategory === tag ? "blue" : "cyan"}
+                style={{
+                  marginBottom: '0.5rem',
+                  cursor: 'pointer',
+                  fontWeight: selectedCategory === tag ? 'bold' : 'normal'
+                }}
                 onClick={() => handleTagClick(tag)}
               >
                 {tag}
@@ -105,7 +123,7 @@ const SearchBrandsPage = ({ brands, topTags }) => {
         <section>
           <Title level={3}>Search Results</Title>
           {filteredBrands.length > 0 ? (
-            <Row gutter={[16, 16]}>
+            <Row gutter={[16, 16]} justify="space-around">
               {filteredBrands.map((brand) => (
                 <Col xs={24} sm={12} md={8} lg={6} key={brand.id}>
                   <Link to={`/brands/${brand.id}`}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {Layout, Typography, Button, Row, Col} from 'antd';
 import '../App.css';
 
@@ -12,6 +12,13 @@ const { Header, Content, Footer: AntFooter } = Layout;
 
 // Function to render the home page, including the header, navigation bar, discover section, categories section, and featured section
 const HomePage = ({ brands, categories }) => {
+  
+  // Function to handle category click and navigate to search-brands with filter
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (category) => {
+    navigate('/search-brands', { state: { selectedCategory: category } });
+  };
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ background: '#fff', padding: '0 2rem' }}>
@@ -45,7 +52,9 @@ const HomePage = ({ brands, categories }) => {
           <Row gutter={[16, 16]} justify="center">
             {categories.slice(0, 6).map((category, index) => (
               <Col xs={24} sm={12} md={8} key={index}>
-                <Button block>{category}</Button>
+                <Button block onClick={() => handleCategoryClick(category)}>
+                  {category}
+                </Button>
               </Col>
             ))}
           </Row>
