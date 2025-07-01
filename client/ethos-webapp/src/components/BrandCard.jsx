@@ -4,7 +4,7 @@ import React from 'react';
 import { Card, Typography, Button, Tag } from 'antd';
 
 // Importing category color for tag colors
-import { getCategoryColor } from './categoryColors.js';
+import { getCategoryColor } from './categoryColors.jsx';
 
 const { Paragraph } = Typography;
 const { Meta } = Card;

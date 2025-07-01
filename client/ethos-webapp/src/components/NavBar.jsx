@@ -12,7 +12,7 @@ const NavBar = () => {
   { key: 'categories', label: <Link to="/categories">Categories</Link> },
   { key: 'brands', label: <Link to="/search-brands">Browse Brands</Link> },
   { key: 'products', label: <Link to="/search-products">Browse Products</Link>},
-  { key: 'contact', label: <Link to="/contact">Account</Link> },
+  { key: 'contact', label: <Link to="/account">Account</Link> },
 ];
 
 

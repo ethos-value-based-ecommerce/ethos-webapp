@@ -8,7 +8,7 @@ import BrandCard from '../components/BrandCard.jsx';
 import Footer from '../components/Footer.jsx';
 
 // Importing category color for tag colors
-import { getCategoryColor } from '../components/categoryColors.js';
+import { getCategoryColor } from '../components/categoryColors.jsx';
 
 const { Title, Paragraph } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;

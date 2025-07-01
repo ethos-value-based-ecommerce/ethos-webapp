@@ -6,7 +6,7 @@ import ProductCard from '../components/ProductCard.jsx';
 import Footer from '../components/Footer.jsx';
 
 // Importing category color for tag colors
-import { getCategoryColor } from '../components/categoryColors.js';
+import { getCategoryColor } from '../components/categoryColors.jsx';
 import '../App.css';
 
 const { Title } = Typography;

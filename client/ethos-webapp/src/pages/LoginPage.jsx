@@ -1,23 +1,34 @@
 import '../App.css';
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card } from "antd";
 
 const { Title, Paragraph, Link } = Typography;
 
 // Function to render a basic login page
-const LoginPage = () => {
+const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const navigate = useNavigate();
 
-   // TO DO: WORK ON LOGIN LATER ONCE BACKEND IS SET UP
+  // TO DO: WORK ON LOGIN LATER ONCE BACKEND IS SET UP
    // Function to handle form submission
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleLogin = (values) => {
+    const { username, password } = values;
+    // For demo purposes - accept any non-empty username/password
+    if (username && password) {
+      if (onLogin) {
+        onLogin({ username, name: username }); // Pass user data to parent
+      }
+      navigate('/account');
+    } else {
+      console.log('Please enter both username and password');
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Logging in with:", formData);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -49,7 +60,7 @@ const LoginPage = () => {
           <Paragraph>Please log in to continue:</Paragraph>
         </div>
 
-        <Form layout="vertical" onFinish={handleSubmit}>
+        <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
             label="Username"
             name="username"
