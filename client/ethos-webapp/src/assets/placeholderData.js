@@ -4,6 +4,71 @@ const brandCategories = [
     "Sustainability", "Social Impact", "Ethical Living", "Vegan", "Cruelty-Free"
   ];
 
+// Category descriptions
+const categoryDescriptions = {
+  "Clothing": {
+    description: "Sustainable and ethical fashion brands that prioritize fair labor practices, eco-friendly materials, and responsible manufacturing processes.",
+    color: "blue",
+    icon: "👕"
+  },
+  "Beauty": {
+    description: "Clean beauty brands offering cruelty-free, non-toxic, and environmentally conscious skincare, makeup, and personal care products.",
+    color: "pink",
+    icon: "💄"
+  },
+  "Home": {
+    description: "Eco-friendly home goods and decor brands focused on sustainable materials, ethical production, and creating healthier living spaces.",
+    color: "green",
+    icon: "🏠"
+  },
+  "Food": {
+    description: "Ethical food brands committed to organic farming, fair trade practices, sustainable packaging, and supporting local communities.",
+    color: "orange",
+    icon: "🍎"
+  },
+  "Travel": {
+    description: "Responsible travel companies and brands promoting sustainable tourism, cultural respect, and environmental conservation.",
+    color: "cyan",
+    icon: "✈️"
+  },
+  "Wellness": {
+    description: "Holistic wellness brands offering natural health products, mindfulness resources, and promoting overall well-being and mental health.",
+    color: "purple",
+    icon: "🧘"
+  },
+  "Sustainability": {
+    description: "Brands dedicated to environmental protection through renewable energy, waste reduction, circular economy practices, and climate action.",
+    color: "green",
+    icon: "🌱"
+  },
+  "Social Impact": {
+    description: "Companies with strong social missions, supporting communities, promoting equality, and creating positive change in society.",
+    color: "orange",
+    icon: "🤝"
+  },
+  "Ethical Living": {
+    description: "Brands promoting conscious consumption, transparency in business practices, and encouraging mindful lifestyle choices.",
+    color: "red",
+    icon: "⚖️"
+  },
+  "Vegan": {
+    description: "Plant-based brands offering vegan alternatives across food, beauty, fashion, and lifestyle products without animal-derived ingredients.",
+    color: "blue",
+    icon: "🌿"
+  },
+  "Cruelty-Free": {
+    description: "Brands committed to never testing on animals and ensuring their entire supply chain maintains cruelty-free standards.",
+    color: "purple",
+    icon: "🐰"
+  }
+};
+
+// Generate category data from brandCategories array
+const categoryData = brandCategories.map(category => ({
+  name: category,
+  ...categoryDescriptions[category]
+}));
+
   const allBrands = [
     {
       id: 1,
@@ -109,4 +174,4 @@ const brandCategories = [
   }
 ];
 
-export {brandCategories, allBrands, brandProducts};
+export {brandCategories, categoryData, allBrands, brandProducts};

@@ -2,6 +2,10 @@ import React from 'react';
 
 
 import { Card, Typography, Button, Tag } from 'antd';
+
+// Importing category color for tag colors
+import { getCategoryColor } from './categoryColors.js';
+
 const { Paragraph } = Typography;
 const { Meta } = Card;
 
@@ -65,12 +69,12 @@ const BrandCard = ({ brand, onTagClick }) => {
                 {brand.categories.map((tag, index) => (
                   <Tag
                     key={index}
-                        color='cyan'
-                        style={{ cursor: 'pointer', marginBottom: '4px'}}
-                        onClick={() => onTagClick(tag)}
-                      >
-                       {tag}
-                      </Tag>
+                    color={getCategoryColor(tag)}
+                    style={{ cursor: 'pointer', marginBottom: '4px'}}
+                    onClick={() => onTagClick && onTagClick(tag)}
+                  >
+                    {tag}
+                  </Tag>
                 ))}
               </div>
             )}

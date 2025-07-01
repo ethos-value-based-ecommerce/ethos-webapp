@@ -7,7 +7,8 @@ import LoginPage from './pages/LoginPage';
 import SearchBrandsPage from './pages/SearchBrandsPage.jsx';
 import BrandPage from './pages/BrandPage.jsx';
 import SearchProductsPage from './pages/SearchProductsPage.jsx';
-import {brandCategories, allBrands, brandProducts} from './assets/placeholderData.js';
+import CategoriesPage from './pages/CategoriesPage.jsx';
+import {brandCategories, categoryData, allBrands, brandProducts} from './assets/placeholderData.js';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/search-brands" element={<SearchBrandsPage brands={allBrands} topTags={brandCategories} />}/>
         <Route path="/brands/:id" element={<BrandPage brands={allBrands} products={brandProducts}/>} />
         <Route path="/search-products" element={<SearchProductsPage products={brandProducts} brands={allBrands}/>}/>
+        <Route path="/categories" element={<CategoriesPage categoryData={categoryData} />}/>
       </Routes>
     </Router>
   );

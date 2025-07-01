@@ -9,7 +9,7 @@ const NavBar = () => {
   const items = [
   { key: 'home', label: <Link to="/">Home</Link> },
   { key: 'login', label: <Link to="/login">Login</Link> },
-  { key: 'categories', label: <Link to="/about">Categories</Link> },
+  { key: 'categories', label: <Link to="/categories">Categories</Link> },
   { key: 'brands', label: <Link to="/search-brands">Browse Brands</Link> },
   { key: 'products', label: <Link to="/search-products">Browse Products</Link>},
   { key: 'contact', label: <Link to="/contact">Account</Link> },
@@ -32,4 +32,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-

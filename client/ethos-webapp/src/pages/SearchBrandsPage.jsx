@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { useState, useEffect } from 'react';
+import React,  { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {Layout, Typography, Input, Button, Row, Col, Tag} from 'antd';
 
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
 import Footer from '../components/Footer.jsx';
+
+// Importing category color for tag colors
+import { getCategoryColor } from '../components/categoryColors.js';
 import '../App.css';
 
 const { Title } = Typography;
@@ -17,26 +19,44 @@ const SearchBrandsPage = ({ brands, topTags }) => {
   const [brandSearch, setBrandSearch] = useState('');
   const [filteredBrands, setFilteredBrands] = useState(brands);
   const location = useLocation();
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Function to handle filtering by categories
   const handleTagClick = (tag) => {
-    const results = brands.filter(
-      (brand) =>
-        brand.categories &&
-        brand.categories.some(
-          (category) => category.toLowerCase() === tag.toLowerCase()
-        )
-    );
-    setFilteredBrands(results);
-    setSelectedCategory(tag);
+    let newSelectedCategories;
+
+    if (selectedCategories.includes(tag)) {
+      // Remove category if already selected
+      newSelectedCategories = selectedCategories.filter(cat => cat !== tag);
+    } else {
+      // Add category if not selected
+      newSelectedCategories = [...selectedCategories, tag];
+    }
+
+    setSelectedCategories(newSelectedCategories);
+
+    // Filter brands based on selected categories
+    if (newSelectedCategories.length === 0) {
+      setFilteredBrands(brands);
+    } else {
+      const results = brands.filter(
+        (brand) =>
+          brand.categories &&
+          newSelectedCategories.every(
+            selectedCat => brand.categories.some(
+              category => category.toLowerCase() === selectedCat.toLowerCase()
+            )
+          )
+      );
+      setFilteredBrands(results);
+    }
   };
 
   // Check for selectedCategory from navigation state and filter
   useEffect(() => {
     if (location.state?.selectedCategory) {
       const category = location.state.selectedCategory;
-      setSelectedCategory(category);
+      setSelectedCategories([category]);
       handleTagClick(category);
     }
   }, [location.state, brands]);
@@ -59,7 +79,7 @@ const SearchBrandsPage = ({ brands, topTags }) => {
   const handleClear = () => {
     setBrandSearch('');
     setFilteredBrands(brands);
-    setSelectedCategory(null);
+    setSelectedCategories([]);
   };
 
   return (
@@ -105,11 +125,14 @@ const SearchBrandsPage = ({ brands, topTags }) => {
             {topTags.slice(0, 10).map((tag, index) => (
               <Tag
                 key={index}
-                color={selectedCategory === tag ? "blue" : "cyan"}
+                color={getCategoryColor(tag)}
                 style={{
                   marginBottom: '0.5rem',
                   cursor: 'pointer',
-                  fontWeight: selectedCategory === tag ? 'bold' : 'normal'
+                  fontWeight: selectedCategories.includes(tag) ? 'bold' : 'normal',
+                  border: selectedCategories.includes(tag) ? '2px solid' : '1px solid transparent',
+                  transform: selectedCategories.includes(tag) ? 'scale(1.05)' : 'scale(1)',
+                  transition: 'all 0.2s ease'
                 }}
                 onClick={() => handleTagClick(tag)}
               >

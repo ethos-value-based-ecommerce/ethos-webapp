@@ -1,18 +1,21 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {Layout, Typography, Button, Row, Col} from 'antd';
+import {Layout, Typography, Button, Row, Col, Tag} from 'antd';
 import '../App.css';
 
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
 import Footer from '../components/Footer.jsx';
 
+// Importing category color for tag colors
+import { getCategoryColor } from '../components/categoryColors.js';
+
 const { Title, Paragraph } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
 
 // Function to render the home page, including the header, navigation bar, discover section, categories section, and featured section
 const HomePage = ({ brands, categories }) => {
-  
+
   // Function to handle category click and navigate to search-brands with filter
   const navigate = useNavigate();
 
@@ -52,9 +55,34 @@ const HomePage = ({ brands, categories }) => {
           <Row gutter={[16, 16]} justify="center">
             {categories.slice(0, 6).map((category, index) => (
               <Col xs={24} sm={12} md={8} key={index}>
-                <Button block onClick={() => handleCategoryClick(category)}>
-                  {category}
-                </Button>
+                <div
+                  style={{
+                    cursor: 'pointer',
+                    padding: '12px',
+                    border: '1px solid #d9d9d9',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    transition: 'all 0.3s ease',
+                    ':hover': {
+                      borderColor: '#1890ff',
+                      boxShadow: '0 2px 8px rgba(24, 144, 255, 0.2)'
+                    }
+                  }}
+                  onClick={() => handleCategoryClick(category)}
+                >
+                  <Tag
+                    color={getCategoryColor(category)}
+                    style={{
+                      fontSize: '14px',
+                      padding: '6px 16px',
+                      borderRadius: '20px',
+                      border: 'none',
+                      fontWeight: '500'
+                    }}
+                  >
+                    {category}
+                  </Tag>
+                </div>
               </Col>
             ))}
           </Row>

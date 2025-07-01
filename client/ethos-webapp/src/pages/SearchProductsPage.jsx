@@ -4,6 +4,9 @@ import { Layout, Typography, Input, Button, Row, Col, Modal, Tag } from 'antd';
 import NavBar from '../components/NavBar.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import Footer from '../components/Footer.jsx';
+
+// Importing category color for tag colors
+import { getCategoryColor } from '../components/categoryColors.js';
 import '../App.css';
 
 const { Title } = Typography;
@@ -19,6 +22,7 @@ const SearchProductsPage = ({ products, brands }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [availableCategories, setAvailableCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Initialize filtered products and categories when props change
   useEffect(() => {
@@ -63,6 +67,7 @@ const SearchProductsPage = ({ products, brands }) => {
   const handleClear = () => {
     setProductSearch('');
     setFilteredProducts(products || []);
+    setSelectedCategories([]);
     setCurrentPage(1);
   };
 
@@ -70,13 +75,32 @@ const SearchProductsPage = ({ products, brands }) => {
   const handleCategoryClick = (category) => {
     if (!products || !brands) return;
 
-    const results = products.filter(product => {
-      const productCategories = getProductCategories(product);
-      return productCategories.some(cat =>
-        cat.toLowerCase() === category.toLowerCase()
-      );
-    });
-    setFilteredProducts(results);
+    let newSelectedCategories;
+
+    if (selectedCategories.includes(category)) {
+      // Remove category if already selected
+      newSelectedCategories = selectedCategories.filter(cat => cat !== category);
+    } else {
+      // Add category if not selected
+      newSelectedCategories = [...selectedCategories, category];
+    }
+
+    setSelectedCategories(newSelectedCategories);
+
+    // Filter products based on selected categories
+    if (newSelectedCategories.length === 0) {
+      setFilteredProducts(products);
+    } else {
+      const results = products.filter(product => {
+        const productCategories = getProductCategories(product);
+        return newSelectedCategories.every(selectedCat =>
+          productCategories.some(cat =>
+            cat.toLowerCase() === selectedCat.toLowerCase()
+          )
+        );
+      });
+      setFilteredProducts(results);
+    }
     setCurrentPage(1);
   };
 
@@ -139,8 +163,15 @@ const SearchProductsPage = ({ products, brands }) => {
             {availableCategories.map((category, index) => (
               <Tag
                 key={index}
-                color="blue"
-                style={{ marginBottom: '0.5rem', cursor: 'pointer' }}
+                color={getCategoryColor(category)}
+                style={{
+                  marginBottom: '0.5rem',
+                  cursor: 'pointer',
+                  fontWeight: selectedCategories.includes(category) ? 'bold' : 'normal',
+                  border: selectedCategories.includes(category) ? '2px solid' : '1px solid transparent',
+                  transform: selectedCategories.includes(category) ? 'scale(1.05)' : 'scale(1)',
+                  transition: 'all 0.2s ease'
+                }}
                 onClick={() => handleCategoryClick(category)}
               >
                 {category}
