@@ -24,9 +24,13 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
+  min-height: 100vh;
+}
+
+/*Added to stop the screen from shrinking during search*/
+#root {
+  width: 100%;
   min-height: 100vh;
 }
 

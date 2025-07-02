@@ -1,21 +1,34 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Menu } from 'antd';
+import { Link, useLocation } from 'react-router-dom';
 
-// Function to render the navigation bar
 const NavBar = () => {
-    return (
-      <nav className='navigation-bar'>
-              <ul>
-                <li><Link to='/'>Home</Link></li>
-                <li><Link to='/login'>Login</Link></li>
-                <li><Link to='/categories'>Categories</Link></li>
-                <li><Link to='/search-brands'>Search Brands</Link></li>
-                <li><Link to='/products'>Search Products</Link></li>
-                <li><Link to='/account'>Account</Link></li>
-              </ul>
-     </nav>
-    )
+  const location = useLocation();
+  const currentKey = location.pathname;
 
+  const items = [
+  { key: 'home', label: <Link to="/">Home</Link> },
+  { key: 'login', label: <Link to="/login">Login</Link> },
+  { key: 'categories', label: <Link to="/categories">Categories</Link> },
+  { key: 'brands', label: <Link to="/search-brands">Browse Brands</Link> },
+  { key: 'products', label: <Link to="/search-products">Browse Products</Link>},
+  { key: 'contact', label: <Link to="/account">Account</Link> },
+];
+
+
+  return (
+    <Menu
+      mode="horizontal"
+      theme="light"
+      selectedKeys={[currentKey]}
+      items={items}
+      style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        borderBottom: 'none',
+      }}
+    />
+  );
 };
 
 export default NavBar;
