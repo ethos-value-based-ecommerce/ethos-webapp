@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import { Form, Input, Button, Select } from 'antd';
 
 import Footer from '../components/Footer.jsx';
@@ -7,9 +8,13 @@ const { TextArea } = Input;
 const { Option } = Select;
 
 // Function to render the BrandUploadPage with image, descriptions, and categories.
-const BrandUploadPage = () => {
+const BrandUploadPage = ({ categories }) => {
+    const [form] = Form.useForm();
 
-    // TODO: Work on Submit Functionality
+    const handleSubmit = (values) => {
+        console.log('Form submitted with values:', values);
+        // TODO: Send data to backend here
+    };
 
     return (
         <main>
@@ -26,6 +31,7 @@ const BrandUploadPage = () => {
                     form={form}
                     layout='vertical'
                     className='brand-upload'
+                    onFinish={handleSubmit}
                 >
                     <Form.Item
                         label="Brand Name"
@@ -71,12 +77,15 @@ const BrandUploadPage = () => {
                         name="category"
                         rules={[{ required: true, message: 'Select a few categories to describe this brand:'}]}
                     >
-                        <Select placeholder="Select categories that describe this brand:">
+                        <Select
+                            placeholder="Select categories that describe this brand:"
+                            mode="multiple" // allow multiple selections
+                        >
                             {categories.map(category => (
-                            <Option key={category} value={category}>
-                                 {category}
-                            </Option>
-                                 ))}
+                                <Option key={category} value={category}>
+                                    {category}
+                                </Option>
+                            ))}
                         </Select>
                     </Form.Item>
 
@@ -84,10 +93,10 @@ const BrandUploadPage = () => {
                         label="Logo / Image Upload"
                         name="imgURL"
                         rules={[
-                        { required: true, message: 'Please enter the image URL' },
-                        { type: 'url', message: 'Please enter a valid URL' }
+                            { required: true, message: 'Please enter the image URL' },
+                            { type: 'url', message: 'Please enter a valid URL' }
                         ]}
-                        >
+                    >
                         <Input placeholder="https://example.com" />
                     </Form.Item>
 
