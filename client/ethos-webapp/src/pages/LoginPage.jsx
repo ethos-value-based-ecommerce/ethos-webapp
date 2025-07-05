@@ -2,26 +2,39 @@ import '../App.css';
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Button, Typography, Card } from "antd";
+import { Form, Input, Button, Typography, Card, Tabs, Space } from "antd";
+import { UserOutlined, ShopOutlined } from "@ant-design/icons";
 
 const { Title, Paragraph, Link } = Typography;
+const { TabPane } = Tabs;
 
-// Function to render a basic login page
+// Function to render a login page with separate user and brand login
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const [activeTab, setActiveTab] = useState("user");
   const navigate = useNavigate();
 
   // TO DO: WORK ON LOGIN LATER ONCE BACKEND IS SET UP
-   // Function to handle form submission
+  // Function to handle form submission
 
   const handleLogin = (values) => {
     const { username, password } = values;
     // For demo purposes - accept any non-empty username/password
     if (username && password) {
       if (onLogin) {
-        onLogin({ username, name: username }); // Pass user data to parent
+        onLogin({
+          username,
+          name: username,
+          accountType: activeTab
+        }); // Pass user data to parent with account type
       }
-      navigate('/account');
+
+      // Navigate based on account type
+      if (activeTab === "brand") {
+        navigate('/brand-account');
+      } else {
+        navigate('/account');
+      }
     } else {
       console.log('Please enter both username and password');
     }
@@ -49,7 +62,7 @@ const LoginPage = ({ onLogin }) => {
     >
       <Card
         style={{
-          width: 400,
+          width: 450,
           padding: 24,
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         }}
@@ -57,8 +70,47 @@ const LoginPage = ({ onLogin }) => {
         <div style={{ textAlign: "center", marginBottom: 24 }}>
           <Title level={2}>ETHOS</Title>
           <Title level={4}>Welcome Back!</Title>
-          <Paragraph>Please log in to continue:</Paragraph>
+          <Paragraph>Choose your account type and log in:</Paragraph>
         </div>
+
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          centered
+          style={{ marginBottom: 24 }}
+        >
+          <TabPane
+            tab={
+              <Space>
+                <UserOutlined />
+                User Login
+              </Space>
+            }
+            key="user"
+          >
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <Paragraph type="secondary">
+                Log in to browse brands, save favorites, and manage your profile
+              </Paragraph>
+            </div>
+          </TabPane>
+
+          <TabPane
+            tab={
+              <Space>
+                <ShopOutlined />
+                Brand Login
+              </Space>
+            }
+            key="brand"
+          >
+            <div style={{ textAlign: "center", marginBottom: 16 }}>
+              <Paragraph type="secondary">
+                Log in to manage your brand profile, upload products, and view analytics
+              </Paragraph>
+            </div>
+          </TabPane>
+        </Tabs>
 
         <Form layout="vertical" onFinish={handleLogin}>
           <Form.Item
@@ -70,6 +122,7 @@ const LoginPage = ({ onLogin }) => {
               name="username"
               value={formData.username}
               onChange={handleChange}
+              placeholder={activeTab === "brand" ? "Brand username" : "Username"}
             />
           </Form.Item>
 
@@ -78,16 +131,17 @@ const LoginPage = ({ onLogin }) => {
             name="password"
             rules={[{ required: true, message: "Please enter your password!" }]}
           >
-          <Input.Password
+            <Input.Password
               name="password"
               value={formData.password}
               onChange={handleChange}
+              placeholder="Password"
             />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
-              Log In
+              {activeTab === "brand" ? "Log In as Brand" : "Log In as User"}
             </Button>
           </Form.Item>
         </Form>
@@ -95,7 +149,9 @@ const LoginPage = ({ onLogin }) => {
         <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
           <Link href="#">Forgot your password?</Link>
           <br />
-          <Link href="#">Don't have an account? Sign up here.</Link>
+          <Link href="#">
+            Don't have an account? Sign up as a {activeTab === "brand" ? "brand" : "user"}.
+          </Link>
           <br />
           <Link href="/">Continue as a guest.</Link>
         </Paragraph>
