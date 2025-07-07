@@ -1,4 +1,6 @@
 const express = require('express')
+const router = express.Router()
+const supabase = require('./supabaseClient.js')
 
 const app = express()
 const PORT = 3000
@@ -8,10 +10,9 @@ app.use(express.json())
 // Parse URL-encoded request bodies for routes.
 app.use(express.urlencoded({ extended: true }))
 
-const { getBrandTags, getAllBrands, getBrandById, searchProducts, searchBrands, getBrandCategories, getAllProducts, getProductCategories, getProductById} = require('./placeholderData.js')
-
 // Routes
 
+// Home Route
 app.get('/', async (req, res) => {
   try {
     res.send('Welcome to Ethos!')
@@ -27,7 +28,10 @@ app.get('/', async (req, res) => {
 // Get all brands
 app.get('/brands', async (req, res) => {
   try {
-    const brands = getAllBrands()
+    const { data: brands, error } = await supabase
+      .from('brands')
+      .select('*')
+
     res.json({
       success: true,
       data: brands,
@@ -45,11 +49,14 @@ app.get('/brands', async (req, res) => {
 // Get each brand's categories
 app.get('/brands/categories', async (req, res) => {
   try {
-    const brandCategories = getBrandCategories()
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('*')
+
     res.json({
       success: true,
-      data: brandCategories,
-      total: brandCategories.length
+      data: categories,
+      total: categories.length
     })
   } catch (error) {
     res.status(500).json({
@@ -63,15 +70,18 @@ app.get('/brands/categories', async (req, res) => {
 // Get categories
 app.get('/categories', async (req, res) => {
   try {
-    const tags = getBrandTags()
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('*')
+
     res.json({
       success: true,
-      data: tags
+      data: categories
     })
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve brand tags',
+      message: 'Failed to retrieve categories',
       error: error.message
     })
   }
@@ -81,14 +91,26 @@ app.get('/categories', async (req, res) => {
 app.get('/brands/search', async (req, res) => {
   try {
     const { query, category } = req.query
-    const result = searchBrands(query, category)
+
+    let supabaseQuery = supabase.from('brands').select('*')
+
+    if (query) {
+      supabaseQuery = supabaseQuery.or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+    }
+
+    if (category) {
+      supabaseQuery = supabaseQuery.eq('category', category)
+    }
+
+    const { data: brands, error } = await supabaseQuery
+
 
     res.json({
       success: true,
-      data: result.brands,
-      query: result.query,
-      category: result.category,
-      total: result.total
+      data: brands,
+      query: query || '',
+      category: category || '',
+      total: brands.length
     })
   } catch (error) {
     res.status(500).json({
@@ -112,13 +134,17 @@ app.get('/brands/:id', async (req, res) => {
       })
     }
 
-    const brand = getBrandById(brandId)
+    const { data: brand, error } = await supabase
+      .from('brands')
+      .select('*')
+      .eq('id', brandId)
+      .single()
 
-    if (!brand) {
-      return res.status(404).json({
-        success: false,
-        message: 'Brand not found'
-      })
+    if (error) {
+        return res.status(404).json({
+          success: false,
+          message: 'Brand not found'
+        })
     }
 
     res.json({
@@ -134,10 +160,110 @@ app.get('/brands/:id', async (req, res) => {
   }
 })
 
+// Add a new brand
+app.post('/brands', async (req, res) => {
+  try {
+    const { name, description, category, tags, website, logo } = req.body
+
+    // Validate required fields
+    if (!name) {
+      return res.status(400).json({
+        success: false,
+        message: 'Brand name is required'
+      })
+    }
+
+    const { data: newBrand, error } = await supabase
+      .from('brands')
+      .insert([{
+        name,
+        description,
+        category,
+        tags,
+        website,
+        logo
+      }])
+      .select()
+      .single()
+
+
+    res.status(201).json({
+      success: true,
+      data: newBrand,
+      message: 'Brand created successfully'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create brand',
+      error: error.message
+    })
+  }
+})
+
+// Edit/Update a brand
+app.put('/brands/:id', async (req, res) => {
+  try {
+    const brandId = req.params.id
+    const { name, description, category, tags, website, logo } = req.body
+
+    // Validate ID parameter
+    if (!brandId || isNaN(parseInt(brandId))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid brand ID provided'
+      })
+    }
+
+    // Check if brand exists
+    const { data: existingBrand, error: selectError } = await supabase
+      .from('brands')
+      .select('id')
+      .eq('id', brandId)
+      .single()
+
+    if (selectError) {
+        return res.status(404).json({
+          success: false,
+          message: 'Brand not found'
+        })
+
+      throw selectError
+    }
+
+    // Update the brand
+    const { data: updatedBrand, error: updateError } = await supabase
+      .from('brands')
+      .update({
+        name,
+        description,
+        category,
+        tags,
+        website,
+        logo
+      })
+      .eq('id', brandId)
+      .select()
+      .single()
+
+    res.json({
+      success: true,
+      data: updatedBrand,
+      message: 'Brand updated successfully'
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update brand',
+      error: error.message
+    })
+  }
+})
+
 // Get all products
 app.get('/products', async (req, res) => {
-  try {
-    const products = getAllProducts()
+ try {
+    // TOD0: Call the product search API.
     res.json({
       success: true,
       data: products,
@@ -154,25 +280,8 @@ app.get('/products', async (req, res) => {
 
 // Get product by ID
 app.get('/products/:id', async (req, res) => {
-  try {
-    const productId = req.params.id
-
-    // Validate ID parameter
-    if (!productId || isNaN(parseInt(productId))) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid product ID provided'
-      })
-    }
-
-    const product = getProductById(productId)
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: 'Product not found'
-      })
-    }
+ try {
+  // TOD0: Call the product search API.
 
     res.json({
       success: true,
@@ -189,9 +298,9 @@ app.get('/products/:id', async (req, res) => {
 
 // Get product categories
 app.get('/products/categories', async (req, res) => {
-  try {
-    const productCategories = getProductCategories()
-    res.json({
+ try {
+// TOD0: Call the product search API.
+  res.json({
       success: true,
       data: productCategories,
       total: productCategories.length
@@ -208,15 +317,13 @@ app.get('/products/categories', async (req, res) => {
 // Get product search with query
 app.get('/products/search', async (req, res) => {
   try {
-    const { query, category } = req.query
-    const result = searchProducts(query, category)
-
+     // TOD0: Call the product search API.
     res.json({
       success: true,
-      data: result.products,
-      query: result.query,
-      category: result.category,
-      total: result.total
+      data: products,
+      query: query || '',
+      category: category || '',
+      total: products.length
     })
   } catch (error) {
     res.status(500).json({
