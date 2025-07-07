@@ -7,6 +7,24 @@ const { Title, Text, Link } = Typography;
 
 // Function to render the footer
 const Footer = () => {
+     const footerStyle = {
+                backgroundColor: '#FFFFFF',
+                color: '#000000',
+                padding: '40px 50px 20px',
+                borderTop: '1px solid #d9d9d9'
+            };
+
+            const linkStyle = {
+                color: '#000000',
+                textDecoration: 'none'
+            };
+
+            const sectionTitleStyle = {
+                color: '#000000',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                marginBottom: '16px'
+            };
 
     return(
         <AntFooter style={footerStyle}>
