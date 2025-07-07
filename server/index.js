@@ -1,6 +1,13 @@
 const express = require('express')
+const axios = require('axios')
+const dotenv = require('dotenv')
+
 const router = express.Router()
+
 const supabase = require('./supabaseClient.js')
+const SERP_API_KEY = process.env.SERP_API_KEY;
+dotenv.config();
+
 
 const app = express()
 const PORT = 3000
@@ -262,21 +269,40 @@ app.put('/brands/:id', async (req, res) => {
 
 // Get all products
 app.get('/products', async (req, res) => {
- try {
-    // TOD0: Call the product search API.
+  const { brand } = req.query;
+
+  if (!brand) {
+    return res.status(400).json({
+      success: false,
+      message: 'Missing brand query parameter',
+    });
+  }
+
+  try {
+    const response = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_shopping',
+        q: brand,
+        api_key: process.env.SERP_API_KEY
+      }
+    });
+
+    const products = response.data.shopping_results || [];
+
     res.json({
       success: true,
       data: products,
       total: products.length
-    })
+    });
   } catch (error) {
+    console.error('Error with Google Shopping API:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve products',
       error: error.message
-    })
+    });
   }
-})
+});
 
 // Get product by ID
 app.get('/products/:id', async (req, res) => {
@@ -297,8 +323,8 @@ app.get('/products/:id', async (req, res) => {
 })
 
 // Get product categories
-app.get('/products/categories', async (req, res) => {
- try {
+app.get('/products', async (req, res) => {
+try {
 // TOD0: Call the product search API.
   res.json({
       success: true,
@@ -316,23 +342,55 @@ app.get('/products/categories', async (req, res) => {
 
 // Get product search with query
 app.get('/products/search', async (req, res) => {
+  const { query = '', category = '', brand = '' } = req.query;
+
   try {
-     // TOD0: Call the product search API.
+
+    const {data, error} = await supabase.from('brands').select('name');
+    const brands = data?.map((row) => row.name);
+ 
+    let serpQuery = '';
+    if (brand) serpQuery += ` ${brand}`;
+    if (category) serpQuery += ` ${category}`;
+    if (query) serpQuery += ` ${query}`;
+    if (!serpQuery.trim()) {
+    serpQuery = 'default search query';
+    }
+
+   
+    const response = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_shopping',
+        q: serpQuery,
+        api_key: process.env.SERP_API_KEY,
+      },
+    });
+
+    const products = response.data.shopping_results || [];
+    
+    // Filter the products to only include brands in the brands table
+    const filteredProducts = products.filter((product) => {
+      const productBrand = product.title.split(' ')[0];
+      return brands.includes(productBrand);
+        });
+
     res.json({
       success: true,
-      data: products,
-      query: query || '',
-      category: category || '',
-      total: products.length
-    })
+      data: filteredProducts,
+      query,
+      category,
+      total: filteredProducts.length,
+    });
   } catch (error) {
+    console.error('Error in product search:', error.message);
+    console.log('Error response:', error.response.data);
     res.status(500).json({
-      success: false,
-      message: 'Failed to search products',
-      error: error.message
-    })
+    success: false,
+    message: 'Failed to search products',
+    error: error.message,
+    });
   }
-})
+});
 
 
 app.listen(PORT, () => {
