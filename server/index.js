@@ -1,13 +1,16 @@
 const express = require('express')
 const axios = require('axios')
 const dotenv = require('dotenv')
-
+const cors = require('cors')
 
 const supabase = require('./supabaseClient.js')
 dotenv.config();
 
 const app = express()
 const PORT = 3000
+
+// Enable CORS for all routes
+app.use(cors())
 
 app.use(express.json())
 
