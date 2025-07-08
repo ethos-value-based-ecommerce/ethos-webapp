@@ -119,6 +119,64 @@ app.get('/categories', async (req, res) => {
   }
 })
 
+// Get color for categories.
+app.get('/categories/color', async (req, res) => {
+  try {
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('name, color')
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve category colors',
+        error: error.message
+      })
+    }
+
+    res.json({
+      success: true,
+      data: categories,
+      total: categories.length
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve category colors',
+      error: error.message
+    })
+  }
+})
+
+// Get color for categories (plural endpoint for compatibility)
+app.get('/categories/colors', async (req, res) => {
+  try {
+    const { data: categories, error } = await supabase
+      .from('categories')
+      .select('name, color')
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to retrieve category colors',
+        error: error.message
+      })
+    }
+
+    res.json({
+      success: true,
+      data: categories,
+      total: categories.length
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to retrieve category colors',
+      error: error.message
+    })
+  }
+})
+
 // Get categories for a specific brand
 app.get('/brands/:id/categories', async (req, res) => {
   try {
