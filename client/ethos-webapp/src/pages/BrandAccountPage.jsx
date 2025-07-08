@@ -11,24 +11,7 @@ const { TabPane } = Tabs;
 // Function to render the brand account page with brand sumbissions and brand upload page.
 const BrandAccountPage = ({ user }) => {
     const navigate = useNavigate();
-    const [submittedBrands] = useState([
-        {
-            id: 1,
-            name: 'EcoThreads',
-            status: 'approved',
-            submittedDate: '2024-01-15',
-            categories: ['Clothing', 'Sustainability'],
-            description: 'Sustainable fashion made from organic materials'
-        },
-        {
-            id: 2,
-            name: 'GreenBeauty',
-            status: 'pending',
-            submittedDate: '2024-01-20',
-            categories: ['Beauty', 'Vegan'],
-            description: 'Cruelty-free beauty products'
-        }
-    ]);
+    const [submittedBrands] = useState([]);
 
     const handleLogout = () => {
         message.success('Logged out successfully!');
@@ -224,7 +207,7 @@ const BrandAccountPage = ({ user }) => {
                                     <Col>
                                         <Title level={4} style={{ margin: 0 }}>
                                             Brand Submissions
-                                        </Title>
+                                      </Title>
                                         <Text type="secondary">
                                             Track the status of your submitted brands
                                         </Text>
