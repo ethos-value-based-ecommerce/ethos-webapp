@@ -10,6 +10,8 @@ import BrandPage from './pages/BrandPage.jsx';
 import SearchProductsPage from './pages/SearchProductsPage.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
+import BrandAccountPage from './pages/BrandAccountPage.jsx';
+import BrandUploadPage from './pages/BrandUploadPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import {brandCategories, categoryData, allBrands, brandProducts} from './assets/placeholderData.js';
 
@@ -31,10 +33,24 @@ function App() {
         <Route path="/search-products" element={<SearchProductsPage products={brandProducts} brands={allBrands}/>}/>
         <Route path="/categories" element={<CategoriesPage categoryData={categoryData} />}/>
         <Route
+            path="/upload-brand"
+            element={
+            <ProtectedRoute user={user}>
+              <BrandUploadPage categories={brandCategories} />
+            </ProtectedRoute>
+              }/>
+        <Route
             path="/account"
             element={
             <ProtectedRoute user={user}>
               <AccountPage user={user} brands={allBrands} products={brandProducts}/>
+            </ProtectedRoute>
+              }/>
+        <Route
+            path="/brand-account"
+            element={
+            <ProtectedRoute user={user}>
+              <BrandAccountPage brand={user} />
             </ProtectedRoute>
               }/>
 
