@@ -1,12 +1,24 @@
-import React from 'react';
-import { Card, Typography } from 'antd';
+import React, { useState } from 'react';
+import { Card, Typography, Button, Spin } from 'antd';
 
 const { Paragraph, Link } = Typography;
 const { Meta } = Card;
 
 
 // Function to render the product card with product title, image, price, description, website
-const ProductCard = ({ productTitle, productPrice, productWebsite, productImage, onClick }) => {
+const ProductCard = ({ productTitle, productPrice, productWebsite, productImage, onClick, showLink = false }) => {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setImageLoading(false);
+    setImageError(true);
+  };
+
   return (
     <Card
       hoverable
@@ -26,15 +38,22 @@ const ProductCard = ({ productTitle, productPrice, productWebsite, productImage,
           justifyContent: 'center',
           backgroundColor: '#fafafa',
           borderBottom: '1px solid #f0f0f0',
+          position: 'relative',
         }}>
+          {imageLoading && productImage && (
+            <Spin size="large" style={{ position: 'absolute', zIndex: 1 }} />
+          )}
           <img
             alt={productTitle}
-            src={productImage || '/fallback.jpg'}
-            onError={(e) => { e.target.onerror = null; e.target.src = '/fallback.jpg'; }}
+            src={imageError || !productImage ? '/fallback.jpg' : productImage}
+            onLoad={handleImageLoad}
+            onError={handleImageError}
             style={{
               maxHeight: '100%',
               maxWidth: '100%',
               objectFit: 'contain',
+              opacity: imageLoading && productImage ? 0.3 : 1,
+              transition: 'opacity 0.3s ease',
             }}
           />
         </div>
@@ -48,7 +67,25 @@ const ProductCard = ({ productTitle, productPrice, productWebsite, productImage,
               style={{ marginBottom: 0 }}>
               {productPrice}
             </Paragraph>
-            {productWebsite && (
+            {productWebsite && showLink && (
+              <div style={{ textAlign: 'center', marginTop: '8px' }}>
+                <Button
+                  href={productWebsite}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shop-now-button"
+                  style={{
+                    backgroundColor: '#000000',
+                    borderColor: '#000000',
+                    color: '#ffffff'
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span style={{ color: '#ffffff' }}>Shop Now!</span>
+                </Button>
+              </div>
+            )}
+            {productWebsite && !showLink && (
               <Link
                 href={productWebsite}
                 target="_blank"
