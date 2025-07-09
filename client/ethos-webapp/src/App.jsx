@@ -29,9 +29,9 @@ function App() {
         <Route index element={<HomePage />}/>
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/search-brands" element={<SearchBrandsPage />}/>
-        <Route path="/brands/:id" element={<BrandPage brands={allBrands} products={brandProducts}/>} />
-        <Route path="/search-products" element={<SearchProductsPage products={brandProducts} brands={allBrands}/>}/>
-        <Route path="/categories" element={<CategoriesPage categoryData={categoryData} />}/>
+        <Route path="/brands/:id" element={<BrandPage />} />
+        <Route path="/search-products" element={<SearchProductsPage />}/>
+        <Route path="/categories" element={<CategoriesPage />}/>
         <Route
             path="/upload-brand"
             element={
