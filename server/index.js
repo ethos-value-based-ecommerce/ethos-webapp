@@ -6,6 +6,7 @@ const cors = require('cors')
 const supabase = require('./supabaseClient.js')
 dotenv.config();
 
+// install express
 const app = express()
 const PORT = 3000
 
