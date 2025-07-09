@@ -432,28 +432,54 @@ app.get('/products', async (req, res) => {
     });
   }
 
+  const normalize = (str) =>
+    str?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
   try {
     const response = await axios.get('https://serpapi.com/search.json', {
       params: {
         engine: 'google_shopping',
         q: brand,
-        api_key: process.env.SERP_API_KEY
-      }
+        api_key: process.env.SERP_API_KEY,
+      },
     });
 
-    const products = response.data.shopping_results || [];
+    const normalizedBrand = normalize(brand);
+
+    let products = (response.data.shopping_results || []).filter((p) => {
+      const normalizedTitle = normalize(p.title);
+      return normalizedTitle.includes(normalizedBrand);
+    });
+
+    // Deduplicate
+    const seen = new Set();
+    const filteredProducts = [];
+
+    for (const p of products) {
+      const key = p.title?.trim().toLowerCase();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        filteredProducts.push({
+          id: p.product_id || p.position || key,
+          title: p.title,
+          price: p.extracted_price ? `$${p.extracted_price.toFixed(2)}` : 'N/A',
+          website: p.product_link,
+          image: p.thumbnail
+        });
+      }
+    }
 
     res.json({
       success: true,
-      data: products,
-      total: products.length
+      data: filteredProducts,
+      total: filteredProducts.length,
     });
   } catch (error) {
-    console.error('Error with Google Shopping API:', error.message);
+    console.error('Error fetching products:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve products',
-      error: error.message
+      message: 'Failed to fetch products',
+      error: error.message,
     });
   }
 });
