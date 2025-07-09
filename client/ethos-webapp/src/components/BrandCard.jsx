@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 
 import { Card, Typography, Button, Tag } from 'antd';
 
 // Importing category color for tag colors
-import { getCategoryColor } from './categoryColors.jsx';
+import { getCachedCategoryColor, preloadCategoryColors } from './categoryColors.jsx';
 
 const { Paragraph } = Typography;
 const { Meta } = Card;
@@ -13,6 +13,11 @@ const { Meta } = Card;
 // Function to render the Brand Card with brand name, image, mission, description, website, and tags
 // More responsiveness in the brand card functionality
 const BrandCard = ({ brand, onTagClick }) => {
+  // Load the category colors.
+  useEffect(() => {
+    preloadCategoryColors();
+  }, []);
+
   if (!brand) {
     return null;
   }
@@ -66,24 +71,38 @@ const BrandCard = ({ brand, onTagClick }) => {
 
             {brand.categories && brand.categories.length > 0 && (
               <div style={{ marginTop: '8px' }}>
-                {brand.categories.map((tag, index) => (
-                  <Tag
-                    key={index}
-                    color={getCategoryColor(tag)}
-                    style={{ cursor: 'pointer', marginBottom: '4px'}}
-                    onClick={() => onTagClick && onTagClick(tag)}
-                  >
-                    {tag}
-                  </Tag>
-                ))}
+                {brand.categories.map((tag, index) => {
+                  const baseColor = getCachedCategoryColor(tag);
+                  return (
+                    <Tag
+                      key={index}
+                      onClick={() => onTagClick && onTagClick(tag)}
+                      style={{
+                        cursor: 'pointer',
+                        marginBottom: '4px',
+                        backgroundColor: `${baseColor}20`, // light pastel fill (12.5% opacity)
+                        border: `1.5px solid ${baseColor}80`, // subtle border (~50% opacity)
+                        color: baseColor,
+                        fontWeight: '600',
+                        borderRadius: '20px',
+                        userSelect: 'none',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        padding: '0 12px',
+                      }}
+                    >
+                      {tag}
+                    </Tag>
+                  );
+                })}
               </div>
             )}
 
             {brand.website && (
               <Button
                 type="default"
-                  onClick={() => window.open(brand.website, '_blank')}
-                  style={{ marginTop: '8px' }}
+                onClick={() => window.open(brand.website, '_blank')}
+                style={{ marginTop: '8px' }}
               >
                 Visit Website Now!
               </Button>
@@ -93,6 +112,6 @@ const BrandCard = ({ brand, onTagClick }) => {
       />
     </Card>
   );
-}
+};
 
 export default BrandCard;
