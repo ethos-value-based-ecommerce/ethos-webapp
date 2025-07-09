@@ -1,25 +1,54 @@
-import { useState } from 'react';
-import { Layout, Typography, Row, Col, Card, Tag, Input } from 'antd';
+import { useState, useEffect } from 'react';
+import { Layout, Typography, Row, Col, Card, Tag, Input, Spin, Alert } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
 import NavBar from '../components/NavBar.jsx';
 import Footer from '../components/Footer.jsx';
+import { categoriesApi } from '../services/api.jsx';
 import '../App.css';
 
 const { Title, Paragraph } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
 
-const CategoriesPage = ({ categoryData }) => {
+const CategoriesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredCategories, setFilteredCategories] = useState(categoryData);
+  const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await categoriesApi.getAll();
+        setCategories(data);
+        setFilteredCategories(data);
+      } catch (err) {
+        setError('Failed to load categories. Please try again later.');
+        console.error('Error fetching categories:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Handle search functionality
   const handleSearch = (value) => {
     setSearchTerm(value);
+    if (!categories || !Array.isArray(categories)) {
+      setFilteredCategories([]);
+      return;
+    }
+
     if (!value.trim()) {
-      setFilteredCategories(categoryData);
+      setFilteredCategories(categories);
     } else {
-      const filtered = categoryData.filter(category =>
+      const filtered = categories.filter(category =>
         category.name.toLowerCase().includes(value.toLowerCase()) ||
         category.description.toLowerCase().includes(value.toLowerCase())
       );
@@ -61,12 +90,38 @@ const CategoriesPage = ({ categoryData }) => {
                 onChange={(e) => handleSearch(e.target.value)}
                 size="large"
                 style={{ borderRadius: '8px' }}
+                disabled={loading}
               />
             </Col>
           </Row>
         </section>
 
+        {/* Loading State */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <Spin size="large" />
+            <Paragraph style={{ marginTop: '1rem', color: '#666' }}>
+              Loading categories...
+            </Paragraph>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div style={{ marginBottom: '2rem' }}>
+            <Alert
+              message="Error"
+              description={error}
+              type="error"
+              showIcon
+              closable
+              onClose={() => setError(null)}
+            />
+          </div>
+        )}
+
         {/* Categories Grid */}
+        {!loading && !error && (
         <section>
           <Row gutter={[24, 24]} justify="center">
             {filteredCategories.map((category, index) => (
@@ -82,9 +137,6 @@ const CategoriesPage = ({ categoryData }) => {
                   styles={{ body: { padding: '24px', height: '100%', display: 'flex', flexDirection: 'column' } }}
                 >
                   <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>
-                      {category.icon}
-                    </div>
                     <Title level={4} style={{ margin: 0, color: '#1890ff' }}>
                       {category.name}
                     </Title>
@@ -129,13 +181,15 @@ const CategoriesPage = ({ categoryData }) => {
             </div>
           )}
         </section>
+        )}
 
         {/* Stats Section */}
+        {!loading && !error && (
         <section style={{ marginTop: '4rem', textAlign: 'center', background: '#f8f9fa', padding: '2rem', borderRadius: '12px' }}>
           <Row gutter={[32, 16]} justify="center">
             <Col xs={24} sm={8}>
               <Title level={2} style={{ color: '#1890ff', margin: 0 }}>
-                {categoryData.length}
+                {categories.length}
               </Title>
               <Paragraph style={{ margin: 0, color: '#666' }}>
                 Categories Available
@@ -159,6 +213,7 @@ const CategoriesPage = ({ categoryData }) => {
             </Col>
           </Row>
         </section>
+        )}
       </Content>
 
       <AntFooter style={{ padding: 0 }}>
