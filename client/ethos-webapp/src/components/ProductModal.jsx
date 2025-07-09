@@ -5,11 +5,12 @@ import { Modal } from 'antd';
 const ProductModal = ({ isOpen, onClose, children, title }) => {
   return (
     <Modal
-      visible={isOpen}
+      open={isOpen}
       onCancel={onClose}
       footer={null}
-      title={title}
+      title={title || 'Product Details'}
       centered
+      destroyOnHidden
     >
       {children}
     </Modal>
