@@ -465,7 +465,7 @@ app.get('/products', async (req, res) => {
           title: p.title,
           price: p.extracted_price ? `$${p.extracted_price.toFixed(2)}` : 'N/A',
           website: p.product_link,
-          image: p.thumbnail
+          image: p.thumbnail || (p.thumbnails && p.thumbnails.length > 0 ? p.thumbnails[0] : null) || (p.serpapi_thumbnails && p.serpapi_thumbnails.length > 0 ? p.serpapi_thumbnails[0] : null)
         });
       }
     }
@@ -485,7 +485,7 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Get all products (to a point)
+// Get all products (to a point) -- NEED TO WORK ON THIS
 app.get('/products/all', async (req, res) => {
   try {
 
@@ -603,7 +603,7 @@ app.get('/product/categories', async (req, res) => {
   }
 })
 
-// Search products with query parameters - limited to brands in database
+// Search products with query parameters - limited to brands in database -- NEED TO WORK ON THIS
 app.get('/products/search', async (req, res) => {
   try {
     const { query, category, brand, limit = 20 } = req.query;

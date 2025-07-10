@@ -1,80 +1,133 @@
-import { useState, useEffect } from 'react';
-import { Layout, Typography, Input, Button, Row, Col, Modal, Tag } from 'antd';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Layout, Typography, Input, Button, Row, Col, Modal, Tag, Spin, Alert, Empty } from 'antd';
 
 import NavBar from '../components/NavBar.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import Footer from '../components/Footer.jsx';
+import { productsApi, categoriesApi } from '../services/api.jsx';
 
 // Importing category color for tag colors
-import { getCategoryColor } from '../components/categoryColors.jsx';
+import { preloadCategoryColors, getCachedCategoryColor } from '../components/categoryColors.jsx';
 import '../App.css';
 
 const { Title } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
 
-// Number of items to show per page (for right now, I'll just use 8)
 const ItemsPerPage = 8;
 
-const SearchProductsPage = ({ products, brands }) => {
+const getTagStyle = (isSelected, tagColor) => ({
+  backgroundColor: isSelected ? tagColor : `${tagColor}20`,
+  border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
+  color: isSelected ? '#000' : '#333',
+  fontWeight: isSelected ? 'bold' : 'normal',
+  marginBottom: '0.5rem',
+  cursor: 'pointer',
+  transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+  transition: 'all 0.2s ease',
+  padding: '0.3rem 0.75rem',
+  borderRadius: '24px'
+});
+
+const SearchProductsPage = () => {
   const [productSearch, setProductSearch] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState(products || []);
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brandCategories, setBrandCategories] = useState([]);
+  const [colorCacheReady, setColorCacheReady] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [availableCategories, setAvailableCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
 
-  // Initialize filtered products and categories when props change
-  useEffect(() => {
-    if (products && brands) {
-      setFilteredProducts(products);
+  // Map from brand name (lowercase) to array of categories for faster lookup
+  const brandToCategories = useMemo(() => {
+    const map = new Map();
+    brandCategories.forEach(({ brand_name, category_name }) => {
+      const key = brand_name.toLowerCase();
+      if (!map.has(key)) {
+        map.set(key, []);
+      }
+      map.get(key).push(category_name);
+    });
+    return map;
+  }, [brandCategories]);
 
-      // Extract unique categories from brands that have products
-      const productBrandIds = [...new Set(products.map(p => p.brandId))];
-      const relevantBrands = brands.filter(b => productBrandIds.includes(b.id));
-      const categories = [...new Set(relevantBrands.flatMap(b => b.categories || []))];
-      setAvailableCategories(categories);
-    }
-  }, [products, brands]);
+  // Initialize data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch all required data
+        const [productData, brandCategoriesData, categoriesData] = await Promise.all([
+          productsApi.getAll(50),
+          productsApi.getCategories(),
+          categoriesApi.getAll(),
+          preloadCategoryColors(),
+        ]);
+
+        setAllProducts(productData);
+        setFilteredProducts(productData);
+        setBrandCategories(brandCategoriesData);
+        setCategories(categoriesData);
+
+        setColorCacheReady(true);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        setError('Failed to load data. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Function to get brand categories for a product
   const getProductCategories = (product) => {
-    if (!brands) return [];
-    const brand = brands.find(b => b.id === product.brandId);
-    return brand ? brand.categories || [] : [];
+    if (!product?.brand) return [];
+    return brandToCategories.get(product.brand.toLowerCase()) || [];
   };
 
   // Function to handle search
-  const handleSearch = () => {
-    if (!products || !brands) return;
+  const handleSearch = useCallback(async () => {
+    const trimmedSearch = productSearch.trim();
+    if (!trimmedSearch) {
+      setFilteredProducts(allProducts);
+      setCurrentPage(1);
+      return;
+    }
 
-    const lowerSearch = productSearch.toLowerCase().trim();
-    const results = products.filter(product => {
-      const matchesName = product.title.toLowerCase().includes(lowerSearch);
-      const matchesDescription = product.description.toLowerCase().includes(lowerSearch);
-      const productCategories = getProductCategories(product);
-      const matchesCategory = productCategories.some(cat =>
-        cat.toLowerCase().includes(lowerSearch)
-      );
+    try {
+      setSearchLoading(true);
+      const searchResults = await productsApi.search(trimmedSearch);
+      setFilteredProducts(searchResults);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error('Search error:', err);
+      const results = localSearch(trimmedSearch);
+      setFilteredProducts(results);
+      setCurrentPage(1);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [productSearch, allProducts]);
 
-      return matchesName || matchesDescription || matchesCategory;
-    });
-    setFilteredProducts(results);
-    setCurrentPage(1);
-  };
 
-  // Function to handle clearing search
   const handleClear = () => {
     setProductSearch('');
-    setFilteredProducts(products || []);
+    setFilteredProducts(allProducts);
     setSelectedCategories([]);
     setCurrentPage(1);
   };
 
-  // Function to handle category filtering
+    // Function to handle category filtering
   const handleCategoryClick = (category) => {
-    if (!products || !brands) return;
-
     let newSelectedCategories;
 
     if (selectedCategories.includes(category)) {
@@ -89,9 +142,9 @@ const SearchProductsPage = ({ products, brands }) => {
 
     // Filter products based on selected categories
     if (newSelectedCategories.length === 0) {
-      setFilteredProducts(products);
+      setFilteredProducts(allProducts);
     } else {
-      const results = products.filter(product => {
+      const results = allProducts.filter(product => {
         const productCategories = getProductCategories(product);
         return newSelectedCategories.every(selectedCat =>
           productCategories.some(cat =>
@@ -134,8 +187,8 @@ const SearchProductsPage = ({ products, brands }) => {
       </Header>
 
       <Content style={{ padding: '2rem' }}>
-        {/* Search Header */}
-        <section style={{ marginBottom: '2rem', textAlign: 'center' }}>
+          {/* Search Header */}
+             <section style={{ marginBottom: '2rem', textAlign: 'center' }}>
           <Title level={2}>Search Products</Title>
           <Row gutter={16} justify="center" style={{ marginTop: '1rem' }}>
             <Col xs={24} sm={16} md={12}>
@@ -158,80 +211,153 @@ const SearchProductsPage = ({ products, brands }) => {
 
         {/* Categories Section */}
         <section style={{ marginBottom: '2rem' }}>
-          <Title level={3}>Filter by Category</Title>
+          <Title level={3}>Filter by Categories</Title>
           <div style={{ marginTop: '1rem' }}>
-            {availableCategories.map((category, index) => (
-              <Tag
-                key={index}
-                color={getCategoryColor(category)}
-                style={{
-                  marginBottom: '0.5rem',
-                  cursor: 'pointer',
-                  fontWeight: selectedCategories.includes(category) ? 'bold' : 'normal',
-                  border: selectedCategories.includes(category) ? '2px solid' : '1px solid transparent',
-                  transform: selectedCategories.includes(category) ? 'scale(1.05)' : 'scale(1)',
-                  transition: 'all 0.2s ease'
-                }}
-                onClick={() => handleCategoryClick(category)}
-              >
-                {category}
-              </Tag>
-            ))}
+            {categories.length > 0 && colorCacheReady ? (
+              categories.map((category, index) => {
+                const catName = typeof category === 'string' ? category : category.name;
+                const isSelected = selectedCategories.includes(catName);
+                const tagColor = (catName && typeof catName === 'string')
+                  ? getCachedCategoryColor(catName) || '#d9d9d9'
+                  : '#d9d9d9';
+
+                return (
+                  <Tag
+                    key={category.id || index}
+                    onClick={() => handleCategoryClick(catName)}
+                    style={getTagStyle(isSelected, tagColor)}
+                  >
+                    {catName}
+                  </Tag>
+                );
+              })
+            ) : (
+              <Spin size="small" />
+            )}
           </div>
-        </section>
 
-        {/* Results Section */}
-        <section>
-          <Title level={3}>Search Results</Title>
-          {paginatedProducts.length > 0 ? (
-            <>
-              <Row gutter={[16, 16]} justify="space-around">
-                {paginatedProducts.map(product => (
-                  <Col xs={24} sm={12} md={8} lg={6} key={product.id}>
-                    <ProductCard
-                      onClick={() => handleProductClick(product)}
-                      productTitle={product.title}
-                      productImage={product.image}
-                      productPrice={product.price}
-                    />
-                  </Col>
-                ))}
-              </Row>
-
-              {/* Pagination */}
-              {filteredProducts.length > ItemsPerPage && (
-                <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                  <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
-                    <Button
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                    >
-                      Previous
-                    </Button>
-                    <span style={{ padding: '0 16px', color: '#666' }}>
-                      Page {currentPage} of {Math.ceil(filteredProducts.length / ItemsPerPage)}
-                    </span>
-                    <Button
-                      disabled={currentPage >= Math.ceil(filteredProducts.length / ItemsPerPage)}
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                    >
-                      Next
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <p>No products matching your search.</p>
+          {selectedCategories.length > 0 && (
+            <div style={{ marginTop: '1rem' }}>
+              <Typography.Text strong>Selected filters: </Typography.Text>
+              {selectedCategories.map((category, index) => {
+                const tagColor = (category && typeof category === 'string')
+                  ? getCachedCategoryColor(category) || '#d9d9d9'
+                  : '#d9d9d9';
+                return (
+                  <Tag
+                    key={index}
+                    closable
+                    onClose={() => handleCategoryClick(category)}
+                    style={{
+                      backgroundColor: tagColor,
+                      border: `2px solid ${tagColor}`,
+                      color: '#000',
+                      fontWeight: 'bold',
+                      marginBottom: '0.5rem',
+                      borderRadius: '24px',
+                      padding: '0.3rem 0.75rem',
+                    }}
+                  >
+                    {category}
+                  </Tag>
+                );
+              })}
+            </div>
           )}
         </section>
+
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <Spin size="large" />
+            <p style={{ marginTop: '1rem' }}>Loading products...</p>
+          </div>
+        )}
+
+        {error && (
+          <Alert
+            message="Error"
+            description={error}
+            type="error"
+            showIcon
+            style={{ marginBottom: '2rem' }}
+          />
+        )}
+
+        {!loading && !error && (
+          <section>
+            <Row justify="space-between" align="middle" style={{ marginBottom: '1rem' }}>
+              <Col>
+                <Title level={3}>
+                  Search Results
+                  {filteredProducts.length > 0 && (
+                    <Typography.Text type="secondary" style={{ fontSize: '16px', fontWeight: 'normal' }}>
+                      ({filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found)
+                    </Typography.Text>
+                  )}
+                </Title>
+              </Col>
+              {searchLoading && (
+                <Col>
+                  <Spin size="small" />
+                </Col>
+              )}
+            </Row>
+
+            {filteredProducts.length > 0 ? (
+              <>
+                <Row gutter={[16, 16]} justify="space-around">
+                  {paginatedProducts.map((product, index) => (
+                    <Col xs={24} sm={12} md={8} lg={6} key={product.id || `product-${index}`}>
+                      <ProductCard
+                        onClick={() => handleProductClick(product)}
+                        productTitle={product.title}
+                        productImage={product.image}
+                        productPrice={product.price}
+                        productWebsite={product.website}
+                        showLink={true}
+                      />
+                    </Col>
+                  ))}
+                </Row>
+
+                {/* Pagination */}
+                {filteredProducts.length > ItemsPerPage && (
+                  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+                    <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
+                      <Button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                      >
+                        Previous
+                      </Button>
+                      <span style={{ padding: '0 16px', color: '#666' }}>
+                        Page {currentPage} of {Math.ceil(filteredProducts.length / ItemsPerPage)}
+                      </span>
+                      <Button
+                        disabled={currentPage >= Math.ceil(filteredProducts.length / ItemsPerPage)}
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <Empty
+                description="No products matching your search."
+                style={{ margin: '2rem 0' }}
+              />
+            )}
+          </section>
+        )}
       </Content>
 
       <AntFooter style={{ padding: 0 }}>
         <Footer />
       </AntFooter>
 
-      {/* Product Detail Modal */}
+        {/* Product Detail Modal */}
       <Modal
         title="Product Details"
         open={isModalVisible}
@@ -244,7 +370,6 @@ const SearchProductsPage = ({ products, brands }) => {
             productImage={selectedProduct.image}
             productTitle={selectedProduct.title}
             productPrice={selectedProduct.price}
-            productDescription={selectedProduct.description}
             productWebsite={selectedProduct.website}
             alt={selectedProduct.alt}
             showLink={true}
