@@ -46,16 +46,24 @@ export const brandsApi = {
  },
 
 // Search brands
- search: async (query, category) => {
-   const params = new URLSearchParams();
-   if (query) params.append('query', query);
-   if (category) params.append('category', category);
+ search: async (query, category, brand, limit = 10) => {
+  // Avoid sending empty searches to backend
+  const hasValidInput = query || category || brand;
+  if (!hasValidInput) {
+    console.warn('Search aborted: No query, category, or brand specified.');
+    return [];
+  }
 
+  const params = new URLSearchParams();
+  if (query) params.append('query', query);
+  if (category) params.append('category', category);
+  if (brand) params.append('brand', brand);
+  if (limit) params.append('limit', limit.toString());
 
-   const endpoint = `/brands/search${params.toString() ? `?${params.toString()}` : ''}`;
-   const response = await apiRequest(endpoint);
-   return response.data || [];
- },
+  const endpoint = `/products/search${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await apiRequest(endpoint);
+  return response.data || [];
+},
 
 
  // Create new brand

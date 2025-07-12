@@ -38,7 +38,7 @@ export const preloadCategoryColors = async () => {
 
 // Get a category's color (sync fallback returns null if not yet fetched)
 export const getCachedCategoryColor = (name) => {
-  if (!name || !categoryColorCache) return null;
+  if (!name || !categoryColorCache || typeof name !== 'string') return null;
   return categoryColorCache[name.toLowerCase()] || null;
 };
 
