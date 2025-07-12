@@ -485,93 +485,81 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Get all products (to a point) -- NEED TO WORK ON THIS
+// Get all products from a few brands.
 app.get('/products/all', async (req, res) => {
   try {
 
     // Limits the number of brands to process
-    const limit = parseInt(req.query.limit) || 5
+  const limit = Math.min(parseInt(req.query.limit) || 10, 10); // 10 Brands
 
     // First, get brands from the brands table with limit
-    const { data: brands, error: brandsError } = await supabase
+    const { data: brands, error } = await supabase
       .from('brands')
-      .select('name')
-      .limit(limit)
+      .select('name, brand_name')
+      .limit(limit);
 
-    if (brandsError) {
+    if (error || !brands || brands.length === 0) {
       return res.status(500).json({
         success: false,
-        message: 'Failed to retrieve brands',
-        error: brandsError.message
-      })
-    }
-
-    if (!brands || brands.length === 0) {
-      return res.json({
-        success: true,
-        data: [],
-        message: 'No brands found in database',
-        total: 0
-      })
+        message: 'Failed to load brands',
+        error: error?.message,
+      });
     }
 
     // Extract brand names for searching
-    const brandNames = brands.map(brand => brand.name)
+    const brandNames = brands.map(b => b.brand_name || b.name);
 
-    // Search for products for each brand with concurrent requests and timeout
-    const allProducts = []
-    const searchPromises = brandNames.map(async (brandName) => {
-      try {
-        const response = await axios.get('https://serpapi.com/search.json', {
-          params: {
-            engine: 'google_shopping',
-            q: brandName,
-            api_key: process.env.SERP_API_KEY
-          },
-        })
+    // Query SerpAPI once per brand, get up to 2 products each
+    const allProducts = await Promise.all(
+      brandNames.map(async (brand) => {
+        try {
+          const response = await axios.get('https://serpapi.com/search.json', {
+            params: {
+              engine: 'google_shopping',
+              q: brand,
+              api_key: process.env.SERP_API_KEY,
+              num: 2,
+            },
+          });
 
-        const products = response.data.shopping_results || []
+          const products = response.data.shopping_results || [];
+          // Add brand information to each product and limit to 2 products per brand
+          return products.slice(0, 2).map(p => ({
+            ...p,
+            brand,
+            image: p.thumbnail ||
+                  (p.thumbnails && p.thumbnails.length > 0 ? p.thumbnails[0] : null) ||
+                  (p.serpapi_thumbnails && p.serpapi_thumbnails.length > 0 ? p.serpapi_thumbnails[0] : null),
+                }));
+          }
+        catch (err) {
+          console.error(`Error fetching products for brand ${brand}:`, err.message);
+          return [];
+        }
+      })
+    );
 
-        // Add brand information to each product and limit to 10 products per brand
-        const productsWithBrand = products.slice(0, 5).map(product => ({
-          ...product,
-          brand: brandName
-        }))
-
-        return productsWithBrand
-      } catch (apiError) {
-        console.error(`Error fetching products for brand ${brandName}:`, apiError.message)
-        return [] // Return empty array if brand fails
-      }
-    })
-
-    // Wait for all requests to complete
-    const results = await Promise.allSettled(searchPromises)
-
-    // Collect all successful results
-    results.forEach(result => {
-      if (result.status === 'fulfilled' && result.value.length > 0) {
-        allProducts.push(...result.value)
-      }
-    })
+    // Flatten results (array of arrays to single array)
+    const flattenedProducts = allProducts.flat();
 
     res.json({
       success: true,
-      data: allProducts,
+      data: flattenedProducts,
       brands_searched: brandNames,
-      brands_processed: limit,
-      total: allProducts.length,
-      message: `Processed ${limit} brands.`
-    })
+      brands_processed: brandNames.length,
+      total: flattenedProducts.length,
+      message: `Processed ${brandNames.length} brands.`,
+    });
+
   } catch (error) {
-    console.error('Error retrieving all products:', error.message)
+    console.error('Error retrieving all products:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve all products',
-      error: error.message
-    })
+      error: error.message,
+    });
   }
-})
+});
 
 // Get product categories
 app.get('/product/categories', async (req, res) => {
@@ -603,230 +591,95 @@ app.get('/product/categories', async (req, res) => {
   }
 })
 
-// Search products with query parameters - limited to brands in database -- NEED TO WORK ON THIS
+// Search products with query parameters - optimized into 1 API call and now working
 app.get('/products/search', async (req, res) => {
   try {
-    const { query, category, brand, limit = 20 } = req.query;
+    const { query, limit = 20 } = req.query;
 
-    // Get brands from database to limit search scope
-    let brandsToSearch = [];
-
-    if (brand) {
-      // Validate brand parameter and get exact name from database
-      const { data: brandData, error: brandError } = await supabase
-        .from('brands')
-        .select('name')
-        .ilike('name', brand)
-        .single();
-
-      if (brandError || !brandData) {
-        return res.status(400).json({
-          success: false,
-          message: `Brand "${brand}" not found in database. Please use a brand that exists in our system.`,
-        });
-      }
-
-      // Use the exact brand name from database
-      brandsToSearch = [brandData.name];
-    } else {
-      const { data: allBrands, error: brandsError } = await supabase
-        .from('brands')
-        .select('name');
-
-      if (brandsError) {
-        return res.status(500).json({
-          success: false,
-          message: 'Failed to retrieve brands from database',
-          error: brandsError.message,
-        });
-      }
-
-      if (!allBrands || allBrands.length === 0) {
-        return res.json({
-          success: true,
-          data: [],
-          message: 'No brands found in database',
-          total: 0,
-        });
-      }
-
-      brandsToSearch = allBrands.map((b) => b.name);
+    if (!query || query.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Query parameter is required',
+      });
     }
 
-    // Validate limit parameter
+    // Use the exact brand name from database
+    const { data: allBrands, error: brandsError } = await supabase
+      .from('brands')
+      .select('name, brand_name');
+
+    if (brandsError || !allBrands || allBrands.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        message: 'No brands found in database.',
+        total: 0,
+      });
+    }
+
     const productLimit = Math.min(parseInt(limit) || 20, 50);
 
-    // Search for products from each brand
-    const allProducts = [];
-    const searchPromises = brandsToSearch.map(async (brandName) => {
-
-      try {
-        // Build search query for this brand
-        let searchQuery = brandName;
-        if (query) {
-          searchQuery += ` ${query}`;
-        }
-        if (category) {
-          searchQuery += ` ${category}`;
-        }
-
-        const response = await axios.get('https://serpapi.com/search.json', {
-          params: {
-            engine: 'google_shopping',
-            q: searchQuery.trim(),
-            api_key: process.env.SERP_API_KEY,
-            num: productLimit,
-          },
-        });
-
-        const products = response.data.shopping_results || [];
-
-        // Filter products to only include those with the brand name in the title
-        // and if query is provided, also check that query terms are in the title
-        const brandFilteredProducts = products.filter((product) => {
-          const title = product.title?.toLowerCase() || '';
-          const brandNameLower = brandName.toLowerCase();
-
-          // Must contain brand name as a complete word
-          const brandRegex = new RegExp(`\\b${brandNameLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-          if (!brandRegex.test(title)) {
-            return false;
-          }
-
-          // If query is provided, must also contain query terms as complete words
-          if (query) {
-            const queryLower = query.toLowerCase();
-            const queryWords = queryLower.split(' ').filter(word => word.length > 0);
-
-            // Check if all query words are present in the title as complete words
-            const hasAllQueryWords = queryWords.every(word => {
-              const wordRegex = new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-              return wordRegex.test(title);
-            });
-            if (!hasAllQueryWords) {
-              return false;
-            }
-          }
-
-          return true;
-        });
-
-        // Add brand information to each product
-        return brandFilteredProducts.map((product) => ({
-          ...product,
-          brand: brandName,
-        }));
-      } catch (apiError) {
-        console.error(`Error fetching products for brand ${brandName}:`, apiError.message);
-        return [];
-      }
+    // Search for products from each brand by calling the API
+    const response = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_shopping',
+        q: query.trim(),
+        api_key: process.env.SERP_API_KEY,
+        num: 50,
+      },
     });
 
-    // Wait for all brand searches to complete
-    const results = await Promise.allSettled(searchPromises);
+    const products = response.data.shopping_results || [];
 
-    // Collect all successful results
-    results.forEach((result) => {
-      if (result.status === 'fulfilled' && result.value.length > 0) {
-        allProducts.push(...result.value);
-      }
-    });
+    // Normalize function (remove accents, lowercase)
+    const normalize = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-    // Filter products by category if specified (additional client-side filtering)
-    let filteredProducts = allProducts;
-    if (category) {
-      filteredProducts = allProducts.filter((product) =>
-        product.title?.toLowerCase().includes(category.toLowerCase()) ||
-        product.source?.toLowerCase().includes(category.toLowerCase())
-      );
-    }
+    // Create regex pattern using normalized brand_name
+    const escapedBrands = allBrands
+      .filter(b => b.brand_name)
+      .map(b => normalize(b.brand_name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
 
-    // Remove duplicates with enhanced logic for similar titles
-    const uniqueProducts = [];
-    const seenProducts = new Set();
+    const brandPattern = new RegExp(`(${escapedBrands.join('|')})`, 'i');
 
-    // Helper function to normalize titles for comparison
-    const normalizeTitle = (title) => {
-      if (!title) return '';
-      return title
-        .toLowerCase()
-        .replace(/[+&\-_|]/g, ' ') // Replace common separators with spaces
-        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
-        .trim();
-    };
+    // Match products
+    const matchedProducts = products
+      .map(product => {
+        const normalizedTitle = normalize(product.title || '');
+        const normalizedSource = normalize(product.source || '');
 
-    filteredProducts.forEach((product) => {
-      // Create a unique identifier for the product
-      let uniqueId = '';
-      let shouldAdd = true;
+        const match = brandPattern.exec(normalizedTitle) || brandPattern.exec(normalizedSource);
 
-      // First try product_id
-      if (product.product_id) {
-        uniqueId = product.product_id;
-      }
-      // Then try product_link
-      else if (product.product_link) {
-        uniqueId = product.product_link;
-      }
-      // For title-based deduplication, use normalized title + brand
-      else if (product.title && product.brand) {
-        const normalizedTitle = normalizeTitle(product.title);
-        const brandName = product.brand.toLowerCase();
-        uniqueId = `${brandName}_${normalizedTitle}`;
-      }
-      // Fallback to original title + price
-      else if (product.title) {
-        uniqueId = `${product.title.toLowerCase()}_${product.extracted_price || product.price || ''}`;
-      }
-      // Last resort
-      else {
-        uniqueId = `${product.position}_${product.title || 'unknown'}`;
-      }
+        if (match) {
+          // Find the original brand record using the normalized match
+          const matchedBrand = allBrands.find(({ brand_name }) =>
+            normalize(brand_name) === match[1].toLowerCase()
+          );
 
-      // Additional check for similar titles even with different product_ids
-      if (product.title && product.brand) {
-        const normalizedCurrentTitle = normalizeTitle(product.title);
-        const currentBrand = product.brand.toLowerCase();
-
-        // Check against existing products for similar titles
-        for (const existingProduct of uniqueProducts) {
-          if (existingProduct.brand && existingProduct.title) {
-            const normalizedExistingTitle = normalizeTitle(existingProduct.title);
-            const existingBrand = existingProduct.brand.toLowerCase();
-
-            // If same brand and very similar titles, consider it a duplicate
-            if (currentBrand === existingBrand && normalizedCurrentTitle === normalizedExistingTitle) {
-              shouldAdd = false;
-              break;
-            }
-          }
+          return {
+            ...product,
+            brand: matchedBrand ? matchedBrand.name : match[1],
+            image:
+             product.thumbnail ||
+            (product.thumbnails && product.thumbnails.length > 0 ? product.thumbnails[0] : null) ||
+            (product.serpapi_thumbnails && product.serpapi_thumbnails.length > 0 ? product.serpapi_thumbnails[0] : null),
+          };
         }
-      }
 
-      if (shouldAdd && !seenProducts.has(uniqueId)) {
-        seenProducts.add(uniqueId);
-        uniqueProducts.push(product);
-      }
-    });
-
-    // Limit final results
-    const finalProducts = uniqueProducts.slice(0, productLimit);
+        return null;
+      })
+      .filter(Boolean);
 
     res.json({
       success: true,
-      data: finalProducts,
-      query: query || '',
-      category: category || '',
-      brand: brand || '',
-      brands_searched: brandsToSearch,
-      total: finalProducts.length,
-      message: `Searched products from ${brandsToSearch.length} brand(s) in your database`,
+      data: matchedProducts.slice(0, productLimit),
+      query,
+      brand:'',
+      brands_searched: allBrands.map(b => b.name),
+      total: matchedProducts.length,
+      message: `Searched '${query}' and returned products matching ${matchedProducts.length} of ${allBrands.length} known brands.`,
     });
   } catch (error) {
     console.error('Error in product search:', error.message);
-    if (error.response?.data) {
-      console.log('Error response:', error.response.data);
-    }
     res.status(500).json({
       success: false,
       message: 'Failed to search products',
