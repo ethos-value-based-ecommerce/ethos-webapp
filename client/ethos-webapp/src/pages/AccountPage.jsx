@@ -1,11 +1,12 @@
 import { Tabs, Layout, Typography, Card, Row, Col, Avatar, Divider, Space, Button, message } from 'antd';
-import { UserOutlined, HeartOutlined, EditOutlined, DashboardOutlined, ArrowLeftOutlined, HomeOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { UserOutlined, HeartOutlined, EditOutlined, DashboardOutlined, ArrowLeftOutlined, HomeOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 import UserProfile from '../components/UserComponents/UserProfile';
 import FavoritesSection from '../components/UserComponents/FavoritesSection';
 import UserInformation from '../components/UserComponents/UserInformation';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const { Content, Header } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -14,7 +15,10 @@ const { TabPane } = Tabs;
 // Function to create account page with different tabs, like dashboard, favorite products + brands, and to update information.
 const AccountPage = ({ user, brands, products }) => {
     const [currentUser, setCurrentUser] = useState(user || {});
+    const navigate = useNavigate();
+    const { signOut } = useAuth();
 
+    // Handle Updates
     const handleUpdate = (updateInfo) => {
         console.log('Updated user info', updateInfo);
         setCurrentUser(prevUser => ({
@@ -22,6 +26,22 @@ const AccountPage = ({ user, brands, products }) => {
             ...updateInfo
         }));
         message.success('User information updated successfully!');
+    };
+
+    // Handle logout
+    const handleLogout = async () => {
+        try {
+            const result = await signOut();
+            if (result.error) {
+                message.error(`Logout failed: ${result.error.message}`);
+            } else {
+                message.success('Successfully logged out!');
+                navigate('/');
+            }
+        } catch (error) {
+            message.error('An error occurred during logout');
+            console.error('Logout error:', error);
+        }
     };
 
     return (
@@ -69,6 +89,13 @@ const AccountPage = ({ user, brands, products }) => {
                                 Back to Browse
                             </Button>
                         </Link>
+                        <Button
+                            type="default"
+                            icon={<LogoutOutlined />}
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </Button>
                     </Space>
                 </div>
             </Header>
