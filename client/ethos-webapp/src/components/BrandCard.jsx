@@ -5,6 +5,7 @@ import { Card, Typography, Button, Tag } from 'antd';
 
 // Importing category color for tag colors
 import { getCachedCategoryColor, preloadCategoryColors } from './categoryColors.jsx';
+import FavoriteButton from './FavoriteButton.jsx';
 
 const { Paragraph } = Typography;
 const { Meta } = Card;
@@ -39,6 +40,7 @@ const BrandCard = ({ brand, onTagClick }) => {
             alignItems: 'center',
             padding: '16px',
             backgroundColor: '#f5f5f5',
+            position: 'relative',
           }}
         >
           <img
@@ -50,6 +52,19 @@ const BrandCard = ({ brand, onTagClick }) => {
               objectFit: 'contain',
             }}
           />
+          <div
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+            }}
+          >
+            <FavoriteButton
+              item={brand}
+              type="brand"
+              size="default"
+            />
+          </div>
         </div>
       }
     >

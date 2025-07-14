@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Typography, Button, Spin } from 'antd';
+import FavoriteButton from './FavoriteButton.jsx';
 
 const { Paragraph, Link } = Typography;
 const { Meta } = Card;
@@ -56,6 +57,25 @@ const ProductCard = ({ productTitle, productPrice, productWebsite, productImage,
               transition: 'opacity 0.3s ease',
             }}
           />
+          <div
+            style={{
+              position: 'absolute',
+              top: '8px',
+              right: '8px',
+            }}
+          >
+            <FavoriteButton
+              item={{
+                id: productTitle, // Using productTitle as id since no id is passed
+                name: productTitle,
+                price: productPrice,
+                image: productImage,
+                website: productWebsite
+              }}
+              type="product"
+              size="default"
+            />
+          </div>
         </div>
       }
     >

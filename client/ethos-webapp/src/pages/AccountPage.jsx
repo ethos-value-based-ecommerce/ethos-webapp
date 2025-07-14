@@ -7,16 +7,18 @@ import UserProfile from '../components/UserComponents/UserProfile';
 import FavoritesSection from '../components/UserComponents/FavoritesSection';
 import UserInformation from '../components/UserComponents/UserInformation';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { useFavorites } from '../contexts/FavoritesContext.jsx';
 
 const { Content, Header } = Layout;
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 // Function to create account page with different tabs, like dashboard, favorite products + brands, and to update information.
-const AccountPage = ({ user, brands, products }) => {
+const AccountPage = () => {
+    const { user, signOut } = useAuth();
+    const { favorites } = useFavorites();
     const [currentUser, setCurrentUser] = useState(user || {});
     const navigate = useNavigate();
-    const { signOut } = useAuth();
 
     // Handle Updates
     const handleUpdate = (updateInfo) => {
@@ -228,7 +230,7 @@ const AccountPage = ({ user, brands, products }) => {
                             key="2"
                         >
                             <div style={{ padding: '24px' }}>
-                                <FavoritesSection brands={brands} products={products} />
+                                <FavoritesSection brands={favorites.brands} products={favorites.products} />
                             </div>
                         </TabPane>
 
