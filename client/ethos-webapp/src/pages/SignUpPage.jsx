@@ -3,7 +3,7 @@ import '../App.css';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, Typography, Card, Tabs, Space, Divider, message } from "antd";
-import { UserOutlined, ShopOutlined, GoogleOutlined, GithubOutlined } from "@ant-design/icons";
+import { UserOutlined, ShopOutlined } from "@ant-design/icons";
 import { useAuth } from "../contexts/AuthContext.jsx";
 
 const { Title, Paragraph, Link } = Typography;
@@ -11,43 +11,11 @@ const { TabPane } = Tabs;
 
 // Function to render the sign-up page, including o-auth from Google and Github.
 const SignUpPage = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    brandName: "",
-    firstName: "",
-    lastName: ""
-  });
   const [activeTab, setActiveTab] = useState("user");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { signInWithGoogle, signInWithGitHub, signUpWithEmail } = useAuth();
+  const { signUpWithEmail } = useAuth();
 
-  // Handle OAuth signup
-  const handleOAuthSignUp = async (provider) => {
-    setLoading(true);
-    try {
-      let result;
-      if (provider === 'google') {
-        result = await signInWithGoogle(activeTab);
-      } else if (provider === 'github') {
-        result = await signInWithGitHub(activeTab);
-      }
-
-      if (result.error) {
-        message.error(`Failed to sign up with ${provider}: ${result.error.message}`);
-      }
-      // OAuth will redirect automatically, so no need to navigate here
-    } catch (error) {
-      message.error(`An error occurred during ${provider} sign up`);
-      console.error(`${provider} sign up error:`, error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle email/password signup
   const handleEmailSignUp = async (values) => {
     const { email, password, confirmPassword, brandName, firstName, lastName } = values;
 
@@ -74,7 +42,6 @@ const SignUpPage = () => {
         message.error(`Sign up failed: ${result.error.message}`);
       } else {
         message.success('Account created successfully! Please check your email to verify your account.');
-        // Navigate to login page after successful signup
         navigate('/login');
       }
     } catch (error) {
@@ -83,10 +50,6 @@ const SignUpPage = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -157,87 +120,34 @@ const SignUpPage = () => {
           </TabPane>
         </Tabs>
 
-        {/* OAuth Buttons */}
-        <Space direction="vertical" style={{ width: '100%', marginBottom: 24 }}>
-          <Button
-            icon={<GoogleOutlined />}
-            onClick={() => handleOAuthSignUp('google')}
-            loading={loading}
-            block
-            size="large"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '48px'
-            }}
-          >
-            Continue with Google
-          </Button>
-
-          <Button
-            icon={<GithubOutlined />}
-            onClick={() => handleOAuthSignUp('github')}
-            loading={loading}
-            block
-            size="large"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '48px',
-              backgroundColor: '#24292e',
-              borderColor: '#24292e',
-              color: 'white'
-            }}
-          >
-            Continue with GitHub
-          </Button>
-        </Space>
-
-        <Divider>Or sign up with email</Divider>
+        <Divider>Sign up with email</Divider>
 
         <Form layout="vertical" onFinish={handleEmailSignUp}>
-          {activeTab === 'brand' ? (
-            <Form.Item
-              label="Brand Name"
-              name="brandName"
-              rules={[{ required: true, message: "Please enter your brand name!" }]}
-            >
-              <Input
-                name="brandName"
-                value={formData.brandName}
-                onChange={handleChange}
-                placeholder="Your brand name"
-              />
-            </Form.Item>
-          ) : (
+          {activeTab === 'user' ? (
             <>
               <Form.Item
                 label="First Name"
                 name="firstName"
                 rules={[{ required: true, message: "Please enter your first name!" }]}
               >
-                <Input
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                />
+                <Input placeholder="First name" />
               </Form.Item>
               <Form.Item
                 label="Last Name"
                 name="lastName"
                 rules={[{ required: true, message: "Please enter your last name!" }]}
               >
-                <Input
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                />
+                <Input placeholder="Last name" />
               </Form.Item>
             </>
+          ) : (
+            <Form.Item
+              label="Brand Name"
+              name="brandName"
+              rules={[{ required: true, message: "Please enter your brand name!" }]}
+            >
+              <Input placeholder="Your brand name" />
+            </Form.Item>
           )}
 
           <Form.Item
@@ -248,12 +158,7 @@ const SignUpPage = () => {
               { type: 'email', message: "Please enter a valid email!" }
             ]}
           >
-            <Input
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder={activeTab === "brand" ? "Brand email" : "Email"}
-            />
+            <Input placeholder={activeTab === "brand" ? "Brand email" : "Email"} />
           </Form.Item>
 
           <Form.Item
@@ -264,17 +169,13 @@ const SignUpPage = () => {
               { min: 6, message: "Password must be at least 6 characters!" }
             ]}
           >
-            <Input.Password
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Password"
-            />
+            <Input.Password placeholder="Password" />
           </Form.Item>
 
           <Form.Item
             label="Confirm Password"
             name="confirmPassword"
+            dependencies={['password']}
             rules={[
               { required: true, message: "Please confirm your password!" },
               ({ getFieldValue }) => ({
@@ -287,12 +188,7 @@ const SignUpPage = () => {
               }),
             ]}
           >
-            <Input.Password
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm password"
-            />
+            <Input.Password placeholder="Confirm password" />
           </Form.Item>
 
           <Form.Item>
