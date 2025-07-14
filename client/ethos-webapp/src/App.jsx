@@ -19,6 +19,7 @@ import BrandUploadPage from './pages/BrandUploadPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 
+
 function App() {
  return (
    <AuthProvider>
