@@ -6,7 +6,9 @@ import '../App.css';
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
 import Footer from '../components/Footer.jsx';
+import QuizModalWrapper from '../components/QuizModalWrapper.jsx';
 import api from '../services/api.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 // Importing category color for tag colors
 import { preloadCategoryColors, getCachedCategoryColor } from '../components/categoryColors.jsx';
@@ -21,9 +23,11 @@ const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showQuizPrompt, setShowQuizPrompt] = useState(false);
 
   // Function to handle category click and navigate to search-brands with filter
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,6 +56,30 @@ const HomePage = () => {
 
     fetchData();
   }, []);
+
+  // Check if user should see quiz prompt - show to all users, but track completion for authenticated users
+  useEffect(() => {
+    if (user) {
+      const hasCompletedQuiz = localStorage.getItem(`quiz_completed_${user.id}`);
+      if (!hasCompletedQuiz) {
+        setShowQuizPrompt(true);
+      } else {
+        setShowQuizPrompt(false);
+      }
+    } else {
+      // Show quiz prompt to non-authenticated users too
+      setShowQuizPrompt(true);
+    }
+  }, [user]);
+
+  const handleQuizComplete = (quizAnswers) => {
+    console.log('Quiz completed with answers:', quizAnswers);
+    // Mark quiz as completed for this user
+    if (user) {
+      localStorage.setItem(`quiz_completed_${user.id}`, 'true');
+    }
+    setShowQuizPrompt(false);
+  };
 
   const refetch = () => {
     setLoading(true);
@@ -117,18 +145,16 @@ const HomePage = () => {
       </Header>
 
       <Content style={{ padding: '2rem' }}>
-        {/* Discover Section */}
-        <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <Title level={2}>Discover brands that match your values</Title>
-          <Paragraph>
-            Find brands and products that align with your values and support causes you care about.
-          </Paragraph>
-          <Link to="/search-brands">
-            <Button type="primary" size="large">
-              Start Your Search Now
-              </Button>
-          </Link>
-        </section>
+        {/* Quiz Prompt Section */}
+        {showQuizPrompt && (
+          <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
+            <Title level={2}>Discover Your Values</Title>
+            <Paragraph>
+              Take a quiz to learn more about your values and discover brands that align with what matters most to you.
+            </Paragraph>
+            <QuizModalWrapper onQuizComplete={handleQuizComplete} />
+          </section>
+        )}
 
         {/* Categories Section */}
         <section style={{ marginBottom: '3rem' }}>
@@ -168,6 +194,19 @@ const HomePage = () => {
               );
             })}
           </Row>
+        </section>
+
+        {/* Discover Section */}
+        <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <Title level={2}>Discover brands that match your values</Title>
+          <Paragraph>
+            Find brands and products that align with your values and support causes you care about.
+          </Paragraph>
+          <Link to="/search-brands">
+            <Button type="primary" size="large">
+              Start Your Search Now
+              </Button>
+          </Link>
         </section>
 
         {/* Featured Brands Section */}
