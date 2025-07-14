@@ -23,45 +23,58 @@ export const AuthProvider = ({ children }) => {
  useEffect(() => {
    // Get initial session
    const getInitialSession = async () => {
-     const { data: { session } } = await supabase.auth.getSession();
-     setUser(session?.user ?? null);
-
-
-     // Get account type from user metadata or local storage
-     if (session?.user) {
-       const storedAccountType = localStorage.getItem('accountType');
-       const metadataAccountType = session.user.user_metadata?.account_type;
-       setAccountType(metadataAccountType || storedAccountType || 'user');
-     }
-
-
-     setLoading(false);
-   };
-
-
-   getInitialSession();
-
-
-   // Listen for auth changes
-   const { data: { subscription } } = supabase.auth.onAuthStateChange(
-     async (_, session) => {
+     try {
+       setLoading(true);
+       const { data: { session } } = await supabase.auth.getSession();
        setUser(session?.user ?? null);
 
-
+       // Get account type from user metadata or local storage
        if (session?.user) {
          const storedAccountType = localStorage.getItem('accountType');
          const metadataAccountType = session.user.user_metadata?.account_type;
          setAccountType(metadataAccountType || storedAccountType || 'user');
-       } else {
-         setAccountType(null);
-         localStorage.removeItem('accountType');
        }
 
-
+       // Clear URL hash containing tokens after processing to avoid repeated reloads or token exposure
+       if (window.location.hash && window.location.hash.includes('access_token')) {
+         window.history.replaceState(null, null, window.location.pathname + window.location.search);
+       }
+     } catch (error) {
+       console.error('Error getting initial session:', error);
+     } finally {
        setLoading(false);
      }
-   );
+   };
 
+   getInitialSession();
+
+   // Listen for auth changes
+   const { data: { subscription } } = supabase.auth.onAuthStateChange(
+     async (event, session) => {
+       try {
+         setLoading(true);
+         setUser(session?.user ?? null);
+
+         if (session?.user) {
+           const storedAccountType = localStorage.getItem('accountType');
+           const metadataAccountType = session.user.user_metadata?.account_type;
+           setAccountType(metadataAccountType || storedAccountType || 'user');
+         } else {
+           setAccountType(null);
+           localStorage.removeItem('accountType');
+         }
+
+         // Clear URL hash containing tokens after processing OAuth redirect
+         if (event === 'SIGNED_IN' && window.location.hash && window.location.hash.includes('access_token')) {
+           window.history.replaceState(null, null, window.location.pathname + window.location.search);
+         }
+       } catch (error) {
+         console.error('Error handling auth state change:', error);
+       } finally {
+         setLoading(false);
+       }
+     }
+   );
 
    return () => subscription.unsubscribe();
  }, []);
