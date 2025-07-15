@@ -4,6 +4,7 @@ import { Modal, Steps, Checkbox, Radio, Button, Typography, message } from "antd
 const { Step } = Steps;
 const { Title, Text } = Typography;
 
+// Defining the quiz steps and options.
 const quizSteps = [
   {
     title: "Ownership",
@@ -73,7 +74,8 @@ const quizSteps = [
   },
 ];
 
-export default function QuizModal({ isOpen, onClose, onSubmit }) {
+// Function to render the quiz model component, with questions and answers.
+const QuizModal = ({ isOpen, onClose, onSubmit }) => {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({
     ownership: [],
@@ -154,4 +156,6 @@ export default function QuizModal({ isOpen, onClose, onSubmit }) {
       </div>
     </Modal>
   );
-}
+};
+
+export default QuizModal;
