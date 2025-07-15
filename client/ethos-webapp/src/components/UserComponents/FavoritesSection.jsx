@@ -1,11 +1,28 @@
-import { Card, Typography, Row, Col, Empty } from 'antd';
-import { HeartOutlined, ShoppingOutlined } from '@ant-design/icons';
+import { Card, Typography, Row, Col, Empty, Spin, Button } from 'antd';
+import { HeartOutlined, ShoppingOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useFavorites } from '../../contexts/FavoritesContext.jsx';
 
 const { Title, Text } = Typography;
 
 // Function to render the favorite brands and products in the account page
-// TO DO: Make Favorite Functionality only available to users with accounts, and like button.
-const FavoritesSection = ({ brands, products }) => {
+const FavoritesSection = () => {
+    const {
+        getFavoriteBrandsWithData,
+        favoriteProducts,
+        loading,
+        toggleBrandFavorite,
+        toggleProductFavorite
+    } = useFavorites();
+
+    const favoriteBrands = getFavoriteBrandsWithData();
+
+    const handleRemoveBrand = async (brandId) => {
+        await toggleBrandFavorite(brandId);
+    };
+
+    const handleRemoveProduct = async (productData) => {
+        await toggleProductFavorite(productData);
+    };
     return (
         <div>
             {/* Favorite Brands Section */}
@@ -15,15 +32,19 @@ const FavoritesSection = ({ brands, products }) => {
                     Favorite Brands
                 </Title>
 
-                {brands && brands.length > 0 ? (
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <Spin size="large" />
+                    </div>
+                ) : favoriteBrands && favoriteBrands.length > 0 ? (
                     <Row gutter={[12, 12]}>
-                        {brands.slice(0, 6).map((brand) => (
+                        {favoriteBrands.slice(0, 6).map((brand) => (
                             <Col key={brand.id} xs={12} sm={8} md={6} lg={4}>
                                 <Card
                                     hoverable
                                     size="small"
                                     cover={
-                                        <div style={{ height: '120px', overflow: 'hidden' }}>
+                                        <div style={{ height: '120px', overflow: 'hidden', position: 'relative' }}>
                                             <img
                                                 alt={brand.name}
                                                 src={brand.image}
@@ -31,6 +52,29 @@ const FavoritesSection = ({ brands, products }) => {
                                                     width: '100%',
                                                     height: '100%',
                                                     objectFit: 'cover'
+                                                }}
+                                            />
+                                            <Button
+                                                type="text"
+                                                icon={<DeleteOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemoveBrand(brand.id);
+                                                }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '4px',
+                                                    right: '4px',
+                                                    color: '#ff4d4f',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '12px',
                                                 }}
                                             />
                                         </div>
@@ -64,22 +108,49 @@ const FavoritesSection = ({ brands, products }) => {
                     Favorite Products
                 </Title>
 
-                {products && products.length > 0 ? (
+                {loading ? (
+                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                        <Spin size="large" />
+                    </div>
+                ) : favoriteProducts && favoriteProducts.length > 0 ? (
                     <Row gutter={[12, 12]}>
-                        {products.slice(0, 8).map((product) => (
-                            <Col key={product.id} xs={12} sm={8} md={6} lg={4}>
+                        {favoriteProducts.slice(0, 8).map((product) => (
+                            <Col key={product.id || product.title} xs={12} sm={8} md={6} lg={4}>
                                 <Card
                                     hoverable
                                     size="small"
                                     cover={
-                                        <div style={{ height: '120px', overflow: 'hidden' }}>
+                                        <div style={{ height: '120px', overflow: 'hidden', position: 'relative' }}>
                                             <img
-                                                alt={product.name}
+                                                alt={product.name || product.title}
                                                 src={product.image}
                                                 style={{
                                                     width: '100%',
                                                     height: '100%',
                                                     objectFit: 'cover'
+                                                }}
+                                            />
+                                            <Button
+                                                type="text"
+                                                icon={<DeleteOutlined />}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRemoveProduct(product);
+                                                }}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '4px',
+                                                    right: '4px',
+                                                    color: '#ff4d4f',
+                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                                    border: 'none',
+                                                    borderRadius: '50%',
+                                                    width: '24px',
+                                                    height: '24px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    fontSize: '12px',
                                                 }}
                                             />
                                         </div>
@@ -89,7 +160,7 @@ const FavoritesSection = ({ brands, products }) => {
                                     <Card.Meta
                                         title={
                                             <Text strong style={{ fontSize: '12px' }}>
-                                                {product.name}
+                                                {product.name || product.title}
                                             </Text>
                                         }
                                         description={
