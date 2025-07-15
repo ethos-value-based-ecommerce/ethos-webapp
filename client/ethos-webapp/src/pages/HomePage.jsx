@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {Layout, Typography, Button, Row, Col, Tag, Spin, Alert } from 'antd';
+import {Layout, Typography, Button, Row, Col, Tag, Spin, Alert, Modal } from 'antd';
 import '../App.css';
 
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
 import Footer from '../components/Footer.jsx';
+import QuizModal from '../components/QuizModal.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 import api from '../services/api.jsx';
 
 // Importing category color for tag colors
@@ -21,6 +23,11 @@ const HomePage = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
+  const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+
+  // Get authentication context
+  const { user } = useAuth();
 
   // Function to handle category click and navigate to search-brands with filter
   const navigate = useNavigate();
@@ -63,6 +70,35 @@ const HomePage = () => {
 
   const handleCategoryClick = (category) => {
     navigate('/search-brands', { state: { selectedCategory: category } });
+  };
+
+  const handleOpenQuizModal = () => {
+    if (user) {
+      // User is logged in, open the quiz modal
+      setIsQuizModalOpen(true);
+    } else {
+      // User is not logged in, show login prompt
+      setIsLoginPromptOpen(true);
+    }
+  };
+
+  const handleCloseQuizModal = () => {
+    setIsQuizModalOpen(false);
+  };
+
+  const handleCloseLoginPrompt = () => {
+    setIsLoginPromptOpen(false);
+  };
+
+  const handleGoToLogin = () => {
+    setIsLoginPromptOpen(false);
+    navigate('/login');
+  };
+
+  const handleQuizSubmit = (answers) => {
+    console.log('Quiz answers:', answers);
+    // TO DO: Hook to the reccomendation system
+    navigate('/search-brands', { state: { quizAnswers: answers } });
   };
 
   if (loading) {
@@ -123,11 +159,9 @@ const HomePage = () => {
           <Paragraph>
             Find brands and products that align with your values and support causes you care about.
           </Paragraph>
-          <Link to="/search-brands">
-            <Button type="primary" size="large">
-              Start Your Search Now
-              </Button>
-          </Link>
+          <Button type="primary" size="large" onClick={handleOpenQuizModal}>
+            Take Values Quiz
+          </Button>
         </section>
 
         {/* Categories Section */}
@@ -170,6 +204,15 @@ const HomePage = () => {
           </Row>
         </section>
 
+        {/* Search Call-to-Action Section */}
+        <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <Link to="/search-brands">
+            <Button type="default" size="large">
+              Start Your Search Now
+            </Button>
+          </Link>
+        </section>
+
         {/* Featured Brands Section */}
         <section>
           <Title level={2}>Featured Brands</Title>
@@ -188,6 +231,36 @@ const HomePage = () => {
       <AntFooter style={{ padding: 0 }}>
         <Footer />
       </AntFooter>
+
+      <QuizModal
+        isOpen={isQuizModalOpen}
+        onClose={handleCloseQuizModal}
+        onSubmit={handleQuizSubmit}
+      />
+
+      <Modal
+        title={<div style={{ textAlign: 'center' }}>Login Required</div>}
+        open={isLoginPromptOpen}
+        onCancel={handleCloseLoginPrompt}
+        footer={
+          <div style={{ textAlign: 'center' }}>
+            <Button key="cancel" onClick={handleCloseLoginPrompt} style={{ marginRight: '8px' }}>
+              Cancel
+            </Button>
+            <Button key="login" type="primary" onClick={handleGoToLogin}>
+              Go to Login
+            </Button>
+          </div>
+        }
+        centered
+      >
+        <div style={{ textAlign: 'center', padding: '30px 20px' }}>
+          <Title level={4} style={{ marginBottom: '16px' }}>Please log in to take the quiz</Title>
+          <Paragraph style={{ marginBottom: 0, fontSize: '16px' }}>
+            You need to be logged in to take our values quiz and get personalized brand recommendations.
+          </Paragraph>
+        </div>
+      </Modal>
     </Layout>
   );
 };
