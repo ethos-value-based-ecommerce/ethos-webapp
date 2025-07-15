@@ -2,9 +2,12 @@ import React, { useEffect } from 'react';
 
 
 import { Card, Typography, Button, Tag } from 'antd';
+import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 
 // Importing category color for tag colors
 import { getCachedCategoryColor, preloadCategoryColors } from './categoryColors.jsx';
+import { useFavorites } from '../contexts/FavoritesContext.jsx';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const { Paragraph } = Typography;
 const { Meta } = Card;
@@ -13,6 +16,9 @@ const { Meta } = Card;
 // Function to render the Brand Card with brand name, image, mission, description, website, and tags
 // More responsiveness in the brand card functionality
 const BrandCard = ({ brand, onTagClick }) => {
+  const { user } = useAuth();
+  const { isBrandFavorite, toggleBrandFavorite } = useFavorites();
+
   // Load the category colors.
   useEffect(() => {
     preloadCategoryColors();
@@ -22,6 +28,13 @@ const BrandCard = ({ brand, onTagClick }) => {
     return null;
   }
 
+  const isFavorite = isBrandFavorite(brand.id);
+
+  const handleFavoriteClick = async (e) => {
+    e.stopPropagation();
+    await toggleBrandFavorite(brand.id);
+  };
+
   return (
     <Card
       hoverable
@@ -29,6 +42,7 @@ const BrandCard = ({ brand, onTagClick }) => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
       }}
       cover={
         <div
@@ -39,6 +53,7 @@ const BrandCard = ({ brand, onTagClick }) => {
             alignItems: 'center',
             padding: '16px',
             backgroundColor: '#f5f5f5',
+            position: 'relative',
           }}
         >
           <img
@@ -50,6 +65,29 @@ const BrandCard = ({ brand, onTagClick }) => {
               objectFit: 'contain',
             }}
           />
+          {user && (
+            <Button
+              type="text"
+              icon={isFavorite ? <HeartFilled /> : <HeartOutlined />}
+              onClick={handleFavoriteClick}
+              style={{
+                position: 'absolute',
+                top: '8px',
+                right: '8px',
+                color: isFavorite ? '#ff4d4f' : '#8c8c8c',
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                border: 'none',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '16px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+              }}
+            />
+          )}
         </div>
       }
     >

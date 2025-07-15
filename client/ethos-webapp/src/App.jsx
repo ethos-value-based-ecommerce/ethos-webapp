@@ -18,6 +18,7 @@ import BrandAccountPage from './pages/BrandAccountPage.jsx';
 import BrandUploadPage from './pages/BrandUploadPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import { FavoritesProvider } from './contexts/FavoritesContext.jsx';
 
 function AppRoutes() {
   const { loading, user } = useAuth();
@@ -87,9 +88,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <FavoritesProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </FavoritesProvider>
     </AuthProvider>
   );
 }

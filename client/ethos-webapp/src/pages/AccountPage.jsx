@@ -13,7 +13,7 @@ const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 // Function to create account page with different tabs, like dashboard, favorite products + brands, and to update information.
-const AccountPage = ({ user, brands, products }) => {
+const AccountPage = ({ user }) => {
     const [currentUser, setCurrentUser] = useState(user || {});
     const navigate = useNavigate();
     const { signOut } = useAuth();
@@ -228,7 +228,7 @@ const AccountPage = ({ user, brands, products }) => {
                             key="2"
                         >
                             <div style={{ padding: '24px' }}>
-                                <FavoritesSection brands={brands} products={products} />
+                                <FavoritesSection />
                             </div>
                         </TabPane>
 
