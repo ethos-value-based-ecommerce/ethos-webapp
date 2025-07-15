@@ -3,8 +3,8 @@ import { Spin } from 'antd';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 
-const ProtectedRoute = ({ children }) => {
- const { user, loading } = useAuth();
+const ProtectedRoute = ({ children, requiredRole }) => {
+ const { user, loading, accountType } = useAuth();
 
 
  // Show loading spinner while authentication state is being determined
@@ -33,6 +33,11 @@ const ProtectedRoute = ({ children }) => {
  if (!user) {
    return <Navigate to="/login" replace />;
  }
+
+ if (requiredRole && accountType !== requiredRole) {
+    return <Navigate to={accountType === "brand" ? "/brand-account" : "/account"} />;
+  }
+
 
 
  return children;

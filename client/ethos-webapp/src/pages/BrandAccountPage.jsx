@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Typography, Card, Row, Col, Space, Button, Tabs, Table, Tag, message } from 'antd';
 import { HomeOutlined, LogoutOutlined, PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 const { Content, Header } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -11,11 +12,22 @@ const { TabPane } = Tabs;
 // Function to render the brand account page with brand sumbissions and brand upload page.
 const BrandAccountPage = ({ user }) => {
     const navigate = useNavigate();
+    const { signOut } = useAuth();
     const [submittedBrands] = useState([]);
 
-    const handleLogout = () => {
-        message.success('Logged out successfully!');
-        navigate('/login');
+    const handleLogout = async () => {
+        try {
+            const result = await signOut();
+            if (result.error) {
+                message.error(`Logout failed: ${result.error.message}`);
+                return;
+            }
+            message.success('Logged out successfully!');
+            navigate('/login');
+        } catch (error) {
+            message.error('An error occurred during logout');
+            console.error('Logout error:', error);
+        }
     };
 
     const getStatusColor = (status) => {

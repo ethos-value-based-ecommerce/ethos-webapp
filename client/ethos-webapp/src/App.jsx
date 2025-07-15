@@ -30,7 +30,7 @@ function AppRoutes() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
 
@@ -64,7 +64,7 @@ function AppRoutes() {
       <Route
         path="/account"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="user">
             <AccountPage />
           </ProtectedRoute>
         }
@@ -72,7 +72,7 @@ function AppRoutes() {
       <Route
         path="/brand-account"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="brand">
             <BrandAccountPage />
           </ProtectedRoute>
         }

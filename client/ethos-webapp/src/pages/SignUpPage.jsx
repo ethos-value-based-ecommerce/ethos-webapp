@@ -27,26 +27,22 @@ const SignUpPage = () => {
     setLoading(true);
 
     try {
-      const additionalData = {};
-
-      if (activeTab === 'brand') {
-        additionalData.brand_name = brandName;
-      } else {
-        additionalData.first_name = firstName;
-        additionalData.last_name = lastName;
-      }
+      const additionalData = activeTab === "brand"
+        ? { brand_name: brandName }
+        : { first_name: firstName, last_name: lastName };
 
       const result = await signUpWithEmail(email, password, activeTab, additionalData);
 
       if (result.error) {
         message.error(`Sign up failed: ${result.error.message}`);
-      } else {
-        message.success('Account created successfully! Please check your email to verify your account.');
-        navigate('/login');
+        return;
       }
-    } catch (error) {
-      message.error('An error occurred during sign up');
-      console.error('Sign up error:', error);
+
+      message.success("Account created successfully! Please check your email to verify your account.");
+      navigate("/login");
+    } catch (err) {
+      console.error("Sign up error:", err);
+      message.error("An error occurred during sign up.");
     } finally {
       setLoading(false);
     }
@@ -155,7 +151,7 @@ const SignUpPage = () => {
             name="email"
             rules={[
               { required: true, message: "Please enter your email!" },
-              { type: 'email', message: "Please enter a valid email!" }
+              { type: "email", message: "Please enter a valid email!" },
             ]}
           >
             <Input placeholder={activeTab === "brand" ? "Brand email" : "Email"} />
@@ -166,7 +162,7 @@ const SignUpPage = () => {
             name="password"
             rules={[
               { required: true, message: "Please enter your password!" },
-              { min: 6, message: "Password must be at least 6 characters!" }
+              { min: 6, message: "Password must be at least 6 characters!" },
             ]}
           >
             <Input.Password placeholder="Password" />
@@ -197,7 +193,7 @@ const SignUpPage = () => {
               htmlType="submit"
               loading={loading}
               block
-            >
+              >
               {activeTab === "brand" ? "Create Brand Account" : "Create User Account"}
             </Button>
           </Form.Item>
@@ -210,7 +206,7 @@ const SignUpPage = () => {
           </Link>
           <br />
           <Link onClick={() => navigate('/')}>
-            Continue as a guest
+           Continue as a guest
           </Link>
         </Paragraph>
       </Card>

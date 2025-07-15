@@ -28,37 +28,39 @@ const { TabPane } = Tabs;
 
       if (result.error) {
         message.error(`Login failed: ${result.error.message}`);
-      } else {
-        if (onLogin) {
-          onLogin({
-            email,
-            name: result.data.user.email,
-            accountType: activeTab
-          });
-        }
-
-        // Navigate based on account type
-        if (activeTab === "brand") {
-          navigate('/brand-account');
-        } else {
-          navigate('/account');
-        }
-        message.success('Successfully logged in!');
+        return;
       }
+
+      // Call parent onLogin if needed
+      if (onLogin) {
+        onLogin({
+          email,
+          name: result.data.user.email,
+          accountType: activeTab,
+        });
+      }
+
+      // Navigate based on account type
+      if (activeTab === "brand") {
+        navigate("/brand-account");
+      } else {
+        navigate("/account");
+      }
+
+      message.success("Successfully logged in!");
     } catch (error) {
-      message.error('An error occurred during login');
-      console.error('Login error:', error);
+      message.error("An error occurred during login");
+      console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  
+
   return (
     <div
       style={{
