@@ -25,12 +25,21 @@ const HomePage = () => {
   const [error, setError] = useState(null);
   const [isQuizModalOpen, setIsQuizModalOpen] = useState(false);
   const [isLoginPromptOpen, setIsLoginPromptOpen] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
 
   // Get authentication context
   const { user } = useAuth();
 
   // Function to handle category click and navigate to search-brands with filter
   const navigate = useNavigate();
+
+  // Check if quiz has been completed
+  useEffect(() => {
+    const quizStatus = localStorage.getItem('quizCompleted');
+    if (quizStatus === 'true') {
+      setQuizCompleted(true);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,8 +106,15 @@ const HomePage = () => {
 
   const handleQuizSubmit = (answers) => {
     console.log('Quiz answers:', answers);
-    // TO DO: Hook to the reccomendation system
-    navigate('/search-brands', { state: { quizAnswers: answers } });
+    // Save quiz completion status to localStorage
+    localStorage.setItem('quizCompleted', 'true');
+    setQuizCompleted(true);
+    // Navigate to the feed page with quiz answers
+    navigate('/feed', { state: { quizAnswers: answers } });
+  };
+
+  const handleViewRecommendations = () => {
+    navigate('/feed');
   };
 
   if (loading) {
@@ -159,9 +175,21 @@ const HomePage = () => {
           <Paragraph>
             Find brands and products that align with your values and support causes you care about.
           </Paragraph>
-          <Button type="primary" size="large" onClick={handleOpenQuizModal}>
-            Take Values Quiz
-          </Button>
+
+          {quizCompleted ? (
+            <>
+              <Paragraph style={{ color: '#52c41a', fontWeight: 'bold', marginBottom: '16px' }}>
+                You've already completed the values quiz!
+              </Paragraph>
+              <Button type="primary" size="large" onClick={handleViewRecommendations}>
+                View Recommendations
+              </Button>
+            </>
+          ) : (
+            <Button type="primary" size="large" onClick={handleOpenQuizModal}>
+              Take Values Quiz
+            </Button>
+          )}
         </section>
 
         {/* Categories Section */}

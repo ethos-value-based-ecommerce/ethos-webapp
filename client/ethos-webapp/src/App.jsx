@@ -16,6 +16,7 @@ import CategoriesPage from './pages/CategoriesPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import BrandAccountPage from './pages/BrandAccountPage.jsx';
 import BrandUploadPage from './pages/BrandUploadPage.jsx';
+import FeedPage from './pages/FeedPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { FavoritesProvider } from './contexts/FavoritesContext.jsx';
@@ -53,6 +54,7 @@ function AppRoutes() {
       <Route path="/brands/:id" element={<BrandPage />} />
       <Route path="/search-products" element={<SearchProductsPage />} />
       <Route path="/categories" element={<CategoriesPage />} />
+      <Route path="/feed" element={<FeedPage />} />
 
       <Route
         path="/upload-brand"

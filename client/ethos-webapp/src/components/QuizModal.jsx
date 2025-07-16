@@ -99,8 +99,13 @@ const QuizModal = ({ isOpen, onClose, onSubmit }) => {
       setCurrent(current + 1);
     } else {
       message.success("Quiz completed! Generating recommendations...");
-      onSubmit(answers);
+      // Close the modal first
       onClose();
+      // Then submit answers and navigate
+      setTimeout(() => {
+        onSubmit(answers);
+        console.log("Quiz completed, onSubmit called with answers:", answers);
+      }, 100);
     }
   };
 

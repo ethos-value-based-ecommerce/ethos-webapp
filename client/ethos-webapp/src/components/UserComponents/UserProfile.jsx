@@ -28,7 +28,7 @@ const UserProfile = ({ user }) => {
                 </Col>
                 <Col flex="auto">
                     <Title level={4} style={{ margin: 0, color: '#262626' }}>
-                        {user?.name || 'User Name'}
+                        User
                     </Title>
                     <Text
                         type="secondary"
