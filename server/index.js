@@ -2,8 +2,10 @@ const express = require('express')
 const axios = require('axios')
 const dotenv = require('dotenv')
 const cors = require('cors')
+const bodyParser = require('body-parser')
 
 const supabase = require('./supabaseClient.js')
+const { getRecommendations } = require('./utils/recommendations.js')
 dotenv.config();
 
 // install express
@@ -17,6 +19,11 @@ app.use(express.json())
 
 // Parse URL-encoded request bodies for routes.
 app.use(express.urlencoded({ extended: true }))
+
+app.use(bodyParser.json())
+
+// Import routes
+const recommendationsRouter = require('./routes/recommendations.js');
 
 // Routes
 
@@ -687,6 +694,10 @@ app.get('/products/search', async (req, res) => {
     });
   }
 });
+
+app.use('/recommendations', recommendationsRouter);
+
+
 
 
 app.listen(PORT, () => {
