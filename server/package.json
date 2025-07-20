@@ -1,10 +1,14 @@
 {
   "dependencies": {
-    "@supabase/supabase-js": "^2.50.3",
+    "@supabase/supabase-js": "^2.51.0",
     "axios": "^1.10.0",
+    "body-parser": "^2.2.0",
+    "compute-cosine-similarity": "^1.1.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.0.1",
-    "express": "^5.1.0"
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "natural": "^8.1.0"
   },
   "name": "server",
   "version": "1.0.0",
