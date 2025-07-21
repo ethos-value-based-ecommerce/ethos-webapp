@@ -134,6 +134,15 @@ export const productsApi = {
    return response.data || [];
  },
 
+ // Get personalized recommendations based on quiz answers
+ getRecommendations: async (preferences) => {
+   const response = await apiRequest('/recommendations', {
+     method: 'POST',
+     body: JSON.stringify(preferences),
+   });
+   return response; // Return the full response
+ },
+
 
  // Search products
  search: async (query, category, brand, limit = 20) => {
@@ -158,11 +167,24 @@ export const productsApi = {
 };
 
 
+// Recommendations API functions
+export const recommendationsApi = {
+ // Get personalized recommendations based on quiz answers
+ get: async (preferences) => {
+   const response = await apiRequest('/recommendations', {
+     method: 'POST',
+     body: JSON.stringify(preferences),
+   });
+   return response; // Return the full response
+ },
+};
+
 // Export default API object
 const api = {
  brands: brandsApi,
  categories: categoriesApi,
  products: productsApi,
+ recommendations: recommendationsApi,
 };
 
 
