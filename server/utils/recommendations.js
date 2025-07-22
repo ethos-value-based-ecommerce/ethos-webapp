@@ -3,11 +3,45 @@ const supabase = require("../supabaseClient.js");
 const { loadGlove, getAverageVector } = require("./gloveLoader.js");
 const cosineSimilarity = require("./cosineSimilarity.js");
 
+// Weights for user vector calculation
+const OWNERSHIP_WEIGHT = 2.5;
+const CATEGORY_WEIGHT = 3.0;
+const ETHICS_WEIGHT = 2.0;
+const ENVIRONMENTAL_WEIGHT = 2.0;
+const SOCIAL_WEIGHT = 1.0;
+
+// Weights for scoring logic
+const BRAND_PRIMARY_WEIGHT = 0.5;
+const BRAND_ETHICS_WEIGHT = 0.2;
+const BRAND_ENVIRONMENTAL_WEIGHT = 0.2;
+const BRAND_VECTOR_WEIGHT = 0.1;
+
+const PRODUCT_PRIMARY_WEIGHT = 0.4;
+const PRODUCT_ETHICS_WEIGHT = 0.2;
+const PRODUCT_ENVIRONMENTAL_WEIGHT = 0.2;
+const PRODUCT_VECTOR_WEIGHT = 0.2;
+
+// Common stop words to ignore when creating GloVe vectors
+const STOP_WORDS = new Set([
+  "the", "and", "of", "in", "on", "for", "with", "a", "to", "at", "by", "from",
+  "an", "or", "as", "is", "this", "that", "these", "those", "it"
+]);
+
 // Helper function to ensure input is always an array
 function safeArray(arr) {
   return Array.isArray(arr) ? arr : [];
 }
 
+// Convert an array of text into cleaned, tokenized words (lowercase, no stop words)
+function cleanTextToWords(textArray) {
+  return textArray
+    .join(" ")
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(word => word && !STOP_WORDS.has(word));
+}
+
+// Main Reccommendation Logic
 async function getRecommendations(userPreferences) {
   // Load GloVe vectors into memory before any vector operations
   await loadGlove();
@@ -30,259 +64,235 @@ async function getRecommendations(userPreferences) {
 
   // Combine all preference vectors into a single "user profile vector"
   const userVector = Array(300).fill(0);
+
+  // Effective divisor ensures we don’t divide by 0
+  const divisor =
+    (userOwnership.length ? OWNERSHIP_WEIGHT : 0) +
+    (userCategories.length ? CATEGORY_WEIGHT : 0) +
+    (userEthics.length ? ETHICS_WEIGHT : 0) +
+    (userEnvironmental.length ? ENVIRONMENTAL_WEIGHT : 0) +
+    (userPreferences.socialResponsibility?.toLowerCase() === "yes" ? SOCIAL_WEIGHT : 0);
+  const effectiveDivisor = divisor || 1;
+
   for (let i = 0; i < 300; i++) {
     userVector[i] =
-      (ownershipVector[i] * 2 +
-        categoriesVector[i] * 2 +
-        ethicsVector[i] * 1.5 +
-        environmentalVector[i] * 1.5 +
-        socialVector[i]) /
-      (
-        (userOwnership.length ? 2 : 0) +
-        (userCategories.length ? 2 : 0) +
-        (userEthics.length ? 1.5 : 0) +
-        (userEnvironmental.length ? 1.5 : 0) +
-        (userPreferences.socialResponsibility === "Yes" ? 1 : 0) ||
-        1
-      );
+      (ownershipVector[i] * OWNERSHIP_WEIGHT +
+        categoriesVector[i] * CATEGORY_WEIGHT +
+        ethicsVector[i] * ETHICS_WEIGHT +
+        environmentalVector[i] * ENVIRONMENTAL_WEIGHT +
+        socialVector[i] * SOCIAL_WEIGHT) / effectiveDivisor;
   }
 
-  // Fetch brands and products from Supabase
-  const { data: brands } = await supabase.from("brands").select("*");
-  const { data: products } = await supabase.from("products").select("*");
-  if (!brands || !products) throw new Error("Could not fetch brands or products");
+  // Fetch brands from Supabase
+  const { data: brands, error: brandsError } = await supabase.from("brands").select("*");
 
-  // Score brands based on how well they match the user's preferences
+  console.log("Brands fetched:", brands ? brands.length : 0, "Error:", brandsError);
+
+  if (!brands || brands.length === 0) {
+    console.error("No brands found in database", { brandsError });
+    throw new Error("No brands found in database");
+  }
+
+
+  // Check if products table exists and has data
+  const { data: products, error: productsError } = await supabase.from("products").select("*");
+
+  console.log("Products fetched:", products ? products.length : 0, "Error:", productsError);
+
+  // If no products, throw an error
+  if (!products || products.length === 0) {
+    console.error("No products found in database", { productsError });
+    throw new Error("No products found in database");
+  }
+
+  // Use the actual products from the database
+  let finalProducts = products;
+
+   // Score brands based on how well they match the user's preferences
   let brandCandidates = brands.map((brand) => {
     const brandOwnership = safeArray(brand.ownership);
-    const brandTags = safeArray(brand.tags);
     const brandCategories = safeArray(brand.categories);
 
-    // Check ownership match (boolean)
+    // Build a brand vector from its name, ownership, and categories
+    const brandWords = cleanTextToWords([
+      brand.name || "",
+      ...brandOwnership,
+      ...brandCategories
+    ]);
+    const brandVector = getAverageVector(brandWords);
+
+    // Cosine similarity between user & brand vectors
+    const vectorScore = cosineSimilarity(userVector, brandVector);
+
+    // Ownership match (true/false → used in primary score)
     const ownershipMatch =
       userOwnership.length === 0 ||
-      userOwnership.some(
-        (ownership) =>
-          brandOwnership.some((bo) =>
-            bo.toLowerCase().includes(ownership.toLowerCase())
-          ) ||
-          brandTags.some((tag) =>
-            tag.toLowerCase().includes(ownership.toLowerCase())
-          ) ||
-          (brand.mission &&
-            brand.mission.toLowerCase().includes(ownership.toLowerCase()))
+      userOwnership.some(o =>
+        brandOwnership.some(bo => bo.toLowerCase().includes(o.toLowerCase()))
       );
 
-    // Calculate category match score (0-1)
+    // Category match score (0–1)
     let categoryMatchScore = 0;
-    if (userCategories.length > 0 && brandCategories.length > 0) {
-      const matchingCategories = userCategories.filter((cat) =>
-        brandCategories.some(
-          (brandCat) =>
-            brandCat.toLowerCase().includes(cat.toLowerCase()) ||
-            cat.toLowerCase().includes(brandCat.toLowerCase())
-        )
+    if (userCategories.length && brandCategories.length) {
+      const matching = userCategories.filter(cat =>
+        brandCategories.some(bc => bc.toLowerCase().includes(cat.toLowerCase()))
       );
-      categoryMatchScore = matchingCategories.length / userCategories.length;
+      categoryMatchScore = matching.length / userCategories.length;
     }
 
-    // Calculate ethics match score (0-1)
+   // Calculate ethics match score (0-1)
     const ethicsMatchScore =
       userEthics.length === 0
         ? 0
-        : userEthics.filter(
-            (ethic) =>
-              brandTags.some((tag) =>
-                tag.toLowerCase().includes(ethic.toLowerCase())
-              ) ||
-              (brand.mission &&
-                brand.mission.toLowerCase().includes(ethic.toLowerCase()))
+        : userEthics.filter(ethic =>
+            brandCategories.some(cat =>
+              cat.toLowerCase().includes(ethic.toLowerCase())
+            )
           ).length / userEthics.length;
 
     // Calculate environmental match score (0-1)
-    const environmentalMatchScore =
+          const environmentalMatchScore =
       userEnvironmental.length === 0
         ? 0
-        : userEnvironmental.filter(
-            (env) =>
-              brandTags.some((tag) =>
-                tag.toLowerCase().includes(env.toLowerCase())
-              ) ||
-              (brand.mission &&
-                brand.mission.toLowerCase().includes(env.toLowerCase()))
+        : userEnvironmental.filter(env =>
+            brandCategories.some(cat =>
+              cat.toLowerCase().includes(env.toLowerCase())
+            )
           ).length / userEnvironmental.length;
 
-    // Combine scores with weighted average
-    const primaryScore = (ownershipMatch ? 0.2 : 0) + categoryMatchScore * 0.8;
+    // Final weighted score
+    const primaryScore = (ownershipMatch ? 0.4 : 0) + categoryMatchScore * 0.6;
     const finalScore =
-      primaryScore * 0.7 +
-      ethicsMatchScore * 0.2 +
-      environmentalMatchScore * 0.1;
+      primaryScore * BRAND_PRIMARY_WEIGHT +
+      ethicsMatchScore * BRAND_ETHICS_WEIGHT +
+      environmentalMatchScore * BRAND_ENVIRONMENTAL_WEIGHT +
+      vectorScore * BRAND_VECTOR_WEIGHT;
 
     return {
       ...brand,
       primaryScore,
       ethicsMatchScore,
       environmentalMatchScore,
-      score: finalScore,
+      vectorScore,
+      score: finalScore
     };
   });
 
-  // Select at least 3 brands, with fallback to ethics/environmental matches
-  let ownershipCategoryBrands = brandCandidates.filter((b) => b.primaryScore > 0);
+  // Select at least 5 brands
+  brandCandidates = brandCandidates.sort((a, b) => b.score - a.score);
+  const scoredBrands = brandCandidates.slice(0, 5);
 
-  if (ownershipCategoryBrands.length < 3) {
-    const needed = 3 - ownershipCategoryBrands.length;
-    const fallbackBrands = brandCandidates
-      .filter(
-        (b) =>
-          b.primaryScore === 0 &&
-          (b.ethicsMatchScore > 0 || b.environmentalMatchScore > 0) &&
-          !ownershipCategoryBrands.includes(b)
-      )
-      .sort(
-        (a, b) =>
-          b.ethicsMatchScore + b.environmentalMatchScore -
-          (a.ethicsMatchScore + a.environmentalMatchScore)
-      )
-      .slice(0, needed);
-    ownershipCategoryBrands = [...ownershipCategoryBrands, ...fallbackBrands];
-  }
+// Score products based on user preferences and vector similarity
+  const productCandidates = finalProducts.map((product) => {
+    const brand = brands.find(b => b.id === product.brand_id) || {};
+    const productCategories = safeArray(product.brand_categories);
 
-  const scoredBrands = ownershipCategoryBrands.slice(0, 3);
+    // Build product vector from title, categories, and brand name
+    const productWords = cleanTextToWords([
+      product.title || "",
+      ...productCategories,
+      brand.name || ""
+    ]);
+    const productVector = product.vector || getAverageVector(productWords);
 
-  console.log("Top brands:");
-  scoredBrands.forEach((b) => {
-    console.log(`- ${b.name}: score=${b.score.toFixed(2)}`);
-  });
+    const vectorScore = cosineSimilarity(userVector, productVector);
 
-  // Score products based on user preferences and vector similarity
-  const productCandidates = products
-    .filter((p) => p.title)
-    .map((product) => {
-      const matchingBrand = brands.find((brand) => brand.id === product.brand_id);
-      const brandOwnership = safeArray(matchingBrand?.ownership);
-      const brandTags = safeArray(matchingBrand?.tags);
-      const productCategories = safeArray(product.brand_categories);
-
-      // Ownership match (boolean)
-      const ownershipMatch =
-        userOwnership.length === 0 ||
-        userOwnership.some(
-          (ownership) =>
-            brandOwnership.some((bo) =>
-              bo.toLowerCase().includes(ownership.toLowerCase())
-            ) ||
-            brandTags.some((tag) =>
-              tag.toLowerCase().includes(ownership.toLowerCase())
-            ) ||
-            (matchingBrand?.mission &&
-              matchingBrand.mission.toLowerCase().includes(ownership.toLowerCase()))
-        );
-
-      // Category match score (0-1)
-      let categoryMatchScore = 0;
-      if (userCategories.length > 0 && productCategories.length > 0) {
-        const matchingCategories = userCategories.filter((cat) =>
-          productCategories.some(
-            (prodCat) =>
-              prodCat.toLowerCase().includes(cat.toLowerCase()) ||
-              cat.toLowerCase().includes(prodCat.toLowerCase())
-          )
-        );
-        categoryMatchScore = matchingCategories.length / userCategories.length;
-      }
-
-      // Ethics match score (0-1)
-      const ethicsMatchScore =
-        userEthics.length === 0
-          ? 0
-          : userEthics.filter(
-              (ethic) =>
-                product.title.toLowerCase().includes(ethic.toLowerCase()) ||
-                brandTags.some((tag) =>
-                  tag.toLowerCase().includes(ethic.toLowerCase())
-                ) ||
-                (matchingBrand?.mission &&
-                  matchingBrand.mission.toLowerCase().includes(ethic.toLowerCase()))
-            ).length / userEthics.length;
-
-      // Environmental match score (0-1)
-      const environmentalMatchScore =
-        userEnvironmental.length === 0
-          ? 0
-          : userEnvironmental.filter(
-              (env) =>
-                product.title.toLowerCase().includes(env.toLowerCase()) ||
-                brandTags.some((tag) =>
-                  tag.toLowerCase().includes(env.toLowerCase())
-                ) ||
-                (matchingBrand?.mission &&
-                  matchingBrand.mission.toLowerCase().includes(env.toLowerCase()))
-            ).length / userEnvironmental.length;
-
-      // Vector similarity between user profile and product title
-      const productVector =
-        product.vector || getAverageVector(product.title.split(/\s+/));
-      const vectorScore = cosineSimilarity(userVector, productVector);
-
-      // Combine scores with weighted average
-      const primaryScore = (ownershipMatch ? 0.4 : 0) + categoryMatchScore * 0.6;
-      const finalScore =
-        primaryScore * 0.5 +
-        ethicsMatchScore * 0.2 +
-        environmentalMatchScore * 0.2 +
-        vectorScore * 0.1;
-
-      return {
-        ...product,
-        primaryScore,
-        vectorScore,
-        ethicsMatchScore,
-        environmentalMatchScore,
-        score: finalScore,
-      };
-    });
-
-  // Select top 6 products, ensuring only one product per brand
-  const sortedProducts = productCandidates
-    .filter((p) => p.primaryScore > 0.1)
-    .sort((a, b) => b.score - a.score);
-
-  const seenBrands = new Set();
-  let scoredProducts = [];
-  for (const product of sortedProducts) {
-    if (!seenBrands.has(product.brand_id)) {
-      seenBrands.add(product.brand_id);
-      scoredProducts.push(product);
-      if (scoredProducts.length >= 6) break;
-    }
-  }
-
-  // Fallback if there are fewer than 6 products
-  if (scoredProducts.length < 6) {
-    console.log("Product fallback to ethics/environmental scoring");
-    seenBrands.clear();
-    const fallbackProducts = productCandidates
-      .sort(
-        (a, b) =>
-          b.ethicsMatchScore + b.environmentalMatchScore -
-          (a.ethicsMatchScore + a.environmentalMatchScore)
+    // Ownership match (boolean)
+    const ownershipMatch =
+      userOwnership.length === 0 ||
+      userOwnership.some(o =>
+        safeArray(brand.ownership).some(bo =>
+          bo.toLowerCase().includes(o.toLowerCase())
+        )
       );
-    scoredProducts = [];
-    for (const product of fallbackProducts) {
-      if (!seenBrands.has(product.brand_id)) {
-        seenBrands.add(product.brand_id);
-        scoredProducts.push(product);
-        if (scoredProducts.length >= 6) break;
-      }
+
+    // Category match score (0-1)
+    let categoryMatchScore = 0;
+    if (userCategories.length && productCategories.length) {
+      const matching = userCategories.filter(cat =>
+        productCategories.some(pc =>
+          pc.toLowerCase().includes(cat.toLowerCase())
+        )
+      );
+      categoryMatchScore = matching.length / userCategories.length;
     }
+
+    // Ethics match score (0-1)
+    const ethicsMatchScore =
+      userEthics.length === 0
+        ? 0
+        : userEthics.filter(ethic =>
+            productCategories.some(pc =>
+              pc.toLowerCase().includes(ethic.toLowerCase())
+            )
+          ).length / userEthics.length;
+
+    // Environmental match score (0-1)
+    const environmentalMatchScore =
+      userEnvironmental.length === 0
+        ? 0
+        : userEnvironmental.filter(env =>
+            productCategories.some(pc =>
+              pc.toLowerCase().includes(env.toLowerCase())
+            )
+          ).length / userEnvironmental.length;
+
+   // Combine scores with weighted average
+    const primaryScore = (ownershipMatch ? 0.4 : 0) + categoryMatchScore * 0.6;
+    const finalScore =
+      primaryScore * PRODUCT_PRIMARY_WEIGHT +
+      ethicsMatchScore * PRODUCT_ETHICS_WEIGHT +
+      environmentalMatchScore * PRODUCT_ENVIRONMENTAL_WEIGHT +
+      vectorScore * PRODUCT_VECTOR_WEIGHT;
+
+    return {
+      ...product,
+      primaryScore,
+      ethicsMatchScore,
+      environmentalMatchScore,
+      vectorScore,
+      score: finalScore,
+      brandName: brand.name || "Unknown Brand"
+    };
+  });
+
+ // Select top 10 products, ensuring only 2 products per brand and no duplicates
+  let sortedProducts = productCandidates.sort((a, b) => b.score - a.score);
+
+  const brandCount = {};
+  const filteredProducts = [];
+  const addedProductIds = new Set(); // Track product IDs that have been added
+  const addedProductTitles = new Map(); // Track normalized product titles by brand
+
+  for (const product of sortedProducts) {
+    // Skip if this product ID has already been added
+    if (addedProductIds.has(product.id)) continue;
+
+    const brandName = product.brandName || "Unknown Brand";
+    const normalizedTitle = product.title?.toLowerCase().trim() || "";
+
+    // Check if we already have a product with similar title from this brand
+    const brandProducts = addedProductTitles.get(brandName) || new Set();
+    if (brandProducts.has(normalizedTitle)) continue;
+
+    brandCount[brandName] = (brandCount[brandName] || 0);
+
+    if (brandCount[brandName] < 2) {
+      filteredProducts.push(product);
+      brandCount[brandName]++;
+      addedProductIds.add(product.id); // Mark this product ID as added
+
+      // Track this product title for this brand
+      if (!addedProductTitles.has(brandName)) {
+        addedProductTitles.set(brandName, new Set());
+      }
+      addedProductTitles.get(brandName).add(normalizedTitle);
+    }
+
+    if (filteredProducts.length >= 10) break;
   }
 
-  console.log("Top products:");
-  scoredProducts.forEach((p) => {
-    console.log(`- ${p.title}: score=${p.score.toFixed(2)}`);
-  });
+  const scoredProducts = filteredProducts;
 
   // Return the final recommendations
   return {

@@ -21,11 +21,18 @@ router.post("/", async (req, res) => {
     const recommendations = await getRecommendations(userPreferences);
 
     // Respond with the recommendations in JSON format
-    res.json(recommendations);
+    res.json({
+      success: true,
+      data: recommendations
+    });
   } catch (err) {
     // Log error and respond with HTTP 500 status and error message
     console.error("Recommendation error:", err);
-    res.status(500).json({ error: "Recommendation error" });
+    res.status(500).json({
+      success: false,
+      error: "Recommendation error",
+      message: err.message
+    });
   }
 });
 

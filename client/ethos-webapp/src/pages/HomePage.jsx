@@ -114,7 +114,34 @@ const HomePage = () => {
   };
 
   const handleViewRecommendations = () => {
-    navigate('/feed');
+    // Get stored preferences from localStorage
+    const storedPreferences = localStorage.getItem('quizPreferences');
+
+    if (storedPreferences) {
+      try {
+        // Parse the stored preferences
+        const preferences = JSON.parse(storedPreferences);
+
+        // Navigate to feed page with the stored preferences
+        navigate('/feed', {
+          state: {
+            quizAnswers: {
+              ownership: preferences.ownership || [],
+              productCategory: preferences.categories || [],
+              socialResponsibility: preferences.socialResponsibility || "no",
+              ethicalPractices: preferences.ethics || [],
+              environmentalPractices: preferences.environmentalPractices || []
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Error parsing stored preferences:", error);
+        navigate('/feed'); // Fallback to simple navigation
+      }
+    } else {
+      // If no stored preferences, just navigate to feed page
+      navigate('/feed');
+    }
   };
 
   if (loading) {
@@ -176,16 +203,21 @@ const HomePage = () => {
             Find brands and products that align with your values and support causes you care about.
           </Paragraph>
 
-          {quizCompleted ? (
-            <>
-              <Paragraph style={{ color: '#52c41a', fontWeight: 'bold', marginBottom: '16px' }}>
-                You've already completed the values quiz!
-              </Paragraph>
+          {user ? (
+            // User is logged in
+            quizCompleted ? (
+              // User has completed the quiz
               <Button type="primary" size="large" onClick={handleViewRecommendations}>
                 View Recommendations
               </Button>
-            </>
+            ) : (
+              // User is logged in but hasn't taken the quiz
+              <Button type="primary" size="large" onClick={handleOpenQuizModal}>
+                Take Values Quiz
+              </Button>
+            )
           ) : (
+            // User is not logged in
             <Button type="primary" size="large" onClick={handleOpenQuizModal}>
               Take Values Quiz
             </Button>

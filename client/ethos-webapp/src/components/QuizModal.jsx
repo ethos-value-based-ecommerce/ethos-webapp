@@ -99,8 +99,24 @@ const QuizModal = ({ isOpen, onClose, onSubmit }) => {
       setCurrent(current + 1);
     } else {
       message.success("Quiz completed! Generating recommendations...");
+
+      // Format the preferences object to match what the backend expects
+      const preferences = {
+        ownership: answers.ownership || [],
+        categories: answers.productCategory || [],
+        socialResponsibility: answers.socialResponsibility || "no",
+        ethics: answers.ethicalPractices || [],
+        environmentalPractices: answers.environmentalPractices || []
+      };
+
+      console.log("Storing preferences in localStorage:", preferences);
+
+      // Store preferences in localStorage for future use
+      localStorage.setItem('quizPreferences', JSON.stringify(preferences));
+
       // Close the modal first
       onClose();
+
       // Then submit answers and navigate
       setTimeout(() => {
         onSubmit(answers);
