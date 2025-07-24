@@ -179,12 +179,39 @@ export const recommendationsApi = {
  },
 };
 
+// Brand Upload API functions
+export const brandUploadApi = {
+ // Get all scraped brands
+ getAll: async () => {
+   const response = await apiRequest('/brand-upload');
+   return response || [];
+ },
+
+ // Upload a brand (which triggers scraping)
+ upload: async (brandData) => {
+   const response = await apiRequest('/brand-upload', {
+     method: 'POST',
+     body: JSON.stringify(brandData),
+   });
+   return response;
+ },
+
+ // Delete a scraped brand
+ delete: async (id) => {
+   const response = await apiRequest(`/brand-upload/${id}`, {
+     method: 'DELETE',
+   });
+   return response;
+ },
+};
+
 // Export default API object
 const api = {
  brands: brandsApi,
  categories: categoriesApi,
  products: productsApi,
  recommendations: recommendationsApi,
+ brandUpload: brandUploadApi,
 };
 
 
