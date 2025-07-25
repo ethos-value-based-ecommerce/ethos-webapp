@@ -46,14 +46,19 @@ const SearchProductsPage = () => {
   // Map from brand name (lowercase) to array of categories for faster lookup
   const brandToCategories = useMemo(() => {
     const map = new Map();
+    // Check if brandCategories is an array and has items
+    if (!Array.isArray(brandCategories) || brandCategories.length === 0) {
+      return map;
+    }
 
-    // Handle the new format where brandCategories is an array of objects with name and brands properties
-    if (brandCategories && Array.isArray(brandCategories)) {
-      brandCategories.forEach((category) => {
-        // Skip invalid category objects
+    // Handle the new format where each item has name and brands properties
+    if (brandCategories[0] && 'name' in brandCategories[0] && 'brands' in brandCategories[0]) {
+      // New format: [{name: "category1", brands: ["brand1", "brand2"]}, ...]
+      brandCategories.forEach(category => {
         if (!category || !category.name || !Array.isArray(category.brands)) return;
 
-        // For each brand associated with this category, add the category to that brand's list
+        const categoryName = category.name;
+
         category.brands.forEach(brandName => {
           if (!brandName) return;
 
@@ -62,12 +67,21 @@ const SearchProductsPage = () => {
             map.set(key, []);
           }
 
-          // Add the category name to this brand's categories if not already present
           const brandCategories = map.get(key);
-          if (!brandCategories.includes(category.name)) {
-            brandCategories.push(category.name);
+          if (!brandCategories.includes(categoryName)) {
+            brandCategories.push(categoryName);
           }
         });
+      });
+    } else {
+      brandCategories.forEach(item => {
+        if (!item || !item.brand_name || !item.category_name) return;
+
+        const key = item.brand_name.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, []);
+        }
+        map.get(key).push(item.category_name);
       });
     }
 
@@ -92,15 +106,7 @@ const SearchProductsPage = () => {
         setAllProducts(productData);
         setFilteredProducts(productData);
         setBrandCategories(brandCategoriesData);
-
-        // Ensure categories are in a consistent format
-        // If categoriesData is an array of objects with name property, use it directly
-        // Otherwise, convert string categories to objects with name property
-        const formattedCategories = Array.isArray(categoriesData)
-          ? categoriesData.map(cat => typeof cat === 'string' ? { name: cat } : cat)
-          : [];
-
-        setCategories(formattedCategories);
+        setCategories(categoriesData);
 
         setColorCacheReady(true);
         setLoading(false);
@@ -122,7 +128,6 @@ const SearchProductsPage = () => {
     }
 
     // Fall back to brand mapping if no direct categories
-    // This now uses the brand_name field which is more consistent
     const brandName = product?.brand_name || product?.brand;
     if (!brandName) return [];
 
@@ -161,19 +166,16 @@ const SearchProductsPage = () => {
     setCurrentPage(1);
   };
 
-  // Function to handle category filtering
+    // Function to handle category filtering
   const handleCategoryClick = (category) => {
-    // Ensure we're working with the category name (string)
-    const categoryName = typeof category === 'string' ? category : category.name;
-
     let newSelectedCategories;
 
-    if (selectedCategories.includes(categoryName)) {
+    if (selectedCategories.includes(category)) {
       // Remove category if already selected
-      newSelectedCategories = selectedCategories.filter(cat => cat !== categoryName);
+      newSelectedCategories = selectedCategories.filter(cat => cat !== category);
     } else {
       // Add category if not selected
-      newSelectedCategories = [...selectedCategories, categoryName];
+      newSelectedCategories = [...selectedCategories, category];
     }
 
     setSelectedCategories(newSelectedCategories);
@@ -253,14 +255,11 @@ const SearchProductsPage = () => {
           <div style={{ marginTop: '1rem' }}>
             {categories.length > 0 && colorCacheReady ? (
               categories.map((category, index) => {
-                // Ensure we're working with a category object that has a name property
-                const catName = category.name || (typeof category === 'string' ? category : '');
-
-                // Check if this category is selected
+                const catName = typeof category === 'string' ? category : category.name;
                 const isSelected = selectedCategories.includes(catName);
-
-                // Get the color for this category
-                const tagColor = getCachedCategoryColor(catName) || '#d9d9d9';
+                const tagColor = (catName && typeof catName === 'string')
+                  ? getCachedCategoryColor(catName) || '#d9d9d9'
+                  : '#d9d9d9';
 
                 return (
                   <Tag

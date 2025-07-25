@@ -2,6 +2,11 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
 import './App.css';
+import './styling/cursor.css';
+
+// Custom Cursor
+import CustomCursor from './components/CustomCursor.jsx';
+
 
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -22,81 +27,82 @@ import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
 import { FavoritesProvider } from './contexts/FavoritesContext.jsx';
 
 function AppRoutes() {
-  const { loading, user } = useAuth();
+ const { loading, user } = useAuth();
 
-  // Clean URL hash after auth tokens processed
-  useEffect(() => {
-    if (window.location.hash.includes('access_token')) {
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-  }, []);
+ // Clean URL hash after auth tokens processed
+ useEffect(() => {
+   if (window.location.hash.includes('access_token')) {
+     window.history.replaceState(null, '', window.location.pathname);
+   }
+ }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+ if (loading) {
+   return <div>Loading...</div>;
+ }
 
 
-  return (
-    <Routes>
-      <Route index element={<HomePage />} />
-      <Route
-        path="/login"
-        element={user ? <Navigate to="/" /> : <LoginPage />}
-      />
-      <Route
-        path="/signup"
-        element={user ? <Navigate to="/" /> : <SignUpPage />}
-      />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/search-brands" element={<SearchBrandsPage />} />
-      <Route path="/brands/:id" element={<BrandPage />} />
-      <Route path="/search-products" element={<SearchProductsPage />} />
-      <Route path="/categories" element={<CategoriesPage />} />
-      <Route path="/feed" element={<FeedPage />} />
+ return (
+   <Routes>
+     <Route index element={<HomePage />} />
+     <Route
+       path="/login"
+       element={user ? <Navigate to="/" /> : <LoginPage />}
+     />
+     <Route
+       path="/signup"
+       element={user ? <Navigate to="/" /> : <SignUpPage />}
+     />
+     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+     <Route path="/reset-password" element={<ResetPasswordPage />} />
+     <Route path="/auth/callback" element={<AuthCallback />} />
+     <Route path="/search-brands" element={<SearchBrandsPage />} />
+     <Route path="/brands/:id" element={<BrandPage />} />
+     <Route path="/search-products" element={<SearchProductsPage />} />
+     <Route path="/categories" element={<CategoriesPage />} />
+     <Route path="/feed" element={<FeedPage />} />
 
-      <Route
-        path="/upload-brand"
-        element={
-          <ProtectedRoute>
-            <BrandUploadPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/account"
-        element={
-          <ProtectedRoute requiredRole="user">
-            <AccountPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/brand-account"
-        element={
-          <ProtectedRoute requiredRole="brand">
-            <BrandAccountPage />
-          </ProtectedRoute>
-        }
-      />
+     <Route
+       path="/upload-brand"
+       element={
+         <ProtectedRoute>
+           <BrandUploadPage />
+         </ProtectedRoute>
+       }
+     />
+     <Route
+       path="/account"
+       element={
+         <ProtectedRoute requiredRole="user">
+           <AccountPage />
+         </ProtectedRoute>
+       }
+     />
+     <Route
+       path="/brand-account"
+       element={
+         <ProtectedRoute requiredRole="brand">
+           <BrandAccountPage />
+         </ProtectedRoute>
+       }
+     />
 
-      {/* Optional: catch-all redirect to home */}
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
-  );
+     {/* Optional: catch-all redirect to home */}
+     <Route path="*" element={<Navigate to="/" />} />
+   </Routes>
+ );
 }
 
 function App() {
-  return (
-    <AuthProvider>
-      <FavoritesProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </FavoritesProvider>
-    </AuthProvider>
-  );
+ return (
+   <AuthProvider>
+     <FavoritesProvider>
+       <Router>
+         <CustomCursor />
+         <AppRoutes />
+       </Router>
+     </FavoritesProvider>
+   </AuthProvider>
+ );
 }
 
 export default App;
