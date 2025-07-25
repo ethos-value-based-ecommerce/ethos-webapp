@@ -46,13 +46,45 @@ const SearchProductsPage = () => {
   // Map from brand name (lowercase) to array of categories for faster lookup
   const brandToCategories = useMemo(() => {
     const map = new Map();
-    brandCategories.forEach(({ brand_name, category_name }) => {
-      const key = brand_name.toLowerCase();
-      if (!map.has(key)) {
-        map.set(key, []);
-      }
-      map.get(key).push(category_name);
-    });
+    // Check if brandCategories is an array and has items
+    if (!Array.isArray(brandCategories) || brandCategories.length === 0) {
+      return map;
+    }
+
+    // Handle the new format where each item has name and brands properties
+    if (brandCategories[0] && 'name' in brandCategories[0] && 'brands' in brandCategories[0]) {
+      // New format: [{name: "category1", brands: ["brand1", "brand2"]}, ...]
+      brandCategories.forEach(category => {
+        if (!category || !category.name || !Array.isArray(category.brands)) return;
+
+        const categoryName = category.name;
+
+        category.brands.forEach(brandName => {
+          if (!brandName) return;
+
+          const key = brandName.toLowerCase();
+          if (!map.has(key)) {
+            map.set(key, []);
+          }
+
+          const brandCategories = map.get(key);
+          if (!brandCategories.includes(categoryName)) {
+            brandCategories.push(categoryName);
+          }
+        });
+      });
+    } else {
+      brandCategories.forEach(item => {
+        if (!item || !item.brand_name || !item.category_name) return;
+
+        const key = item.brand_name.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, []);
+        }
+        map.get(key).push(item.category_name);
+      });
+    }
+
     return map;
   }, [brandCategories]);
 
@@ -90,8 +122,16 @@ const SearchProductsPage = () => {
 
   // Function to get brand categories for a product
   const getProductCategories = (product) => {
-    if (!product?.brand) return [];
-    return brandToCategories.get(product.brand.toLowerCase()) || [];
+    // First check if product has brand_categories directly (from database)
+    if (product?.brand_categories && Array.isArray(product.brand_categories)) {
+      return product.brand_categories;
+    }
+
+    // Fall back to brand mapping if no direct categories
+    const brandName = product?.brand_name || product?.brand;
+    if (!brandName) return [];
+
+    return brandToCategories.get(brandName.toLowerCase()) || [];
   };
 
   // Function to handle search
