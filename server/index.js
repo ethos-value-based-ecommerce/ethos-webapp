@@ -696,7 +696,105 @@ app.get('/products/search', async (req, res) => {
   }
 });
 
+
+// Search and save products by brand
+app.post('/products/save', async (req, res) => {
+  try {
+    const { brand } = req.body;
+
+    if (!brand) {
+      return res.status(400).json({
+        success: false,
+        message: 'Brand name is required in the request body',
+      });
+    }
+
+    // First, search for products using SerpAPI
+    const response = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_shopping',
+        q: brand,
+        api_key: process.env.SERP_API_KEY,
+      },
+    });
+
+    // Normalize function (remove accents, lowercase)
+    const normalize = (str) =>
+      str?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+    const normalizedBrand = normalize(brand);
+
+    let products = (response.data.shopping_results || []).filter((p) => {
+      const normalizedTitle = normalize(p.title);
+      return normalizedTitle.includes(normalizedBrand);
+    });
+
+    // Get brand ID from database
+    const { data: brandData, error: brandError } = await supabase
+      .from('brands')
+      .select('id')
+      .ilike('name', `%${brand}%`)
+      .single();
+
+    if (brandError) {
+      console.error('Error finding brand:', brandError.message);
+    }
+
+    const brandId = brandData?.id || null;
+
+    // Prepare products for insertion
+    const productsToInsert = products.map(p => ({
+      id: p.product_id || String(p.position),
+      title: p.title,
+      price: p.extracted_price ? `$${p.extracted_price.toFixed(2)}` : p.price || 'N/A',
+      website: p.product_link || p.link,
+      image: p.thumbnail ||
+             (p.thumbnails && p.thumbnails.length > 0 ? p.thumbnails[0] : null) ||
+             (p.serpapi_thumbnails && p.serpapi_thumbnails.length > 0 ? p.serpapi_thumbnails[0] : null),
+      brand_name: brand,
+      created_at: new Date().toISOString(),
+      brand_vector: p.brand_vector || null,
+      vector: p.vector || null,
+      brand_categories: p.brand_categories || null,
+      brand_id: brandId
+    }));
+
+    // Insert products into database
+    const { data: savedProducts, error: insertError } = await supabase
+      .from('products')
+      .upsert(productsToInsert, {
+        onConflict: 'id',
+        ignoreDuplicates: false
+      })
+      .select();
+
+    if (insertError) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to save products to database',
+        error: insertError.message
+      });
+    }
+
+    res.json({
+      success: true,
+      data: savedProducts || productsToInsert,
+      total: productsToInsert.length,
+      message: `Successfully saved ${productsToInsert.length} products for brand "${brand}" to database`
+    });
+  } catch (error) {
+    console.error('Error in product search and save:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to search and save products',
+      error: error.message,
+    });
+  }
+});
+
+
 // Use recommendation router and brand-upload router.
+
 app.use('/recommendations', recommendationsRouter);
 app.use('/brand-upload', brandUploadRouter);
 
