@@ -144,19 +144,16 @@ export const productsApi = {
  },
 
 
- // Search products
- search: async (query, category, brand, limit = 20) => {
-   const params = new URLSearchParams();
-   if (query) params.append('query', query);
-   if (category) params.append('category', category);
-   if (brand) params.append('brand', brand);
-   if (limit) params.append('limit', limit.toString());
+// Search products
+search: async (query, limit = 20) => {
+  const params = new URLSearchParams();
+  if (query) params.append('query', query);
+  if (limit) params.append('limit', limit.toString());
 
-
-   const endpoint = `/products/search${params.toString() ? `?${params.toString()}` : ''}`;
-   const response = await apiRequest(endpoint);
-   return response.data || [];
- },
+  const endpoint = `/products/search${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await apiRequest(endpoint);
+  return response.data || [];
+},
 
 
  // Get product categories
