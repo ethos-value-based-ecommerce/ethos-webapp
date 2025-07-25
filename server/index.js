@@ -24,7 +24,6 @@ app.use(bodyParser.json())
 
 // Import routes
 const recommendationsRouter = require('./routes/recommendations.js');
-const brandUploadRouter = require('./routes/brandUpload.js');
 
 // Routes
 
@@ -696,9 +695,7 @@ app.get('/products/search', async (req, res) => {
   }
 });
 
-// Use recommendation router and brand-upload router.
 app.use('/recommendations', recommendationsRouter);
-app.use('/brand-upload', brandUploadRouter);
 
 
 
