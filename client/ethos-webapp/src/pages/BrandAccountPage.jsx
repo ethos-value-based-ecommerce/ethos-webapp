@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Layout, Typography, Card, Row, Col, Space, Button, Tabs, Table, Tag, message } from 'antd';
-import { HomeOutlined, LogoutOutlined, PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Layout, Typography, Card, Row, Col, Space, Button, Tabs, Table, Tag, message, Spin, Modal, Descriptions, Image } from 'antd';
+import { HomeOutlined, LogoutOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
+import { brandUploadApi } from '../services/api.jsx';
 
 const { Content, Header } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -13,7 +14,41 @@ const { TabPane } = Tabs;
 const BrandAccountPage = ({ user }) => {
     const navigate = useNavigate();
     const { signOut } = useAuth();
-    const [submittedBrands] = useState([]);
+    const [submittedBrands, setSubmittedBrands] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [viewModalVisible, setViewModalVisible] = useState(false);
+    const [currentBrand, setCurrentBrand] = useState(null);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    // Fetch scraped brands when component mounts
+    useEffect(() => {
+        const fetchBrands = async () => {
+            try {
+                const brands = await brandUploadApi.getAll();
+                // Transform the data to match the table structure
+                const formattedBrands = brands.map(brand => ({
+                    id: brand.id,
+                    name: brand.name,
+                    status: 'pending', // Default status for newly submitted brands
+                    categories: brand.categories || [],
+                    submittedDate: new Date(brand.created_at).toLocaleDateString(),
+                    website: brand.website,
+                    logo_url: brand.logo_url,
+                    description: brand.description,
+                    mission: brand.mission
+                }));
+                setSubmittedBrands(formattedBrands);
+            } catch (error) {
+                console.error('Error fetching brands:', error);
+                message.error('Failed to load submitted brands');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchBrands();
+    }, []);
 
     const handleLogout = async () => {
         try {
@@ -76,11 +111,23 @@ const BrandAccountPage = ({ user }) => {
         {
             title: 'Actions',
             key: 'actions',
-            render: () => (
+            render: (_, record) => (
                 <Space>
-                    <Button size="small" icon={<EyeOutlined />}>View</Button>
-                    <Button size="small" icon={<EditOutlined />}>Edit</Button>
-                    <Button size="small" danger icon={<DeleteOutlined />}>Delete</Button>
+                    <Button
+                        size="small"
+                        icon={<EyeOutlined />}
+                        onClick={() => handleViewBrand(record)}
+                    >
+                        View
+                    </Button>
+                    <Button
+                        size="small"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteConfirm(record)}
+                    >
+                        Delete
+                    </Button>
                 </Space>
             )
         }
@@ -234,13 +281,98 @@ const BrandAccountPage = ({ user }) => {
                                 </Row>
                             </div>
 
-                            <Table
-                                columns={columns}
-                                dataSource={submittedBrands}
-                                rowKey="id"
-                                pagination={{ pageSize: 10 }}
-                                style={{ marginTop: '16px' }}
-                            />
+                            {loading ? (
+                                <div style={{ textAlign: 'center', padding: '40px 0' }}>
+                                    <Spin size="large" />
+                                    <p style={{ marginTop: '16px' }}>Loading your submitted brands...</p>
+                                </div>
+                            ) : (
+                                <Table
+                                    columns={columns}
+                                    dataSource={submittedBrands}
+                                    rowKey="id"
+                                    pagination={{ pageSize: 10 }}
+                                    style={{ marginTop: '16px' }}
+                                    locale={{ emptyText: 'No brands submitted yet. Click "Submit New Brand" to get started!' }}
+                                />
+                            )}
+
+                            {/* View Brand Modal */}
+                            <Modal
+                                title={currentBrand?.name ? `${currentBrand.name} Details` : "Brand Details"}
+                                open={viewModalVisible}
+                                onCancel={() => setViewModalVisible(false)}
+                                footer={[
+                                    <Button key="close" onClick={() => setViewModalVisible(false)}>
+                                        Close
+                                    </Button>
+                                ]}
+                                width={700}
+                            >
+                                {currentBrand && (
+                                    <div>
+                                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                            <Image
+                                                src={currentBrand.logo_url}
+                                                alt={currentBrand.name}
+                                                style={{ maxHeight: '150px', objectFit: 'contain' }}
+                                                fallback="https://blocks.astratic.com/img/general-img-square.png"
+                                            />
+                                        </div>
+
+                                        <Descriptions bordered column={1}>
+                                            <Descriptions.Item label="Brand Name">{currentBrand.name}</Descriptions.Item>
+                                            <Descriptions.Item label="Website">
+                                                <a href={currentBrand.website} target="_blank" rel="noopener noreferrer">
+                                                    {currentBrand.website}
+                                                </a>
+                                            </Descriptions.Item>
+                                            <Descriptions.Item label="Status">
+                                                <Tag color={getStatusColor(currentBrand.status)}>
+                                                    {currentBrand.status.toUpperCase()}
+                                                </Tag>
+                                            </Descriptions.Item>
+                                            <Descriptions.Item label="Submitted Date">
+                                                {currentBrand.submittedDate}
+                                            </Descriptions.Item>
+                                            <Descriptions.Item label="Categories">
+                                                {currentBrand.categories.map(category => (
+                                                    <Tag key={category} color="blue">{category}</Tag>
+                                                ))}
+                                            </Descriptions.Item>
+                                            <Descriptions.Item label="Mission">
+                                                {currentBrand.mission || "No mission statement available"}
+                                            </Descriptions.Item>
+                                            <Descriptions.Item label="Description">
+                                                {currentBrand.description || "No description available"}
+                                            </Descriptions.Item>
+                                        </Descriptions>
+                                    </div>
+                                )}
+                            </Modal>
+
+                            {/* Delete Confirmation Modal */}
+                            <Modal
+                                title="Delete Brand"
+                                open={deleteModalVisible}
+                                onCancel={() => setDeleteModalVisible(false)}
+                                footer={[
+                                    <Button key="cancel" onClick={() => setDeleteModalVisible(false)}>
+                                        Cancel
+                                    </Button>,
+                                    <Button
+                                        key="delete"
+                                        type="primary"
+                                        danger
+                                        loading={deleteLoading}
+                                        onClick={handleDeleteBrand}
+                                    >
+                                        Delete
+                                    </Button>
+                                ]}
+                            >
+                                <p>Are you sure you want to delete the brand "{currentBrand?.name}"? This action cannot be undone.</p>
+                            </Modal>
                         </TabPane>
 
                         <TabPane tab="Guidelines" key="2">
@@ -285,6 +417,41 @@ const BrandAccountPage = ({ user }) => {
             </Content>
         </Layout>
     );
+
+    // Function to handle viewing a brand's details
+    function handleViewBrand(brand) {
+        setCurrentBrand(brand);
+        setViewModalVisible(true);
+    }
+
+    // Function to show delete confirmation modal
+    function handleDeleteConfirm(brand) {
+        setCurrentBrand(brand);
+        setDeleteModalVisible(true);
+    }
+
+    // Function to delete a brand
+    async function handleDeleteBrand() {
+        if (!currentBrand?.id) return;
+
+        setDeleteLoading(true);
+        try {
+            await brandUploadApi.delete(currentBrand.id);
+            message.success(`Brand "${currentBrand.name}" has been deleted successfully`);
+
+            // Remove the deleted brand from the state
+            setSubmittedBrands(prevBrands =>
+                prevBrands.filter(brand => brand.id !== currentBrand.id)
+            );
+
+            setDeleteModalVisible(false);
+        } catch (error) {
+            console.error('Error deleting brand:', error);
+            message.error('Failed to delete brand. Please try again.');
+        } finally {
+            setDeleteLoading(false);
+        }
+    }
 };
 
 export default BrandAccountPage;

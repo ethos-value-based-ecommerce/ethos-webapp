@@ -8,7 +8,8 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
-    "natural": "^8.1.0"
+    "natural": "^8.1.0",
+    "puppeteer": "^24.14.0"
   },
   "name": "server",
   "version": "1.0.0",

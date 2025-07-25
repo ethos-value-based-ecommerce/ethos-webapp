@@ -1,19 +1,18 @@
 import React, {useState} from 'react';
-import { Form, Input, Button, Select, Layout, Typography, Row, Col, Card } from 'antd';
+import { Form, Input, Button, Layout, Typography, Row, Col, Card, message } from 'antd';
 import { UploadOutlined, SendOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 import Footer from '../components/Footer.jsx';
 import NavBar from '../components/NavBar.jsx';
+import { brandUploadApi } from '../services/api.jsx';
 import '../App.css';
 
-const { TextArea } = Input;
-const { Option } = Select;
 const { Title, Paragraph } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
 
-// Function to render the BrandUploadPage with image, descriptions, and categories.
-const BrandUploadPage = ({ categories }) => {
+// Function to render the BrandUploadPage with brand name, website, and logo.
+const BrandUploadPage = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
@@ -21,16 +20,34 @@ const BrandUploadPage = ({ categories }) => {
         navigate(-1); // Go back to previous page
     };
 
+    const [loading, setLoading] = useState(false);
+
     const handleSubmit = async (values) => {
-        // TO DO: Add code to submit brand data to backend
+        setLoading(true);
         try {
-            console.log('Brand submission data:', values);
+            // Prepare data for API call
+            const brandData = {
+                brand: values.brandName,
+                website: values.website,
+                logo: values.imgURL
+            };
+
+            // Call the API to upload brand data
+            const response = await brandUploadApi.upload(brandData);
+
+            console.log('Brand submission successful:', response);
+            message.success('Brand submitted successfully! The website is being scraped for additional information.');
+
             // Reset the form after successful submission
             form.resetFields();
 
+            // Navigate to the brand account page to see the submitted brand
+            navigate('/brand-account');
         } catch (error) {
             console.error('Error submitting brand:', error);
-
+            message.error('Failed to submit brand. Please try again.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,60 +139,6 @@ const BrandUploadPage = ({ categories }) => {
                                     </Col>
                                 </Row>
 
-                                <Row gutter={16}>
-                                    <Col span={24}>
-                                        <Form.Item
-                                            label={<span style={{ fontWeight: '600' }}>Brand Description</span>}
-                                            name="description"
-                                            rules={[{ required: true, message: 'Please enter a brand description' }]}
-                                        >
-                                            <TextArea
-                                                rows={4}
-                                                placeholder="Tell us about your brand, what makes it special, and what products or services you offer..."
-                                                style={{ borderRadius: '8px' }}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-
-                                <Row gutter={16}>
-                                    <Col span={24}>
-                                        <Form.Item
-                                            label={<span style={{ fontWeight: '600' }}>Brand Mission</span>}
-                                            name="mission"
-                                            rules={[{ required: true, message: 'Please enter your brand mission' }]}
-                                        >
-                                            <TextArea
-                                                rows={4}
-                                                placeholder="What is your brand's mission? How do you contribute to sustainability and ethical practices?"
-                                                style={{ borderRadius: '8px' }}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-
-                                <Row gutter={16}>
-                                    <Col span={24}>
-                                        <Form.Item
-                                            label={<span style={{ fontWeight: '600' }}>Categories</span>}
-                                            name="category"
-                                            rules={[{ required: true, message: 'Please select at least one category' }]}
-                                        >
-                                            <Select
-                                                mode="multiple"
-                                                placeholder="Select categories that best describe your brand"
-                                                style={{ borderRadius: '8px' }}
-                                                maxTagCount="responsive"
-                                            >
-                                                {categories && categories.map(category => (
-                                                    <Option key={category} value={category}>
-                                                        {category}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
 
                                 <Row gutter={16}>
                                     <Col span={24}>
@@ -201,6 +164,7 @@ const BrandUploadPage = ({ categories }) => {
                                         htmlType="submit"
                                         size="large"
                                         icon={<SendOutlined />}
+                                        loading={loading}
                                         style={{
                                             borderRadius: '8px',
                                             height: '48px',
