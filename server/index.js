@@ -696,6 +696,14 @@ app.get('/products/search', async (req, res) => {
   }
 });
 
+/*
+  Explanation:
+  I added this code to improve search reliability because SerpAPI (Google Shopping) only returns products that appear
+  in its current search results, usually limited to the first page. For example, if I search for “indigenous makeup,”
+  and a product from one of my brands doesn’t show up in the top results, SerpAPI would return nothing, even though the
+  product exists. By storing products in my own database, I can return relevant products from known brands even when Google
+  Shopping doesn’t immediately surface them.
+*/
 
 // Search and save products by brand
 app.post('/products/save', async (req, res) => {
