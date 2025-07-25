@@ -24,6 +24,7 @@ app.use(bodyParser.json())
 
 // Import routes
 const recommendationsRouter = require('./routes/recommendations.js');
+const brandUploadRouter = require('./routes/brandUpload.js');
 
 // Routes
 
@@ -492,72 +493,24 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Get all products from a few brands.
+// Get all products from the database
 app.get('/products/all', async (req, res) => {
   try {
+    // Fetch ALL products — no limit
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*');
 
-    // Limits the number of brands to process
-  const limit = Math.min(parseInt(req.query.limit) || 10, 10); // 10 Brands
-
-    // First, get brands from the brands table with limit
-    const { data: brands, error } = await supabase
-      .from('brands')
-      .select('name, brand_name')
-      .limit(limit);
-
-    if (error || !brands || brands.length === 0) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to load brands',
-        error: error?.message,
-      });
+    if (error) {
+      throw new Error(error.message);
     }
-
-    // Extract brand names for searching
-    const brandNames = brands.map(b => b.brand_name || b.name);
-
-    // Query SerpAPI once per brand, get up to 2 products each
-    const allProducts = await Promise.all(
-      brandNames.map(async (brand) => {
-        try {
-          const response = await axios.get('https://serpapi.com/search.json', {
-            params: {
-              engine: 'google_shopping',
-              q: brand,
-              api_key: process.env.SERP_API_KEY,
-              num: 2,
-            },
-          });
-
-          const products = response.data.shopping_results || [];
-          // Add brand information to each product and limit to 2 products per brand
-          return products.slice(0, 2).map(p => ({
-            ...p,
-            brand,
-            image: p.thumbnail ||
-                  (p.thumbnails && p.thumbnails.length > 0 ? p.thumbnails[0] : null) ||
-                  (p.serpapi_thumbnails && p.serpapi_thumbnails.length > 0 ? p.serpapi_thumbnails[0] : null),
-                }));
-          }
-        catch (err) {
-          console.error(`Error fetching products for brand ${brand}:`, err.message);
-          return [];
-        }
-      })
-    );
-
-    // Flatten results (array of arrays to single array)
-    const flattenedProducts = allProducts.flat();
 
     res.json({
       success: true,
-      data: flattenedProducts,
-      brands_searched: brandNames,
-      brands_processed: brandNames.length,
-      total: flattenedProducts.length,
-      message: `Processed ${brandNames.length} brands.`,
+      data: products,
+      total: products.length,
+      message: `Retrieved ${products.length} product(s) from the database.`,
     });
-
   } catch (error) {
     console.error('Error retrieving all products:', error.message);
     res.status(500).json({
@@ -568,37 +521,64 @@ app.get('/products/all', async (req, res) => {
   }
 });
 
-// Get product categories
+// Get product categories based on products table
 app.get('/product/categories', async (req, res) => {
   try {
-    // Get brand categories from the brand_category table
-    const { data: productCategories, error } = await supabase
-      .from('brand_category')
-      .select('brand_name, category_name')
+    // Fetch brand_categories and brand_name from all products
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('brand_categories, brand_name');
 
     if (error) {
       return res.status(500).json({
         success: false,
         message: 'Failed to retrieve product categories',
         error: error.message
-      })
+      });
     }
+
+    // Create a map of category to brands
+    const categoryToBrands = new Map();
+
+    // Process each product
+    products.forEach(product => {
+      const brandName = product.brand_name;
+      const categories = product.brand_categories || [];
+
+      if (brandName && categories.length > 0) {
+        categories.forEach(category => {
+          if (!category) return; // Skip null/undefined categories
+
+          if (!categoryToBrands.has(category)) {
+            categoryToBrands.set(category, new Set());
+          }
+          categoryToBrands.get(category).add(brandName);
+        });
+      }
+    });
+
+    // Convert the map to an array of objects with category and brands
+    const categoriesWithBrands = Array.from(categoryToBrands.entries()).map(([category, brandsSet]) => ({
+      name: category,
+      brands: Array.from(brandsSet)
+    }));
 
     res.json({
       success: true,
-      data: productCategories,
-      total: productCategories.length
-    })
+      data: categoriesWithBrands,
+      total: categoriesWithBrands.length
+    });
   } catch (error) {
+    console.error('Error retrieving product categories:', error.message);
     res.status(500).json({
       success: false,
       message: 'Failed to retrieve product categories',
       error: error.message
-    })
+    });
   }
-})
+});
 
-// Search products with query parameters - optimized into 1 API call and now working
+// Search products with query parameters - now using Supabase instead of SerpAPI
 app.get('/products/search', async (req, res) => {
   try {
     const { query, limit = 20 } = req.query;
@@ -610,80 +590,27 @@ app.get('/products/search', async (req, res) => {
       });
     }
 
-    // Use the exact brand name from database
-    const { data: allBrands, error: brandsError } = await supabase
-      .from('brands')
-      .select('name, brand_name');
+    const productLimit = Math.min(parseInt(limit) || 20, 1000);
 
-    if (brandsError || !allBrands || allBrands.length === 0) {
-      return res.json({
-        success: true,
-        data: [],
-        message: 'No brands found in database.',
-        total: 0,
-      });
+    // Query products table with case-insensitive partial match on title
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*')
+      .ilike('title', `%${query}%`) // case-insensitive LIKE
+
+    if (error) {
+      throw new Error(error.message);
     }
 
-    const productLimit = Math.min(parseInt(limit) || 20, 50);
-
-    // Search for products from each brand by calling the API
-    const response = await axios.get('https://serpapi.com/search.json', {
-      params: {
-        engine: 'google_shopping',
-        q: query.trim(),
-        api_key: process.env.SERP_API_KEY,
-        num: 50,
-      },
-    });
-
-    const products = response.data.shopping_results || [];
-
-    // Normalize function (remove accents, lowercase)
-    const normalize = str => str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-    // Create regex pattern using normalized brand_name
-    const escapedBrands = allBrands
-      .filter(b => b.brand_name)
-      .map(b => normalize(b.brand_name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-
-    const brandPattern = new RegExp(`(${escapedBrands.join('|')})`, 'i');
-
-    // Match products
-    const matchedProducts = products
-      .map(product => {
-        const normalizedTitle = normalize(product.title || '');
-        const normalizedSource = normalize(product.source || '');
-
-        const match = brandPattern.exec(normalizedTitle) || brandPattern.exec(normalizedSource);
-
-        if (match) {
-          // Find the original brand record using the normalized match
-          const matchedBrand = allBrands.find(({ brand_name }) =>
-            normalize(brand_name) === match[1].toLowerCase()
-          );
-
-          return {
-            ...product,
-            brand: matchedBrand ? matchedBrand.name : match[1],
-            image:
-             product.thumbnail ||
-            (product.thumbnails && product.thumbnails.length > 0 ? product.thumbnails[0] : null) ||
-            (product.serpapi_thumbnails && product.serpapi_thumbnails.length > 0 ? product.serpapi_thumbnails[0] : null),
-          };
-        }
-
-        return null;
-      })
-      .filter(Boolean);
+    // Defensive: ensure products is an array
+    const safeProducts = Array.isArray(products) ? products : [];
 
     res.json({
       success: true,
-      data: matchedProducts.slice(0, productLimit),
+      data: safeProducts.slice(0, productLimit),
       query,
-      brand:'',
-      brands_searched: allBrands.map(b => b.name),
-      total: matchedProducts.length,
-      message: `Searched '${query}' and returned products matching ${matchedProducts.length} of ${allBrands.length} known brands.`,
+      total: safeProducts.length,
+      message: `Found ${safeProducts.length} product(s) matching '${query}'.`,
     });
   } catch (error) {
     console.error('Error in product search:', error.message);
@@ -695,7 +622,115 @@ app.get('/products/search', async (req, res) => {
   }
 });
 
+/*
+  Explanation:
+  I added this code to improve search reliability because SerpAPI (Google Shopping) only returns products that appear
+  in its current search results, usually limited to the first page. For example, if I search for “indigenous makeup,”
+  and a product from one of my brands doesn’t show up in the top results, SerpAPI would return nothing, even though the
+  product exists. By storing products in my own database, I can return relevant products from known brands even when Google
+  Shopping doesn’t immediately surface them.
+*/
+
+// Search and save products by brand
+app.post('/products/save', async (req, res) => {
+  try {
+    const { brand } = req.body;
+
+    if (!brand) {
+      return res.status(400).json({
+        success: false,
+        message: 'Brand name is required in the request body',
+      });
+    }
+
+    // First, search for products using SerpAPI
+    const response = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_shopping',
+        q: brand,
+        api_key: process.env.SERP_API_KEY,
+      },
+    });
+
+    // Normalize function (remove accents, lowercase)
+    const normalize = (str) =>
+      str?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+    const normalizedBrand = normalize(brand);
+
+    let products = (response.data.shopping_results || []).filter((p) => {
+      const normalizedTitle = normalize(p.title);
+      return normalizedTitle.includes(normalizedBrand);
+    });
+
+    // Get brand ID from database
+    const { data: brandData, error: brandError } = await supabase
+      .from('brands')
+      .select('id')
+      .ilike('name', `%${brand}%`)
+      .single();
+
+    if (brandError) {
+      console.error('Error finding brand:', brandError.message);
+    }
+
+    const brandId = brandData?.id || null;
+
+    // Prepare products for insertion
+    const productsToInsert = products.map(p => ({
+      id: p.product_id || String(p.position),
+      title: p.title,
+      price: p.extracted_price ? `$${p.extracted_price.toFixed(2)}` : p.price || 'N/A',
+      website: p.product_link || p.link,
+      image: p.thumbnail ||
+             (p.thumbnails && p.thumbnails.length > 0 ? p.thumbnails[0] : null) ||
+             (p.serpapi_thumbnails && p.serpapi_thumbnails.length > 0 ? p.serpapi_thumbnails[0] : null),
+      brand_name: brand,
+      created_at: new Date().toISOString(),
+      brand_vector: p.brand_vector || null,
+      vector: p.vector || null,
+      brand_categories: p.brand_categories || null,
+      brand_id: brandId
+    }));
+
+    // Insert products into database
+    const { data: savedProducts, error: insertError } = await supabase
+      .from('products')
+      .upsert(productsToInsert, {
+        onConflict: 'id',
+        ignoreDuplicates: false
+      })
+      .select();
+
+    if (insertError) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to save products to database',
+        error: insertError.message
+      });
+    }
+
+    res.json({
+      success: true,
+      data: savedProducts || productsToInsert,
+      total: productsToInsert.length,
+      message: `Successfully saved ${productsToInsert.length} products for brand "${brand}" to database`
+    });
+  } catch (error) {
+    console.error('Error in product search and save:', error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to search and save products',
+      error: error.message,
+    });
+  }
+});
+
+
+// Use recommendation router and brand-upload router.
+
 app.use('/recommendations', recommendationsRouter);
+app.use('/brand-upload', brandUploadRouter);
 
 
 

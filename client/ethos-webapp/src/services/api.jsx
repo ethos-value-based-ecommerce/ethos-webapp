@@ -144,19 +144,16 @@ export const productsApi = {
  },
 
 
- // Search products
- search: async (query, category, brand, limit = 20) => {
-   const params = new URLSearchParams();
-   if (query) params.append('query', query);
-   if (category) params.append('category', category);
-   if (brand) params.append('brand', brand);
-   if (limit) params.append('limit', limit.toString());
+// Search products
+search: async (query, limit = 20) => {
+  const params = new URLSearchParams();
+  if (query) params.append('query', query);
+  if (limit) params.append('limit', limit.toString());
 
-
-   const endpoint = `/products/search${params.toString() ? `?${params.toString()}` : ''}`;
-   const response = await apiRequest(endpoint);
-   return response.data || [];
- },
+  const endpoint = `/products/search${params.toString() ? `?${params.toString()}` : ''}`;
+  const response = await apiRequest(endpoint);
+  return response.data || [];
+},
 
 
  // Get product categories
@@ -179,12 +176,39 @@ export const recommendationsApi = {
  },
 };
 
+// Brand Upload API functions
+export const brandUploadApi = {
+ // Get all scraped brands
+ getAll: async () => {
+   const response = await apiRequest('/brand-upload');
+   return response || [];
+ },
+
+ // Upload a brand (which triggers scraping)
+ upload: async (brandData) => {
+   const response = await apiRequest('/brand-upload', {
+     method: 'POST',
+     body: JSON.stringify(brandData),
+   });
+   return response;
+ },
+
+ // Delete a scraped brand
+ delete: async (id) => {
+   const response = await apiRequest(`/brand-upload/${id}`, {
+     method: 'DELETE',
+   });
+   return response;
+ },
+};
+
 // Export default API object
 const api = {
  brands: brandsApi,
  categories: categoriesApi,
  products: productsApi,
  recommendations: recommendationsApi,
+ brandUpload: brandUploadApi,
 };
 
 
