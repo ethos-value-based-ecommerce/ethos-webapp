@@ -1,11 +1,99 @@
+@import './styling/colors.css';
+
 * {
   font-family: Arial, sans-serif;
   margin: 0;
-  color: black;
+  color: var(--body-text);
 }
 
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  background-color: var(--background-primary);
+}
+
+/* Global button styling - More specific selectors to override Ant Design defaults */
+.ant-btn.ant-btn-primary,
+button.ant-btn-primary {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+.ant-btn.ant-btn-primary:hover,
+.ant-btn.ant-btn-primary:focus,
+.ant-btn.ant-btn-primary:active,
+button.ant-btn-primary:hover,
+button.ant-btn-primary:focus,
+button.ant-btn-primary:active {
+  background-color: var(--button-hover) !important;
+  border-color: var(--button-hover) !important;
+  color: var(--button-text) !important;
+}
+
+.ant-btn.ant-btn-default,
+button.ant-btn-default {
+  border-color: var(--border-color) !important;
+  color: var(--body-text) !important;
+  background-color: white !important;
+}
+
+.ant-btn.ant-btn-default:hover,
+.ant-btn.ant-btn-default:focus,
+.ant-btn.ant-btn-default:active,
+button.ant-btn-default:hover,
+button.ant-btn-default:focus,
+button.ant-btn-default:active {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  background-color: white !important;
+}
+
+/* Remove ALL blue outlines and effects on buttons */
+.ant-btn:focus,
+.ant-btn:active,
+.ant-btn-primary:focus,
+.ant-btn-primary:active,
+.ant-btn-default:focus,
+.ant-btn-default:active,
+button.ant-btn:focus,
+button.ant-btn:active,
+button.ant-btn-primary:focus,
+button.ant-btn-primary:active,
+button.ant-btn-default:focus,
+button.ant-btn-default:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Override Ant Design's default focus styles */
+.ant-btn::after,
+button.ant-btn::after {
+  display: none !important;
+}
+
+/* Override any blue wave effect */
+.ant-wave {
+  display: none !important;
+}
+
+/* Global heading styling */
+h1, h2, h3, h4, h5, h6,
+.ant-typography h1,
+.ant-typography h2,
+.ant-typography h3,
+.ant-typography h4,
+.ant-typography h5,
+.ant-typography h6 {
+  color: var(--heading-text);
+}
+
+/* Global link styling */
+a {
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--accent);
 }
