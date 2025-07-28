@@ -91,63 +91,76 @@ const BrandCard = ({ brand, onTagClick }) => {
         </div>
       }
     >
-      <Meta
-        title={brand.name}
-        description={
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {brand.mission && (
-              <Paragraph style={{ margin: 0, fontStyle: 'italic' }}>
-                {brand.mission}
-              </Paragraph>
-            )}
+      
+      <div style={{ paddingBottom: '60px' }}>
+        <Meta
+          title={brand.name}
+          description={
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {brand.mission && (
+                <Paragraph style={{ margin: 0, fontStyle: 'italic' }}>
+                  {brand.mission}
+                </Paragraph>
+              )}
 
-            {brand.description && (
-              <Paragraph style={{ margin: 0 }}>
-                {brand.description}
-              </Paragraph>
-            )}
+              {brand.description && (
+                <Paragraph style={{ margin: 0 }}>
+                  {brand.description}
+                </Paragraph>
+              )}
 
-            {brand.categories && brand.categories.length > 0 && (
-              <div style={{ marginTop: '8px' }}>
-                {brand.categories.map((tag, index) => {
-                  const baseColor = getCachedCategoryColor(tag);
-                  return (
-                    <Tag
-                      key={index}
-                      onClick={() => onTagClick && onTagClick(tag)}
-                      style={{
-                        cursor: 'pointer',
-                        marginBottom: '4px',
-                        backgroundColor: `${baseColor}20`, // light pastel fill (12.5% opacity)
-                        border: `1.5px solid ${baseColor}80`, // subtle border (~50% opacity)
-                        color: baseColor,
-                        fontWeight: '600',
-                        borderRadius: '20px',
-                        userSelect: 'none',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        padding: '0 12px',
-                      }}
-                    >
-                      {tag}
-                    </Tag>
-                  );
-                })}
-              </div>
-            )}
+              {brand.categories && brand.categories.length > 0 && (
+                <div style={{ marginTop: '8px' }}>
+                  {brand.categories.map((tag, index) => {
+                    const baseColor = getCachedCategoryColor(tag);
+                    return (
+                      <Tag
+                        key={index}
+                        onClick={() => onTagClick && onTagClick(tag)}
+                        style={{
+                          cursor: 'pointer',
+                          marginBottom: '4px',
+                          backgroundColor: `${baseColor}20`, // light pastel fill (12.5% opacity)
+                          border: `1.5px solid ${baseColor}80`, // subtle border (~50% opacity)
+                          color: baseColor,
+                          fontWeight: '600',
+                          borderRadius: '20px',
+                          userSelect: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: '0 12px',
+                        }}
+                      >
+                        {tag}
+                      </Tag>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          }
+        />
+      </div>
 
-            {brand.website && (
-              <Button
-                type="default"
-                onClick={() => window.open(brand.website, '_blank')}
-                style={{ marginTop: '8px' }}
-              >
-                Visit Website Now!
-              </Button>
-            )}
-          </div>
-        }
-      />
+      {brand.website && (
+        <div style={{
+          position: 'absolute',
+          bottom: '16px',
+          left: '16px',
+          right: '16px'
+        }}>
+          <Button
+            type="default"
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(brand.website, '_blank');
+            }}
+            style={{ width: '100%' }}
+          >
+            Visit Website Now!
+          </Button>
+        </div>
+      )}
     </Card>
   );
 };
