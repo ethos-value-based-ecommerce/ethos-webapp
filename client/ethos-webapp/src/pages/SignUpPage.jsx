@@ -1,4 +1,5 @@
 import '../App.css';
+import '../styling/LoginPages.css';
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -49,39 +50,19 @@ const SignUpPage = () => {
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f0f2f5",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <Card
-        style={{
-          width: 450,
-          padding: 24,
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <Title level={2}>ETHOS</Title>
-          <Title level={4}>Create Your Account</Title>
-          <Paragraph>Choose your account type and sign up:</Paragraph>
+    <div className="auth-container">
+      <Card className="auth-card">
+        <div className="auth-header">
+          <Title level={2} className="auth-title">ETHOS</Title>
+          <Title level={4} className="auth-subtitle">Create Your Account</Title>
+          <Paragraph className="auth-description">Choose your account type and sign up:</Paragraph>
         </div>
 
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
           centered
-          style={{ marginBottom: 24 }}
+          className="auth-tabs"
         >
           <TabPane
             tab={
@@ -92,8 +73,8 @@ const SignUpPage = () => {
             }
             key="user"
           >
-            <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <Paragraph type="secondary">
+            <div className="text-center mb-16">
+              <Paragraph type="secondary" className="auth-description">
                 Create an account to browse brands, save favorites, and manage your profile
               </Paragraph>
             </div>
@@ -108,17 +89,17 @@ const SignUpPage = () => {
             }
             key="brand"
           >
-            <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <Paragraph type="secondary">
+            <div className="text-center mb-16">
+              <Paragraph type="secondary" className="auth-description">
                 Create a brand account to showcase your products and connect with customers
               </Paragraph>
             </div>
           </TabPane>
         </Tabs>
 
-        <Divider>Sign up with email</Divider>
+        <Divider className="auth-divider">Sign up with email</Divider>
 
-        <Form layout="vertical" onFinish={handleEmailSignUp}>
+        <Form layout="vertical" onFinish={handleEmailSignUp} className="auth-form">
           {activeTab === 'user' ? (
             <>
               <Form.Item
@@ -126,14 +107,14 @@ const SignUpPage = () => {
                 name="firstName"
                 rules={[{ required: true, message: "Please enter your first name!" }]}
               >
-                <Input placeholder="First name" />
+                <Input placeholder="First name" className="auth-input" />
               </Form.Item>
               <Form.Item
                 label="Last Name"
                 name="lastName"
                 rules={[{ required: true, message: "Please enter your last name!" }]}
               >
-                <Input placeholder="Last name" />
+                <Input placeholder="Last name" className="auth-input" />
               </Form.Item>
             </>
           ) : (
@@ -142,7 +123,7 @@ const SignUpPage = () => {
               name="brandName"
               rules={[{ required: true, message: "Please enter your brand name!" }]}
             >
-              <Input placeholder="Your brand name" />
+              <Input placeholder="Your brand name" className="auth-input" />
             </Form.Item>
           )}
 
@@ -154,7 +135,7 @@ const SignUpPage = () => {
               { type: "email", message: "Please enter a valid email!" },
             ]}
           >
-            <Input placeholder={activeTab === "brand" ? "Brand email" : "Email"} />
+            <Input placeholder={activeTab === "brand" ? "Brand email" : "Email"} className="auth-input" />
           </Form.Item>
 
           <Form.Item
@@ -165,7 +146,7 @@ const SignUpPage = () => {
               { min: 6, message: "Password must be at least 6 characters!" },
             ]}
           >
-            <Input.Password placeholder="Password" />
+            <Input.Password placeholder="Password" className="auth-input" />
           </Form.Item>
 
           <Form.Item
@@ -184,7 +165,7 @@ const SignUpPage = () => {
               }),
             ]}
           >
-            <Input.Password placeholder="Confirm password" />
+            <Input.Password placeholder="Confirm password" className="auth-input" />
           </Form.Item>
 
           <Form.Item>
@@ -193,19 +174,20 @@ const SignUpPage = () => {
               htmlType="submit"
               loading={loading}
               block
+              className="auth-button"
               >
               {activeTab === "brand" ? "Create Brand Account" : "Create User Account"}
             </Button>
           </Form.Item>
         </Form>
 
-        <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
+        <Paragraph className="auth-footer">
           Already have an account?{" "}
-          <Link onClick={() => navigate('/login')}>
+          <Link onClick={() => navigate('/login')} className="auth-link">
             Sign in here
           </Link>
           <br />
-          <Link onClick={() => navigate('/')}>
+          <Link onClick={() => navigate('/')} className="auth-link">
            Continue as a guest
           </Link>
         </Paragraph>

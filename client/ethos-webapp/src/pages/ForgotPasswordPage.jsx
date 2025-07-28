@@ -1,4 +1,5 @@
 import '../App.css';
+import '../styling/LoginPages.css';
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -44,36 +45,15 @@ const ForgotPasswordPage = () => {
 
   if (emailSent) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "#f0f2f5",
-          padding: "20px",
-          boxSizing: "border-box",
-        }}
-      >
-        <Card
-          style={{
-            width: 450,
-            padding: 24,
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ marginBottom: 24 }}>
-            <MailOutlined style={{ fontSize: 48, color: "#1890ff", marginBottom: 16 }} />
-            <Title level={3}>Check Your Email</Title>
-            <Paragraph>
+      <div className="auth-container">
+        <Card className="auth-card success-page-card">
+          <div className="auth-header">
+            <MailOutlined className="success-icon" />
+            <Title level={3} className="auth-subtitle">Check Your Email</Title>
+            <Paragraph className="auth-description">
               We've sent a password reset link to <strong>{email}</strong>
             </Paragraph>
-            <Paragraph type="secondary">
+            <Paragraph type="secondary" className="auth-description">
               Click the link in the email to reset your password. If you don't see the email,
               check your spam folder.
             </Paragraph>
@@ -83,7 +63,7 @@ const ForgotPasswordPage = () => {
             type="primary"
             onClick={() => navigate('/login')}
             block
-            style={{ marginBottom: 16 }}
+            className="auth-button mb-16"
           >
             Back to Login
           </Button>
@@ -92,6 +72,7 @@ const ForgotPasswordPage = () => {
             type="link"
             onClick={() => setEmailSent(false)}
             block
+            className="auth-link"
           >
             Try a different email address
           </Button>
@@ -101,37 +82,17 @@ const ForgotPasswordPage = () => {
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f0f2f5",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <Card
-        style={{
-          width: 450,
-          padding: 24,
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <Title level={2}>ETHOS</Title>
-          <Title level={4}>Reset Your Password</Title>
-          <Paragraph>
+    <div className="auth-container">
+      <Card className="auth-card">
+        <div className="auth-header">
+          <Title level={2} className="auth-title">ETHOS</Title>
+          <Title level={4} className="auth-subtitle">Reset Your Password</Title>
+          <Paragraph className="auth-description">
             Enter your email address and we'll send you a link to reset your password.
           </Paragraph>
         </div>
 
-        <Form layout="vertical" onFinish={handleResetPassword}>
+        <Form layout="vertical" onFinish={handleResetPassword} className="auth-form">
           <Form.Item
             label="Email Address"
             name="email"
@@ -146,6 +107,7 @@ const ForgotPasswordPage = () => {
               onChange={handleChange}
               placeholder="Enter your email address"
               size="large"
+              className="auth-input"
             />
           </Form.Item>
 
@@ -156,25 +118,27 @@ const ForgotPasswordPage = () => {
               loading={loading}
               block
               size="large"
+              className="auth-button"
             >
               Send Reset Link
             </Button>
           </Form.Item>
         </Form>
 
-        <div style={{ textAlign: "center", marginTop: 24 }}>
+        <div className="text-center" style={{ marginTop: 24 }}>
           <Button
             type="link"
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate('/login')}
+            className="auth-link"
           >
             Back to Login
           </Button>
         </div>
 
-        <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
+        <Paragraph className="auth-footer">
           Don't have an account?{" "}
-          <Link onClick={() => navigate('/signup')}>
+          <Link onClick={() => navigate('/signup')} className="auth-link">
             Sign up here
           </Link>
         </Paragraph>

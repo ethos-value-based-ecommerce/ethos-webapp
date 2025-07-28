@@ -1,4 +1,5 @@
 import '../App.css';
+import '../styling/LoginPages.css';
 
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -68,32 +69,11 @@ const ResetPasswordPage = () => {
 
   if (passwordReset) {
     return (
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          background: "#f0f2f5",
-          padding: "20px",
-          boxSizing: "border-box",
-        }}
-      >
-        <Card
-          style={{
-            width: 450,
-            padding: 24,
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            textAlign: "center",
-          }}
-        >
-          <div style={{ marginBottom: 24 }}>
-            <CheckCircleOutlined style={{ fontSize: 48, color: "#52c41a", marginBottom: 16 }} />
-            <Title level={3}>Password Reset Successful</Title>
+      <div className="auth-container">
+        <Card className="auth-card success-page-card">
+          <div className="auth-header">
+            <CheckCircleOutlined className="success-icon" />
+            <Title level={3} className="auth-subtitle">Password Reset Successful</Title>
             <Paragraph>
               Your password has been successfully updated. You can now log in with your new password.
             </Paragraph>
@@ -104,6 +84,7 @@ const ResetPasswordPage = () => {
             onClick={() => navigate('/login')}
             block
             size="large"
+            className="auth-button"
           >
             Go to Login
           </Button>
@@ -113,38 +94,18 @@ const ResetPasswordPage = () => {
   }
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f0f2f5",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <Card
-        style={{
-          width: 450,
-          padding: 24,
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <LockOutlined style={{ fontSize: 48, color: "#1890ff", marginBottom: 16 }} />
-          <Title level={2}>ETHOS</Title>
-          <Title level={4}>Set New Password</Title>
-          <Paragraph>
+    <div className="auth-container">
+      <Card className="auth-card">
+        <div className="auth-header">
+          <LockOutlined className="auth-logo" />
+          <Title level={2} className="auth-title">ETHOS</Title>
+          <Title level={4} className="auth-subtitle">Set New Password</Title>
+          <Paragraph className="auth-description">
             Enter your new password below.
           </Paragraph>
         </div>
 
-        <Form layout="vertical" onFinish={handleResetPassword}>
+        <Form layout="vertical" onFinish={handleResetPassword} className="auth-form">
           <Form.Item
             label="New Password"
             name="newPassword"
@@ -159,6 +120,7 @@ const ResetPasswordPage = () => {
               onChange={handleChange}
               placeholder="Enter new password"
               size="large"
+              className="auth-input"
             />
           </Form.Item>
 
@@ -183,6 +145,7 @@ const ResetPasswordPage = () => {
               onChange={handleChange}
               placeholder="Confirm new password"
               size="large"
+              className="auth-input"
             />
           </Form.Item>
 
@@ -193,15 +156,16 @@ const ResetPasswordPage = () => {
               loading={loading}
               block
               size="large"
+              className="auth-button"
             >
               Update Password
             </Button>
           </Form.Item>
         </Form>
 
-        <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
+        <Paragraph className="auth-footer">
           Remember your password?{" "}
-          <Button type="link" onClick={() => navigate('/login')} style={{ padding: 0 }}>
+          <Button type="link" onClick={() => navigate('/login')} className="auth-link p-0">
             Back to Login
           </Button>
         </Paragraph>
