@@ -1,0 +1,540 @@
+
+.home-layout {
+  min-height: 100vh;
+  background-color: var(--background-primary);
+}
+
+/* Header Styling - Contains the navigation bar and branding elements */
+.home-header {
+  background: var(--navbar-background);
+  padding: 0 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Navbar links styling - Completely removes all borders and box styling */
+.home-header .ant-menu {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.home-header .ant-menu-horizontal {
+  border-bottom: none !important;
+  line-height: 64px;
+}
+
+/* Target all possible menu item elements and states */
+.home-header .ant-menu-item,
+.home-header .ant-menu-overflow-item,
+.home-header .ant-menu-submenu,
+.home-header .ant-menu-submenu-title {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 10px !important;
+}
+
+/* Remove all pseudo-elements that might create borders or indicators */
+.home-header .ant-menu-item::after,
+.home-header .ant-menu-item::before,
+.home-header .ant-menu-submenu::after,
+.home-header .ant-menu-submenu::before,
+.home-header .ant-menu-overflow-item::after,
+.home-header .ant-menu-overflow-item::before {
+  display: none !important;
+  opacity: 0 !important;
+  content: none !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Target the title content wrapper */
+.home-header .ant-menu-title-content {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Style links within menu items */
+.home-header .ant-menu-item a,
+.home-header .ant-menu-submenu a,
+.home-header .ant-menu-overflow-item a {
+  color: var(--body-text);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Hover states */
+.home-header .ant-menu-item:hover a,
+.home-header .ant-menu-submenu:hover a,
+.home-header .ant-menu-overflow-item:hover a {
+  color: var(--dusty-rose);
+}
+
+/* Selected states */
+.home-header .ant-menu-item-selected,
+.home-header .ant-menu-submenu-selected {
+  color: var(--dusty-rose) !important;
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.home-header .ant-menu-item-selected a,
+.home-header .ant-menu-submenu-selected a {
+  color: var(--dusty-rose) !important;
+}
+
+/* Active, selected, and focus states */
+.home-header .ant-menu-item-active,
+.home-header .ant-menu-item-selected,
+.home-header .ant-menu-item:focus,
+.home-header .ant-menu-submenu-active,
+.home-header .ant-menu-submenu-selected,
+.home-header .ant-menu-submenu:focus,
+.home-header .ant-menu-overflow-item-active,
+.home-header .ant-menu-overflow-item-selected,
+.home-header .ant-menu-overflow-item:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Remove bottom border indicator */
+.home-header .ant-menu-horizontal > .ant-menu-item::after,
+.home-header .ant-menu-horizontal > .ant-menu-submenu::after,
+.home-header .ant-menu-horizontal > .ant-menu-overflow-item::after {
+  display: none !important;
+  border-bottom: none !important;
+  bottom: 0 !important;
+}
+
+/* Remove focus rings and outlines for accessibility (use with caution) */
+.home-header .ant-menu *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Override any inline styles that might be applied */
+.home-header .ant-menu-item[style],
+.home-header .ant-menu-submenu[style],
+.home-header .ant-menu-overflow-item[style] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.home-title {
+  margin: 0;
+  color: var(--dusty-rose);
+  font-weight: 800;
+  font-size: 36px !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding-top: 12px; /* Increased drop down */
+}
+
+/* Logo hover effect - Creates an interactive scaling and shadow effect when hovering over the logo */
+a .home-title {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover .home-title {
+  transform: scale(1.05);
+  text-shadow: 0 0 10px rgba(165, 138, 137, 0.3);
+}
+
+/* Content Areas - Define the various content container layouts used throughout the page */
+.home-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.home-content-centered {
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-section {
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.home-section-centered {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+/* Hero Section - The main banner/jumbotron area with call-to-action */
+.hero-section {
+  background: linear-gradient(135deg, var(--deep-taupe) 0%, #5D4F50 100%);
+  padding: 80px 40px;
+  border-radius: 16px;
+  margin-bottom: 4rem;
+  text-align: center;
+  box-shadow: 0 15px 30px rgba(118, 102, 103, 0.3);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="50" height="50" fill="rgba(255,255,255,0.03)"/><rect x="50" y="50" width="50" height="50" fill="rgba(255,255,255,0.03)"/></svg>');
+  opacity: 0.4;
+}
+
+.hero-title {
+  font-size: 48px !important;
+  margin-bottom: 24px !important;
+  color: white !important;
+  position: relative;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.hero-description {
+  font-size: 18px !important;
+  margin-bottom: 32px !important;
+  color: white !important;
+  max-width: 700px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative;
+}
+
+.hero-button {
+  height: 50px !important;
+  font-size: 18px !important;
+  padding: 0 32px !important;
+  position: relative;
+  border-radius: 25px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  background-color: #DCCBC7 !important;
+  border-color: #DCCBC7 !important;
+  color: #4A4546 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.5px !important;
+  transition: all 0.3s ease !important;
+}
+
+.hero-button:hover {
+  background-color: #CBB4B0 !important;
+  border-color: #CBB4B0 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Value Proposition Cards - Grid layout for displaying key benefits/features */
+.value-props {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 3rem;
+}
+
+.value-prop-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(220, 203, 199, 0.3);
+}
+
+.value-prop-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(165, 138, 137, 0.15);
+  border-color: var(--dusty-rose);
+}
+
+.value-prop-icon {
+  font-size: 36px;
+  color: var(--dusty-rose);
+  margin-bottom: 16px;
+  background-color: rgba(165, 138, 137, 0.1);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+}
+
+/* Section Titles - Consistent heading styles with decorative underline accent */
+.section-title {
+  margin-bottom: 32px !important;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--dusty-rose);
+}
+
+.section-title-centered {
+  margin-bottom: 32px !important;
+  position: relative;
+  display: inline-block;
+}
+
+.section-title-centered::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: var(--dusty-rose);
+}
+
+/* Categories Styling - Infinite Scroll Animation */
+/* Creates a continuous horizontal scrolling effect for category tags */
+/* Animation pauses on hover for better user interaction */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.categories-container {
+  display: flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  margin-top: 24px;
+  padding-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.categories-scroll {
+  display: flex;
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+  padding-right: 24px;
+}
+
+.categories-scroll:hover {
+  animation-play-state: paused;
+}
+
+.category-item {
+  cursor: pointer;
+  padding: 0;
+  border-radius: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0 12px 0 0;
+}
+
+.category-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(165, 138, 137, 0.2);
+}
+
+.category-tag {
+  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: var(--body-text);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Call to Action Section - Secondary promotional area to encourage user engagement */
+.cta-section {
+  background-color: var(--background-secondary);
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 4rem;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.cta-button {
+  height: 48px !important;
+  font-size: 16px !important;
+  padding: 0 28px !important;
+  border-radius: 24px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Modal Styling - Custom styles for popup dialogs and modals */
+.modal-title-centered {
+  text-align: center;
+}
+
+.modal-content-centered {
+  text-align: center;
+  padding: 40px 30px;
+}
+
+.modal-title {
+  margin-bottom: 20px !important;
+  color: var(--heading-text) !important;
+}
+
+.modal-paragraph {
+  margin-bottom: 0;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.modal-footer-centered {
+  text-align: center;
+  padding: 16px 0;
+}
+
+.modal-button-margin {
+  margin-right: 12px;
+}
+
+/* Featured Brands Styling - Showcases partner or featured company cards */
+.featured-brands-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.view-all-link {
+  font-weight: 600;
+  color: var(--dusty-rose);
+  font-size: 16px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.view-all-link:hover {
+  opacity: 0.8;
+  transform: translateX(3px);
+}
+
+.featured-brand-card {
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+  background-color: var(--card-background);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.featured-brand-card .ant-card {
+  border: none;
+  box-shadow: none;
+  background-color: var(--card-background);
+}
+
+.featured-brand-card:hover {
+  border-color: var(--dusty-rose);
+  box-shadow: 0 12px 24px rgba(165, 138, 137, 0.15);
+  transform: translateY(-5px);
+}
+
+/* Testimonials Section - Customer/user quotes and feedback display */
+/* Features decorative quotation mark and centered layout for testimonial content */
+.testimonials-section {
+  background-color: var(--background-secondary);
+  padding: 60px 40px;
+  border-radius: 16px;
+  margin-bottom: 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonials-section::before {
+  content: '"';
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 120px;
+  color: rgba(165, 138, 137, 0.1);
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.testimonial-quote {
+  font-size: 22px !important;
+  font-style: italic;
+  line-height: 1.6 !important;
+  margin-bottom: 24px !important;
+  max-width: 800px;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  position: relative;
+}
+
+.testimonial-author {
+  font-weight: 600;
+  color: var(--dusty-rose);
+  font-size: 16px !important;
+}
+
+/* Animations - Custom keyframe animations for page elements */
+/* Each card type has sequenced animation delays for a cascading appearance */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-section {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.value-prop-card {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.value-prop-card:nth-child(1) { animation-delay: 0.1s; }
+.value-prop-card:nth-child(2) { animation-delay: 0.3s; }
+.value-prop-card:nth-child(3) { animation-delay: 0.5s; }
+
+.featured-brand-card {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.featured-brand-card:nth-child(1) { animation-delay: 0.1s; }
+.featured-brand-card:nth-child(2) { animation-delay: 0.2s; }
+.featured-brand-card:nth-child(3) { animation-delay: 0.3s; }
+.featured-brand-card:nth-child(4) { animation-delay: 0.4s; }

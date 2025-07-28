@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {Layout, Typography, Button, Row, Col, Tag, Spin, Alert, Modal } from 'antd';
 import '../App.css';
+import '../styling/HomePage.css';
 
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
@@ -146,14 +147,18 @@ const HomePage = () => {
 
   if (loading) {
     return (
-      <Layout style={{ minHeight: '100vh' }}>
-        <Header style={{ background: '#fff', padding: '0 2rem' }}>
+      <Layout className="home-layout">
+        <Header className="home-header">
           <Row justify="space-between" align="middle">
-            <Col><Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title></Col>
+            <Col>
+              <Link to="/">
+                <Title level={2} className="home-title">ETHOS</Title>
+              </Link>
+            </Col>
             <Col><NavBar /></Col>
           </Row>
         </Header>
-        <Content style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Content className="home-content-centered">
           <Spin size="large" />
         </Content>
       </Layout>
@@ -162,14 +167,18 @@ const HomePage = () => {
 
   if (error) {
     return (
-      <Layout style={{ minHeight: '100vh' }}>
-        <Header style={{ background: '#fff', padding: '0 2rem' }}>
+      <Layout className="home-layout">
+        <Header className="home-header">
           <Row justify="space-between" align="middle">
-            <Col><Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title></Col>
+            <Col>
+              <Link to="/">
+                <Title level={2} className="home-title">ETHOS</Title>
+              </Link>
+            </Col>
             <Col><NavBar /></Col>
           </Row>
         </Header>
-        <Content style={{ padding: '2rem' }}>
+        <Content className="home-content">
           <Alert
             message="Error Loading Data"
             description={`Failed to load homepage data: ${error}`}
@@ -183,11 +192,13 @@ const HomePage = () => {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ background: '#fff', padding: '0 2rem' }}>
+    <Layout className="home-layout">
+      <Header className="home-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+            <Link to="/">
+              <Title level={2} className="home-title">ETHOS</Title>
+            </Link>
           </Col>
           <Col>
             <NavBar />
@@ -195,96 +206,151 @@ const HomePage = () => {
         </Row>
       </Header>
 
-      <Content style={{ padding: '2rem' }}>
-        {/* Discover Section */}
-        <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <Title level={2}>Discover brands that match your values</Title>
-          <Paragraph>
-            Find brands and products that align with your values and support causes you care about.
+      <Content className="home-content">
+        {/* Hero Section */}
+        <section className="hero-section">
+          <Title level={1} className="hero-title">Discover Brands That Share Your Values</Title>
+          <Paragraph className="hero-description">
+            Connect with ethical companies making a positive impact on the world.
+            Find products that align with what matters most to you.
           </Paragraph>
 
           {user ? (
             // User is logged in
             quizCompleted ? (
               // User has completed the quiz
-              <Button type="primary" size="large" onClick={handleViewRecommendations}>
-                View Recommendations
+              <Button type="primary" size="large" className="hero-button" onClick={handleViewRecommendations}>
+                View Your Recommendations
               </Button>
             ) : (
               // User is logged in but hasn't taken the quiz
-              <Button type="primary" size="large" onClick={handleOpenQuizModal}>
-                Take Values Quiz
+              <Button type="primary" size="large" className="hero-button" onClick={handleOpenQuizModal}>
+                Take the Values Quiz
               </Button>
             )
           ) : (
             // User is not logged in
-            <Button type="primary" size="large" onClick={handleOpenQuizModal}>
-              Take Values Quiz
+            <Button type="primary" size="large" className="hero-button" onClick={handleOpenQuizModal}>
+              Take the Values Quiz
             </Button>
           )}
         </section>
 
+        {/* Value Propositions */}
+        <section className="home-section">
+          <div className="value-props">
+            <div className="value-prop-card">
+              <div className="value-prop-icon">✓</div>
+              <Title level={4}>Ethical Sourcing</Title>
+              <Paragraph>Discover brands committed to responsible sourcing and fair labor practices.</Paragraph>
+            </div>
+            <div className="value-prop-card">
+              <div className="value-prop-icon">♻️</div>
+              <Title level={4}>Sustainability</Title>
+              <Paragraph>Support companies reducing environmental impact through innovative practices.</Paragraph>
+            </div>
+            <div className="value-prop-card">
+              <div className="value-prop-icon">❤️</div>
+              <Title level={4}>Social Impact</Title>
+              <Paragraph>Find brands that give back to communities and support important causes.</Paragraph>
+            </div>
+          </div>
+        </section>
+
         {/* Categories Section */}
-        <section style={{ marginBottom: '3rem' }}>
-          <Title level={2}>Browse by Category</Title>
-          <Row gutter={[16, 16]} justify="center">
-            {categories.slice(0, 9).map((category, index) => {
-              const color = getCachedCategoryColor(category);
-              return (
-                <Col xs={24} sm={12} md={8} key={index}>
+        <section className="home-section">
+          <Title level={2} className="section-title">Browse by Category</Title>
+          <div className="categories-container">
+            <div className="categories-scroll">
+              {/* Original categories */}
+              {categories.map((category, index) => {
+                const color = getCachedCategoryColor(category);
+                return (
                   <div
-                    style={{
-                      cursor: 'pointer',
-                      padding: '12px',
-                      border: '1px solid #f0f0f0',
-                      borderRadius: '8px',
-                      textAlign: 'center',
-                      transition: 'all 0.3s ease'
-                    }}
+                    key={index}
+                    className="category-item"
                     onClick={() => handleCategoryClick(category)}
                   >
                     <Tag
+                      className="category-tag"
                       style={{
                         backgroundColor: `${color}20`,
-                        border: `1px solid ${color}40`,
-                        color: '#000',
-                        fontSize: '14px',
-                        padding: '6px 16px',
-                        borderRadius: '20px',
-                        fontWeight: '500',
-                        transition: 'all 0.2s ease'
+                        border: `1px solid ${color}40`
                       }}
                     >
                       {category}
                     </Tag>
                   </div>
-                </Col>
-              );
-            })}
-          </Row>
+                );
+              })}
+
+              {/* Duplicated categories for infinite scroll effect */}
+              {categories.map((category, index) => {
+                const color = getCachedCategoryColor(category);
+                return (
+                  <div
+                    key={`dup-${index}`}
+                    className="category-item"
+                    onClick={() => handleCategoryClick(category)}
+                  >
+                    <Tag
+                      className="category-tag"
+                      style={{
+                        backgroundColor: `${color}20`,
+                        border: `1px solid ${color}40`
+                      }}
+                    >
+                      {category}
+                    </Tag>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </section>
 
         {/* Search Call-to-Action Section */}
-        <section style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <section className="cta-section">
+          <Title level={3}>Ready to find your perfect ethical match?</Title>
+          <Paragraph>
+            Browse our curated collection of brands committed to making a difference.
+          </Paragraph>
           <Link to="/search-brands">
-            <Button type="default" size="large">
+            <Button type="primary" size="large" className="cta-button">
               Start Your Search Now
             </Button>
           </Link>
         </section>
 
         {/* Featured Brands Section */}
-        <section>
-          <Title level={2}>Featured Brands</Title>
-          <Row gutter={[16, 16]} justify="start">
+        <section className="home-section">
+          <div className="featured-brands-header">
+            <Title level={2} className="section-title">Featured Brands</Title>
+            <Link to="/search-brands" className="view-all-link">
+              View All →
+            </Link>
+          </div>
+          <Row gutter={[24, 24]} justify="start">
             {brands.slice(0, 8).map((brand) => (
               <Col xs={24} sm={12} md={8} lg={6} key={brand.id}>
-                <Link to={`/brands/${brand.id}`}>
-                  <BrandCard brand={brand} />
-                </Link>
+                <div className="featured-brand-card">
+                  <Link to={`/brands/${brand.id}`}>
+                    <BrandCard brand={brand} />
+                  </Link>
+                </div>
               </Col>
             ))}
           </Row>
+        </section>
+        {/* Testimonials Section */}
+        <section className="testimonials-section">
+          <Title level={2} className="section-title-centered">What Our Users Say</Title>
+          <Paragraph className="testimonial-quote">
+            "ETHOS has completely changed how I shop. I've discovered amazing brands that align with my values, and I feel good knowing my purchases are making a positive impact."
+          </Paragraph>
+          <Paragraph className="testimonial-author">
+            — Sarah K., ETHOS User
+          </Paragraph>
         </section>
       </Content>
 
@@ -299,12 +365,12 @@ const HomePage = () => {
       />
 
       <Modal
-        title={<div style={{ textAlign: 'center' }}>Login Required</div>}
+        title={<div className="modal-title-centered">Login Required</div>}
         open={isLoginPromptOpen}
         onCancel={handleCloseLoginPrompt}
         footer={
-          <div style={{ textAlign: 'center' }}>
-            <Button key="cancel" onClick={handleCloseLoginPrompt} style={{ marginRight: '8px' }}>
+          <div className="modal-footer-centered">
+            <Button key="cancel" onClick={handleCloseLoginPrompt} className="modal-button-margin">
               Cancel
             </Button>
             <Button key="login" type="primary" onClick={handleGoToLogin}>
@@ -314,9 +380,9 @@ const HomePage = () => {
         }
         centered
       >
-        <div style={{ textAlign: 'center', padding: '30px 20px' }}>
-          <Title level={4} style={{ marginBottom: '16px' }}>Please log in to take the quiz</Title>
-          <Paragraph style={{ marginBottom: 0, fontSize: '16px' }}>
+        <div className="modal-content-centered">
+          <Title level={4} className="modal-title">Please log in to take the quiz</Title>
+          <Paragraph className="modal-paragraph">
             You need to be logged in to take our values quiz and get personalized brand recommendations.
           </Paragraph>
         </div>

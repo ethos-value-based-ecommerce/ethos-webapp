@@ -1,0 +1,28 @@
+/* ETHOS Color Palette - Muted Tones */
+
+:root {
+  /* Primary Colors */
+  --light-taupe: #DCCBC7;
+  --rosy-beige: #CBB4B0;
+  --lavender-gray: #A6A3A7;
+  --dusty-rose: #A58A89;
+  --deep-taupe: #766667;
+
+  /* Functional Colors */
+  --background-primary: white;
+  --background-secondary: #F8F6F5;
+  --accent: var(--dusty-rose);
+  --heading-text: var(--deep-taupe);
+  --body-text: #4A4546;
+
+  /* Component-specific Colors */
+  --button-background: var(--dusty-rose);
+  --button-text: white;
+  --button-hover: #95797A;
+  --link-color: var(--dusty-rose);
+  --border-color: var(--light-taupe);
+  --card-background: white;
+  --navbar-background: white;
+  --navbar-text: var(--deep-taupe);
+
+}
