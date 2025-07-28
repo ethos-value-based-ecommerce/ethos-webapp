@@ -1,0 +1,141 @@
+/* Login Pages Styling */
+
+/* Color palette from colors.css is used throughout this file */
+
+/* Full page container */
+.auth-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--background-secondary);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Card styling */
+.auth-card {
+  width: 450px;
+  padding: 32px;
+  background-color: var(--card-background);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+/* Header section */
+.auth-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth-logo {
+  font-size: 48px;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.auth-title {
+  color: var(--heading-text) !important;
+  margin-bottom: 8px !important;
+}
+
+.auth-subtitle {
+  color: var(--heading-text) !important;
+  margin-bottom: 8px !important;
+}
+
+.auth-description {
+  color: var(--body-text) !important;
+}
+
+/* Form styling */
+.auth-form {
+  margin-bottom: 16px;
+}
+
+/* Button styling */
+.auth-button {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+  height: 40px !important;
+  font-weight: 500 !important;
+}
+
+.auth-button:hover {
+  background-color: var(--button-hover) !important;
+  border-color: var(--button-hover) !important;
+}
+
+/* Link styling */
+.auth-link {
+  color: var(--link-color) !important;
+}
+
+/* Footer section */
+.auth-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* Success icon */
+.success-icon {
+  font-size: 48px;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+/* Tab styling */
+.auth-tabs .ant-tabs-nav::before {
+  border-bottom-color: var(--border-color) !important;
+}
+
+.auth-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--accent) !important;
+}
+
+.auth-tabs .ant-tabs-ink-bar {
+  background-color: var(--accent) !important;
+}
+
+.auth-tabs {
+  margin-bottom: 24px;
+}
+
+/* Divider styling */
+.auth-divider {
+  color: var(--body-text) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Input styling */
+.auth-input {
+  border-color: var(--border-color) !important;
+}
+
+.auth-input:hover, .auth-input:focus {
+  border-color: var(--accent) !important;
+}
+
+/* Additional utility classes */
+.text-center {
+  text-align: center;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+/* Success page styling */
+.success-page-card {
+  text-align: center;
+}
