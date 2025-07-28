@@ -1,4 +1,5 @@
 import '../App.css';
+import '../styling/LoginPages.css';
 
 
 import { useState } from "react";
@@ -62,39 +63,19 @@ const { TabPane } = Tabs;
 
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f0f2f5",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <Card
-        style={{
-          width: 450,
-          padding: 24,
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <Title level={2}>ETHOS</Title>
-          <Title level={4}>Welcome Back!</Title>
-          <Paragraph>Choose your account type and log in:</Paragraph>
+    <div className="auth-container">
+      <Card className="auth-card">
+        <div className="auth-header">
+          <Title level={2} className="auth-title">ETHOS</Title>
+          <Title level={4} className="auth-subtitle">Welcome Back!</Title>
+          <Paragraph className="auth-description">Choose your account type and log in:</Paragraph>
         </div>
 
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
           centered
-          style={{ marginBottom: 24 }}
+          className="auth-tabs"
         >
           <TabPane
             tab={
@@ -105,8 +86,8 @@ const { TabPane } = Tabs;
             }
             key="user"
           >
-            <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <Paragraph type="secondary">
+            <div className="text-center mb-16">
+              <Paragraph type="secondary" className="auth-description">
                 Log in to browse brands, save favorites, and manage your profile
               </Paragraph>
             </div>
@@ -121,17 +102,17 @@ const { TabPane } = Tabs;
             }
             key="brand"
           >
-            <div style={{ textAlign: "center", marginBottom: 16 }}>
-              <Paragraph type="secondary">
+            <div className="text-center mb-16">
+              <Paragraph type="secondary" className="auth-description">
                 Log in to manage your brand profile, upload products, and view analytics
               </Paragraph>
             </div>
           </TabPane>
         </Tabs>
 
-        <Divider>Continue with email</Divider>
+        <Divider className="auth-divider">Continue with email</Divider>
 
-        <Form layout="vertical" onFinish={handleEmailLogin}>
+        <Form layout="vertical" onFinish={handleEmailLogin} className="auth-form">
           <Form.Item
             label="Email"
             name="email"
@@ -145,6 +126,7 @@ const { TabPane } = Tabs;
               value={formData.email}
               onChange={handleChange}
               placeholder={activeTab === "brand" ? "Brand email" : "Email"}
+              className="auth-input"
             />
           </Form.Item>
 
@@ -158,6 +140,7 @@ const { TabPane } = Tabs;
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
+              className="auth-input"
             />
           </Form.Item>
 
@@ -167,20 +150,21 @@ const { TabPane } = Tabs;
               htmlType="submit"
               loading={loading}
               block
+              className="auth-button"
             >
               {activeTab === "brand" ? "Log In as Brand" : "Log In as User"}
             </Button>
           </Form.Item>
         </Form>
 
-        <Paragraph style={{ textAlign: "center", marginTop: 16 }}>
-          <Link onClick={() => navigate('/forgot-password')}>Forgot your password?</Link>
+        <Paragraph className="auth-footer">
+          <Link onClick={() => navigate('/forgot-password')} className="auth-link">Forgot your password?</Link>
           <br />
-          <Link onClick={() => navigate('/signup')}>
+          <Link onClick={() => navigate('/signup')} className="auth-link">
             Don't have an account? Sign up as a {activeTab === "brand" ? "brand" : "user"}.
           </Link>
           <br />
-          <Link onClick={() => navigate('/')}>Continue as a guest.</Link>
+          <Link onClick={() => navigate('/')} className="auth-link">Continue as a guest.</Link>
         </Paragraph>
       </Card>
     </div>
