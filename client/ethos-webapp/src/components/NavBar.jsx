@@ -26,6 +26,8 @@ const NavBar = () => {
         display: 'flex',
         justifyContent: 'flex-end',
         borderBottom: 'none',
+        backgroundColor: 'var(--navbar-background)',
+        color: 'var(--navbar-text)',
       }}
     />
   );
