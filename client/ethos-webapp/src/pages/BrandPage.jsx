@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Layout, Typography, Row, Col, Spin, Alert } from 'antd';
+import { useParams, Link } from 'react-router-dom';
+import { Layout, Typography, Row, Col, Spin, Alert, Tag } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
+import { getCachedCategoryColor } from '../components/categoryColors.jsx';
 import '../App.css';
+import '../styling/BrandPage.css';
 
 import NavBar from '../components/NavBar.jsx';
 import BrandCard from '../components/BrandCard.jsx';
@@ -59,14 +61,18 @@ const BrandPage = () => {
 
   if (loading) {
     return (
-      <Layout style={{ minHeight: '100vh' }}>
-        <Header style={{ background: '#fff', padding: '0 2rem' }}>
+      <Layout className="brand-layout">
+        <Header className="brand-header">
           <Row justify="space-between" align="middle">
-            <Col><Title level={3}>ETHOS</Title></Col>
+            <Col>
+              <Link to="/">
+                <Title level={2} className="brand-title">ETHOS</Title>
+              </Link>
+            </Col>
             <Col><NavBar /></Col>
           </Row>
         </Header>
-        <Content style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '2rem' }}>
+        <Content className="brand-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
         </Content>
       </Layout>
@@ -75,14 +81,18 @@ const BrandPage = () => {
 
   if (error || !brand) {
     return (
-      <Layout style={{ minHeight: '100vh' }}>
-        <Header style={{ background: '#fff', padding: '0 2rem' }}>
+      <Layout className="brand-layout">
+        <Header className="brand-header">
           <Row justify="space-between" align="middle">
-            <Col><Title level={3}>ETHOS</Title></Col>
+            <Col>
+              <Link to="/">
+                <Title level={2} className="brand-title">ETHOS</Title>
+              </Link>
+            </Col>
             <Col><NavBar /></Col>
           </Row>
         </Header>
-        <Content style={{ padding: '2rem' }}>
+        <Content className="brand-content">
           <Alert message="Error" description={error} type="error" showIcon />
         </Content>
       </Layout>
@@ -90,39 +100,98 @@ const BrandPage = () => {
   }
 
   return (
-    <Layout style={{ minHeight: '100vh', width: '100vw' }}>
-      <Header style={{ background: '#fff', padding: '0 2rem' }}>
+    <Layout className="brand-layout">
+      <Header className="brand-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+            <Link to="/">
+              <Title level={2} className="brand-title">ETHOS</Title>
+            </Link>
           </Col>
           <Col>
-          <NavBar />
+            <NavBar />
           </Col>
         </Row>
       </Header>
 
-      <Content style={{ padding: '2rem', width: '100%' }}>
-        <Row justify="center" style={{ marginBottom: '2rem' }}>
-          <Col xs={24} sm={22} md={20} lg={16}>
-            <BrandCard brand={brand} />
-          </Col>
-        </Row>
+      <Content className="brand-content">
+        <section className="brand-hero-section">
+          <Row justify="center">
+            <Col xs={24} sm={22} md={20} lg={16}>
+              <div className="brand-card-wrapper">
+                <BrandCard brand={brand} />
 
-        <Title level={3}>Products</Title>
-        <Row gutter={[16, 16]}>
-          {brandProducts.map((product, index) => (
-            <Col xs={24} sm={12} md={8} lg={6}
-            key={product.id || `${product.title}-${index}`}>
-            <ProductCard
-              onClick={() => handleProductClick(product)}
-              productTitle={product.title}
-              productImage={product.image}
-              productPrice={product.price}
-            />
-          </Col>
-            ))}
+                {/* Category Tags based on qualities_vector */}
+                {brand.qualities_vector && brand.qualities_vector.length > 0 && (
+                  <div className="brand-categories-container">
+                    {/* Map qualities to category names */}
+                    {(() => {
+                      // Define quality categories based on the qualities_vector positions
+                      const qualityCategories = [
+                        "Black-Owned", "Asian-Owned", "Latin-Owned", "Indigenous-Owned", "Lgbtq-Owned",
+                        "Disability-Owned", "Women-Founded", "Minority-Founded", "Underrepresented-Group-Founded",
+                        "Beauty", "Clothing", "Footwear", "Handbags", "Personal-Care", "Outdoor-Gear",
+                        "Home-Decor", "Electronics", "Vegan", "Cruelty-Free", "Sustainable", "Eco-Conscious",
+                        "Fair-Trade", "Social-Responsibility", "Zero-Waste", "Carbon-Neutral", "Clean-Ingredients"
+                      ];
+
+                      // Filter qualities that are marked as 1 in the vector
+                      const brandQualities = brand.qualities_vector
+                        .map((value, index) => value === 1 ? qualityCategories[index] : null)
+                        .filter(quality => quality !== null);
+
+                      // Return the tags
+                      return brandQualities.map((quality, index) => {
+                        const color = getCachedCategoryColor(quality);
+                        return (
+                          <Tag
+                            key={index}
+                            className="category-tag"
+                            style={{
+                              backgroundColor: `${color}20`,
+                              border: `1px solid ${color}40`
+                            }}
+                          >
+                            {quality}
+                          </Tag>
+                        );
+                      });
+                    })()}
+                  </div>
+                )}
+              </div>
+            </Col>
           </Row>
+        </section>
+
+        <section className="brand-section">
+          <div className="section-title">
+            <Title level={3}>Products</Title>
+          </div>
+          <div className="products-grid">
+            {brandProducts.map((product, index) => (
+              <div
+                className="product-card"
+                key={product.id || `${product.title}-${index}`}
+                onClick={() => handleProductClick(product)}
+              >
+                <div className="product-image-container">
+                  {product.image && (
+                    <img
+                      src={product.image}
+                      alt={product.title}
+                      className="product-image"
+                    />
+                  )}
+                </div>
+                <div className="product-details">
+                  <h3 className="product-title">{product.title}</h3>
+                  <p className="product-price">{product.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </Content>
 
       <AntFooter style={{ padding: 0 }}>
@@ -131,42 +200,31 @@ const BrandPage = () => {
 
       <ProductModal isOpen={!!selectedProduct} onClose={closeModal} title={selectedProduct?.title}>
         {selectedProduct && (
-          <div style={{ textAlign: 'center' }}>
+          <div className="modal-content-centered">
             {selectedProduct.image && (
               <img
                 src={selectedProduct.image}
                 alt={selectedProduct.title}
-                style={{ maxWidth: '100%', maxHeight: 300, marginBottom: 16, borderRadius: 12 }}
+                className="product-image"
+                style={{ maxHeight: 300, marginBottom: 16 }}
               />
             )}
-            <h3>{selectedProduct.title}</h3>
-            <p style={{ fontWeight: 'bold', marginBottom: 8 }}>{selectedProduct.price}</p>
+            <h3 className="product-title">{selectedProduct.title}</h3>
+            <p className="product-price">{selectedProduct.price}</p>
             {selectedProduct.website && (
               <a
                 href={selectedProduct.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  display: 'inline-block',
-                  padding: '10px 24px',
-                  backgroundColor: '#222',
-                  color: '#f0f0f0',
-                  borderRadius: '8px',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                  marginTop: 12,
-                  transition: 'background-color 0.3s ease',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-                }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#444'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#222'}
+                className="cta-button"
+                style={{ display: 'inline-block', marginTop: 16 }}
               >
                 Shop Now
               </a>
             )}
           </div>
         )}
-    </ProductModal>
+      </ProductModal>
 
     </Layout>
   );
