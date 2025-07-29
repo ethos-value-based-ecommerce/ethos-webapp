@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout, Typography, Row, Col, Card, Tag, Input, Spin, Alert } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -62,7 +63,9 @@ const CategoriesPage = () => {
       <Header className="categories-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} className="categories-title">ETHOS</Title>
+            <Link to="/">
+              <Title level={2} className="categories-title">ETHOS</Title>
+            </Link>
           </Col>
           <Col>
             <NavBar />
