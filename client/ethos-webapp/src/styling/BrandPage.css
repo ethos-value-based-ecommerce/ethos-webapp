@@ -1,0 +1,395 @@
+
+/* Layout Styles */
+.brand-layout {
+  min-height: 100vh;
+  background-color: var(--background-primary);
+}
+
+.brand-header {
+  background: var(--navbar-background);
+  padding: 0 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Navbar links styling - Completely removes all borders and box styling */
+.brand-header .ant-menu {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.brand-header .ant-menu-horizontal {
+  border-bottom: none !important;
+  line-height: 64px;
+}
+
+/* Target all possible menu item elements and states */
+.brand-header .ant-menu-item,
+.brand-header .ant-menu-overflow-item,
+.brand-header .ant-menu-submenu,
+.brand-header .ant-menu-submenu-title {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 10px !important;
+}
+
+/* Remove all pseudo-elements that might create borders or indicators */
+.brand-header .ant-menu-item::after,
+.brand-header .ant-menu-item::before,
+.brand-header .ant-menu-submenu::after,
+.brand-header .ant-menu-submenu::before,
+.brand-header .ant-menu-overflow-item::after,
+.brand-header .ant-menu-overflow-item::before {
+  display: none !important;
+  opacity: 0 !important;
+  content: none !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Target the title content wrapper */
+.brand-header .ant-menu-title-content {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Style links within menu items */
+.brand-header .ant-menu-item a,
+.brand-header .ant-menu-submenu a,
+.brand-header .ant-menu-overflow-item a {
+  color: var(--body-text);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Hover states */
+.brand-header .ant-menu-item:hover a,
+.brand-header .ant-menu-submenu:hover a,
+.brand-header .ant-menu-overflow-item:hover a {
+  color: var(--dusty-rose);
+}
+
+/* Selected states */
+.brand-header .ant-menu-item-selected,
+.brand-header .ant-menu-submenu-selected {
+  color: var(--dusty-rose) !important;
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.brand-header .ant-menu-item-selected a,
+.brand-header .ant-menu-submenu-selected a {
+  color: var(--dusty-rose) !important;
+}
+
+/* Active, selected, and focus states */
+.brand-header .ant-menu-item-active,
+.brand-header .ant-menu-item-selected,
+.brand-header .ant-menu-item:focus,
+.brand-header .ant-menu-submenu-active,
+.brand-header .ant-menu-submenu-selected,
+.brand-header .ant-menu-submenu:focus,
+.brand-header .ant-menu-overflow-item-active,
+.brand-header .ant-menu-overflow-item-selected,
+.brand-header .ant-menu-overflow-item:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Remove bottom border indicator */
+.brand-header .ant-menu-horizontal > .ant-menu-item::after,
+.brand-header .ant-menu-horizontal > .ant-menu-submenu::after,
+.brand-header .ant-menu-horizontal > .ant-menu-overflow-item::after {
+  display: none !important;
+  border-bottom: none !important;
+  bottom: 0 !important;
+}
+
+/* Remove focus rings and outlines for accessibility (use with caution) */
+.brand-header .ant-menu *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Override any inline styles that might be applied */
+.brand-header .ant-menu-item[style],
+.brand-header .ant-menu-submenu[style],
+.brand-header .ant-menu-overflow-item[style] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.brand-content {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.brand-title {
+  margin: 0;
+  color: var(--dusty-rose);
+  font-weight: 800;
+  font-size: 36px !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding-top: 12px; /* Increased drop down */
+}
+
+a .brand-title {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover .brand-title {
+  transform: scale(1.05);
+  text-shadow: 0 0 10px rgba(165, 138, 137, 0.3);
+}
+
+/* Hero Section */
+.brand-hero-section {
+  background: var(--background-primary);
+  padding: 40px 20px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+/* Brand Card Wrapper */
+.brand-card-wrapper {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  background-color: white;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  margin: 0 auto;
+  max-width: 1000px;
+  width: 100%;
+}
+
+
+/* Brand Details Section */
+.brand-section {
+  margin-bottom: 48px;
+}
+
+.section-title {
+  color: var(--heading-text);
+  margin-bottom: 24px;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background-color: var(--accent);
+}
+
+
+
+/* Category Tags */
+.brand-categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: center;
+}
+
+.category-tag {
+  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  color: var(--body-text);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 0;
+}
+
+.category-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Products Section */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+@media (max-width: 992px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.product-card {
+  background-color: var(--card-background);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition:
+    transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.4s ease,
+    border-color 0.4s ease,
+    opacity 0.3s ease;
+  border: 1px solid var(--border-color);
+  margin-bottom: 8px;
+  cursor: pointer;
+  position: relative;
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.product-card:hover {
+  transform: translateY(-25px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  border-color: var(--accent);
+}
+
+.product-image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+}
+
+.product-image-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.product-image-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.1) 100%);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.product-card:hover .product-image-container::after {
+  opacity: 0.6;
+}
+
+.product-details {
+  padding: 16px;
+  transition: background-color 0.3s ease;
+}
+
+
+.product-title {
+  color: var(--heading-text);
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+
+.product-price {
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+
+
+
+.cta-button {
+  background-color: var(--button-background);
+  border-color: var(--button-background);
+  color: var(--button-text);
+  height: 48px;
+  padding: 0 32px;
+  font-size: 16px;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(165, 138, 137, 0.3);
+  transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: var(--button-hover);
+  border-color: var(--button-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(165, 138, 137, 0.4);
+}
+
+
+/* Animations - Custom keyframe animations for page elements */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.brand-hero-section {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.brand-section {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+.product-card {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.product-card:nth-child(1) { animation-delay: 0.1s; }
+.product-card:nth-child(2) { animation-delay: 0.2s; }
+.product-card:nth-child(3) { animation-delay: 0.3s; }
+.product-card:nth-child(4) { animation-delay: 0.4s; }
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .brand-content {
+    padding: 16px;
+  }
+
+  .brand-hero-section {
+    padding: 32px 16px;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+}
+
+@media (max-width: 576px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+
+  .section-title {
+    font-size: 20px;
+  }
+}
