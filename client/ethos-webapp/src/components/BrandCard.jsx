@@ -52,8 +52,9 @@ const BrandCard = ({ brand, onTagClick }) => {
             justifyContent: 'center',
             alignItems: 'center',
             padding: '16px',
-            backgroundColor: '#f5f5f5',
+            background: 'linear-gradient(135deg, #e6e6e6 0%, #f5f5f5 100%)',
             position: 'relative',
+            overflow: 'hidden',
           }}
         >
           <img
@@ -63,6 +64,7 @@ const BrandCard = ({ brand, onTagClick }) => {
               maxWidth: '100%',
               maxHeight: '100%',
               objectFit: 'contain',
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
             }}
           />
           {user && (
@@ -91,7 +93,7 @@ const BrandCard = ({ brand, onTagClick }) => {
         </div>
       }
     >
-      
+
       <div style={{ paddingBottom: '60px' }}>
         <Meta
           title={brand.name}
