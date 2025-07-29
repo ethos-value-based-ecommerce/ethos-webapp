@@ -33,20 +33,156 @@
 
 /* Sticky header that remains visible when scrolling */
 .categories-header {
-  background: var(--background-primary);
+  background: var(--navbar-background);
   padding: 0 2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
+/* Navbar links styling - Completely removes all borders and box styling */
+.categories-header .ant-menu {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.categories-header .ant-menu-horizontal {
+  border-bottom: none !important;
+  line-height: 64px;
+}
+
+/* Target all possible menu item elements and states */
+.categories-header .ant-menu-item,
+.categories-header .ant-menu-overflow-item,
+.categories-header .ant-menu-submenu,
+.categories-header .ant-menu-submenu-title {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 10px !important;
+}
+
+/* Remove all pseudo-elements that might create borders or indicators */
+.categories-header .ant-menu-item::after,
+.categories-header .ant-menu-item::before,
+.categories-header .ant-menu-submenu::after,
+.categories-header .ant-menu-submenu::before,
+.categories-header .ant-menu-overflow-item::after,
+.categories-header .ant-menu-overflow-item::before {
+  display: none !important;
+  opacity: 0 !important;
+  content: none !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Target the title content wrapper */
+.categories-header .ant-menu-title-content {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Style links within menu items */
+.categories-header .ant-menu-item a,
+.categories-header .ant-menu-submenu a,
+.categories-header .ant-menu-overflow-item a {
+  color: var(--body-text);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Hover states */
+.categories-header .ant-menu-item:hover a,
+.categories-header .ant-menu-submenu:hover a,
+.categories-header .ant-menu-overflow-item:hover a {
+  color: var(--dusty-rose);
+}
+
+/* Selected states */
+.categories-header .ant-menu-item-selected,
+.categories-header .ant-menu-submenu-selected {
+  color: var(--dusty-rose) !important;
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.categories-header .ant-menu-item-selected a,
+.categories-header .ant-menu-submenu-selected a {
+  color: var(--dusty-rose) !important;
+}
+
+/* Active, selected, and focus states */
+.categories-header .ant-menu-item-active,
+.categories-header .ant-menu-item-selected,
+.categories-header .ant-menu-item:focus,
+.categories-header .ant-menu-submenu-active,
+.categories-header .ant-menu-submenu-selected,
+.categories-header .ant-menu-submenu:focus,
+.categories-header .ant-menu-overflow-item-active,
+.categories-header .ant-menu-overflow-item-selected,
+.categories-header .ant-menu-overflow-item:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Remove bottom border indicator */
+.categories-header .ant-menu-horizontal > .ant-menu-item::after,
+.categories-header .ant-menu-horizontal > .ant-menu-submenu::after,
+.categories-header .ant-menu-horizontal > .ant-menu-overflow-item::after {
+  display: none !important;
+  border-bottom: none !important;
+  bottom: 0 !important;
+}
+
+/* Remove focus rings and outlines for accessibility (use with caution) */
+.categories-header .ant-menu *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Override any inline styles that might be applied */
+.categories-header .ant-menu-item[style],
+.categories-header .ant-menu-submenu[style],
+.categories-header .ant-menu-overflow-item[style] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
 /* Main title with animation and letter spacing for elegance */
 .categories-title {
   margin: 0;
-  color: var(--heading-text);
-  letter-spacing: 1px;
+  color: var(--dusty-rose);
+  font-weight: 800;
+  font-size: 36px !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding-top: 12px;
   animation: slideInFromLeft 0.8s ease-out;
+}
+
+/* Logo hover effect - Creates an interactive scaling and shadow effect when hovering over the logo */
+a .categories-title {
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover .categories-title {
+  transform: scale(1.05);
+  text-shadow: 0 0 10px rgba(165, 138, 137, 0.3);
 }
 
 /* Content container with maximum width for readability */
