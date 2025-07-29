@@ -11,6 +11,7 @@ import { brandsApi, categoriesApi } from '../services/api.jsx';
 // Importing category color for tag colors
 import { preloadCategoryColors, getCachedCategoryColor } from '../components/categoryColors.jsx';
 import '../App.css';
+import '../styling/SearchBrandsPage.css';
 
 const { Title } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
@@ -151,30 +152,32 @@ const SearchBrandsPage = () => {
 
   if (loading) {
     return (
-      <Layout style={{ minHeight: '100vh' }}>
-        <Header style={{ background: '#fff', padding: '0 2rem' }}>
+      <Layout className="search-page-layout">
+        <Header className="search-page-header">
           <Row justify="space-between" align="middle">
             <Col>
-              <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+              <Title level={3} className="search-page-title">ETHOS</Title>
             </Col>
             <Col>
               <NavBar />
             </Col>
           </Row>
         </Header>
-        <Content style={{ padding: '2rem', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Spin size="large" indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
+        <Content className="loading-container">
+          <Spin size="large" indicator={<LoadingOutlined className="loading-icon" spin />} />
         </Content>
       </Layout>
     );
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ background: '#fff', padding: '0 2rem' }}>
+    <Layout className="search-page-layout">
+      <Header className="search-page-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+            <Link to="/">
+              <Title level={3} className="search-page-title">ETHOS</Title>
+            </Link>
           </Col>
           <Col>
             <NavBar />
@@ -182,7 +185,7 @@ const SearchBrandsPage = () => {
         </Row>
       </Header>
 
-      <Content style={{ padding: '2rem' }}>
+      <Content className="search-page-content">
         {error && (
           <Alert
             message="Error"
@@ -191,14 +194,14 @@ const SearchBrandsPage = () => {
             showIcon
             closable
             onClose={() => setError(null)}
-            style={{ marginBottom: '2rem' }}
+            className="error-alert"
           />
         )}
 
         {/* Search Header */}
-        <section style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          <Title level={2}>Search Brands</Title>
-          <Row gutter={16} justify="center" style={{ marginTop: '1rem' }}>
+        <section className="search-section">
+          <Title level={2} className="search-title">Search Brands</Title>
+          <Row gutter={16} justify="center" className="search-input-container">
             <Col xs={24} sm={16} md={12}>
               <Input
                 placeholder="Search by name or tag..."
@@ -227,6 +230,7 @@ const SearchBrandsPage = () => {
                 loading={searchLoading}
                 disabled={!brandSearch.trim() && selectedCategories.length === 0}
                 onClick={handleSearch}
+                className="search-button"
               >
                 Search
               </Button>
@@ -236,6 +240,7 @@ const SearchBrandsPage = () => {
                 icon={<ClearOutlined />}
                 onClick={handleClear}
                 disabled={!brandSearch && selectedCategories.length === 0}
+                className="clear-button"
               >
                 Clear
               </Button>
@@ -244,45 +249,74 @@ const SearchBrandsPage = () => {
         </section>
 
         {/* Tags Section */}
-        <section style={{ marginBottom: '2rem' }}>
-          <Title level={3}>Filter by Categories</Title>
-          <div style={{ marginTop: '1rem' }}>
-            {categories.length > 0 && colorCacheReady ? (
-              categories.map((category, index) => {
-                const catName = category.name || category;
-                const isSelected = selectedCategories.includes(catName);
-                const tagColor = getCachedCategoryColor(catName) || '#d9d9d9';
+        <section className="tags-section">
+          <Title level={3} className="tags-title">Filter by Categories</Title>
+          <div className="tags-container">
+            <div className="categories-scroll">
+              {categories.length > 0 && colorCacheReady ? (
+                <>
+                  {/* Original categories */}
+                  {categories.map((category, index) => {
+                    const catName = category.name || category;
+                    const isSelected = selectedCategories.includes(catName);
+                    const tagColor = getCachedCategoryColor(catName) || '#d9d9d9';
 
-                return (
-                  <Tag
-                    key={index}
-                    onClick={() => handleTagClick(catName)}
-                    style={{
-                      backgroundColor: isSelected ? tagColor : `${tagColor}20`,
-                      border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
-                      color: isSelected ? '#000' : '#333',
-                      fontWeight: isSelected ? 'bold' : 'normal',
-                      marginBottom: '0.5rem',
-                      cursor: 'pointer',
-                      transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-                      transition: 'all 0.2s ease',
-                      padding: '0.3rem 0.75rem',
-                      borderRadius: '24px'
-                    }}
-                  >
-                    {catName}
-                  </Tag>
-                );
-              })
-            ) : (
-              <Spin size="small" />
-            )}
+                    return (
+                      <div
+                        key={index}
+                        className="category-item"
+                        onClick={() => handleTagClick(catName)}
+                      >
+                        <Tag
+                          className={`category-tag ${isSelected ? 'category-tag-selected' : ''}`}
+                          style={{
+                            backgroundColor: isSelected ? tagColor : `${tagColor}20`,
+                            border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
+                            color: isSelected ? '#000' : '#333'
+                          }}
+                        >
+                          {catName}
+                        </Tag>
+                      </div>
+                    );
+                  })}
+
+                  {/* Duplicated categories for infinite scroll effect */}
+                  {categories.map((category, index) => {
+                    const catName = category.name || category;
+                    const isSelected = selectedCategories.includes(catName);
+                    const tagColor = getCachedCategoryColor(catName) || '#d9d9d9';
+
+                    return (
+                      <div
+                        key={`dup-${index}`}
+                        className="category-item"
+                        onClick={() => handleTagClick(catName)}
+                      >
+                        <Tag
+                          className={`category-tag ${isSelected ? 'category-tag-selected' : ''}`}
+                          style={{
+                            backgroundColor: isSelected ? tagColor : `${tagColor}20`,
+                            border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
+                            color: isSelected ? '#000' : '#333'
+                          }}
+                        >
+                          {catName}
+                        </Tag>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <Spin size="small" />
+              )}
+            </div>
           </div>
 
           {/* Selected tags */}
           {selectedCategories.length > 0 && (
-            <div style={{ marginTop: '1rem' }}>
-              <Typography.Text strong>Selected filters: </Typography.Text>
+            <div className="selected-filters-container">
+              <Typography.Text className="selected-filter-label">Selected filters: </Typography.Text>
               {selectedCategories.map((category, index) => {
                 const tagColor = getCachedCategoryColor(category) || '#d9d9d9';
                 return (
@@ -290,14 +324,11 @@ const SearchBrandsPage = () => {
                     key={index}
                     closable
                     onClose={() => handleTagClick(category)}
+                    className="selected-tag"
                     style={{
                       backgroundColor: tagColor,
                       border: `2px solid ${tagColor}`,
-                      color: '#000',
-                      fontWeight: 'bold',
-                      marginBottom: '0.5rem',
-                      borderRadius: '24px',
-                      padding: '0.3rem 0.75rem',
+                      color: '#000'
                     }}
                   >
                     {category}
@@ -309,13 +340,13 @@ const SearchBrandsPage = () => {
         </section>
 
         {/* Results Section */}
-        <section>
-          <Row justify="space-between" align="middle" style={{ marginBottom: '1rem' }}>
+        <section className="results-section">
+          <Row justify="space-between" align="middle" className="results-header">
             <Col>
-              <Title level={3}>
+              <Title level={3} className="results-title">
                 Search Results
                 {filteredBrands.length > 0 && (
-                  <Typography.Text type="secondary" style={{ fontSize: '16px', fontWeight: 'normal' }}>
+                  <Typography.Text type="secondary" className="results-count">
                     ({filteredBrands.length} brand{filteredBrands.length !== 1 ? 's' : ''} found)
                   </Typography.Text>
                 )}
@@ -331,10 +362,12 @@ const SearchBrandsPage = () => {
           {filteredBrands.length > 0 ? (
             <Row gutter={[16, 16]} justify="start">
               {filteredBrands.map((brand) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={brand.id}>
-                  <Link to={`/brands/${brand.id}`} style={{ textDecoration: 'none' }}>
-                    <BrandCard brand={brand} onTagClick={handleTagClick} />
-                  </Link>
+                <Col xs={24} sm={12} md={12} lg={8} key={brand.id}>
+                  <div className="featured-brand-card">
+                    <Link to={`/brands/${brand.id}`}>
+                      <BrandCard brand={brand} onTagClick={handleTagClick} />
+                    </Link>
+                  </div>
                 </Col>
               ))}
             </Row>
@@ -345,7 +378,7 @@ const SearchBrandsPage = () => {
                   ? "No brands match your search criteria"
                   : "Start searching to discover ethical brands"
               }
-              style={{ margin: '2rem 0' }}
+              className="empty-results"
             />
           ) : null}
         </section>
