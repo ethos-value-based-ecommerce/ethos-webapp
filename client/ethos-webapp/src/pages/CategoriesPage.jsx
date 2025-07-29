@@ -6,6 +6,7 @@ import NavBar from '../components/NavBar.jsx';
 import Footer from '../components/Footer.jsx';
 import { categoriesApi } from '../services/api.jsx';
 import '../App.css';
+import '../styling/CategoriesPage.css';
 
 const { Title, Paragraph } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
@@ -57,11 +58,11 @@ const CategoriesPage = () => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ background: '#fff', padding: '0 2rem' }}>
+    <Layout className="categories-layout">
+      <Header className="categories-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+            <Title level={3} className="categories-title">ETHOS</Title>
           </Col>
           <Col>
             <NavBar />
@@ -69,18 +70,18 @@ const CategoriesPage = () => {
         </Row>
       </Header>
 
-      <Content style={{ padding: '2rem' }}>
+      <Content className="categories-content">
         {/* Header Section */}
-        <section style={{ marginBottom: '3rem', textAlign: 'center' }}>
-          <Title level={1}>Categories</Title>
-          <Paragraph style={{ fontSize: '18px', color: '#666', maxWidth: '800px', margin: '0 auto' }}>
+        <section className="categories-intro">
+          <Title level={1} className="categories-intro-title">Categories</Title>
+          <Paragraph className="categories-intro-text">
             Explore our diverse range of ethical and sustainable categories. Each category represents brands
             committed to making a positive impact on people, planet, and communities.
           </Paragraph>
         </section>
 
         {/* Search Section */}
-        <section style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <section className="categories-search">
           <Row justify="center">
             <Col xs={24} sm={16} md={12} lg={8}>
               <Input
@@ -89,7 +90,7 @@ const CategoriesPage = () => {
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
                 size="large"
-                style={{ borderRadius: '8px' }}
+                className="categories-search-input"
                 disabled={loading}
               />
             </Col>
@@ -98,9 +99,9 @@ const CategoriesPage = () => {
 
         {/* Loading State */}
         {loading && (
-          <div style={{ textAlign: 'center', padding: '3rem' }}>
+          <div className="categories-loading">
             <Spin size="large" />
-            <Paragraph style={{ marginTop: '1rem', color: '#666' }}>
+            <Paragraph className="categories-loading-text">
               Loading categories...
             </Paragraph>
           </div>
@@ -108,7 +109,7 @@ const CategoriesPage = () => {
 
         {/* Error State */}
         {error && (
-          <div style={{ marginBottom: '2rem' }}>
+          <div className="categories-error">
             <Alert
               message="Error"
               description={error}
@@ -128,39 +129,30 @@ const CategoriesPage = () => {
               <Col xs={24} sm={12} md={8} lg={6} key={index}>
                 <Card
                   hoverable
-                  style={{
-                    height: '100%',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    transition: 'all 0.3s ease'
+                  className="categories-card"
+                  styles={{
+                    body: {
+                      padding: '24px',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }
                   }}
-                  styles={{ body: { padding: '24px', height: '100%', display: 'flex', flexDirection: 'column' } }}
                 >
-                  <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                    <Title level={4} style={{ margin: 0, color: '#1890ff' }}>
+                  <div className="categories-card-title-container">
+                    <Title level={4} className="categories-card-title">
                       {category.name}
                     </Title>
                   </div>
 
-                  <Paragraph
-                    style={{
-                      flex: 1,
-                      color: '#666',
-                      lineHeight: '1.6',
-                      textAlign: 'center'
-                    }}
-                  >
+                  <Paragraph className="categories-card-description">
                     {category.description}
                   </Paragraph>
 
-                  <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                  <div className="categories-card-tag-container">
                     <Tag
                       color={category.color}
-                      style={{
-                        fontSize: '12px',
-                        padding: '4px 12px',
-                        borderRadius: '16px'
-                      }}
+                      className="categories-card-tag"
                     >
                       {category.name}
                     </Tag>
@@ -171,11 +163,11 @@ const CategoriesPage = () => {
           </Row>
 
           {filteredCategories.length === 0 && (
-            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-              <Title level={4} style={{ color: '#999' }}>
+            <div className="categories-empty">
+              <Title level={4} className="categories-empty-title">
                 No categories found matching "{searchTerm}"
               </Title>
-              <Paragraph style={{ color: '#666' }}>
+              <Paragraph className="categories-empty-text">
                 Try searching with different keywords or browse all categories.
               </Paragraph>
             </div>
@@ -185,29 +177,29 @@ const CategoriesPage = () => {
 
         {/* Stats Section */}
         {!loading && !error && (
-        <section style={{ marginTop: '4rem', textAlign: 'center', background: '#f8f9fa', padding: '2rem', borderRadius: '12px' }}>
+        <section className="categories-stats">
           <Row gutter={[32, 16]} justify="center">
             <Col xs={24} sm={8}>
-              <Title level={2} style={{ color: '#1890ff', margin: 0 }}>
+              <Title level={2} className="categories-stats-number">
                 {categories.length}
               </Title>
-              <Paragraph style={{ margin: 0, color: '#666' }}>
+              <Paragraph className="categories-stats-label">
                 Categories Available
               </Paragraph>
             </Col>
             <Col xs={24} sm={8}>
-              <Title level={2} style={{ color: '#52c41a', margin: 0 }}>
+              <Title level={2} className="categories-stats-number">
                 100+
               </Title>
-              <Paragraph style={{ margin: 0, color: '#666' }}>
+              <Paragraph className="categories-stats-label">
                 Ethical Brands
               </Paragraph>
             </Col>
             <Col xs={24} sm={8}>
-              <Title level={2} style={{ color: '#fa8c16', margin: 0 }}>
+              <Title level={2} className="categories-stats-number">
                 500+
               </Title>
-              <Paragraph style={{ margin: 0, color: '#666' }}>
+              <Paragraph className="categories-stats-label">
                 Sustainable Products
               </Paragraph>
             </Col>
@@ -216,7 +208,7 @@ const CategoriesPage = () => {
         )}
       </Content>
 
-      <AntFooter style={{ padding: 0 }}>
+      <AntFooter className="categories-footer">
         <Footer />
       </AntFooter>
     </Layout>
