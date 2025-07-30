@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Layout, Typography, Row, Col, Spin, Alert, Tag } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Layout, Typography, Row, Col, Spin, Alert, Tag, Button } from 'antd';
+import { LoadingOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { getCachedCategoryColor } from '../components/categoryColors.jsx';
 import '../App.css';
 import '../styling/BrandPage.css';
@@ -21,6 +21,7 @@ const { Header, Content, Footer: AntFooter } = Layout;
 const BrandPage = () => {
   const { id } = useParams();
   const brandId = parseInt(id, 10);
+  const navigate = useNavigate();
 
   const [brand, setBrand] = useState(null);
   const [brandProducts, setBrandProducts] = useState([]);
@@ -115,6 +116,17 @@ const BrandPage = () => {
       </Header>
 
       <Content className="brand-content">
+        <div className="back-button-container">
+          <Button
+            type="text"
+            icon={<ArrowLeftOutlined />}
+            className="back-button"
+            onClick={() => navigate('/search-brands')}
+          >
+            Back to Search
+          </Button>
+        </div>
+
         <section className="brand-hero-section">
           <Row justify="center">
             <Col xs={24} sm={22} md={20} lg={16}>

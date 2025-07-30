@@ -141,6 +141,39 @@
   margin: 0 auto;
 }
 
+/* Back Button Styling */
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  display: flex;
+  align-items: center;
+  color: var(--body-text);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.back-button:hover {
+  color: var(--accent);
+  background-color: rgba(165, 138, 137, 0.05);
+  border-color: var(--border-color);
+  transform: translateX(-4px);
+}
+
+.back-button .anticon {
+  margin-right: 8px;
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.back-button:hover .anticon {
+  transform: translateX(-4px);
+}
+
 .brand-title {
   margin: 0;
   color: var(--dusty-rose);
@@ -263,7 +296,7 @@ a:hover .brand-title {
 }
 
 .product-card:hover {
-  transform: translateY(-25px);
+  transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
   border-color: var(--accent);
 }
