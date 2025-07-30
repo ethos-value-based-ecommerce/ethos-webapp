@@ -1,33 +1,25 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Layout, Typography, Input, Button, Row, Col, Modal, Tag, Spin, Alert, Empty } from 'antd';
+import { Link } from 'react-router-dom';
+import { Layout, Typography, Input, Button, Row, Col, Tag, Spin, Alert, Empty } from 'antd';
+import { SearchOutlined, ClearOutlined, LoadingOutlined } from '@ant-design/icons';
 
 import NavBar from '../components/NavBar.jsx';
 import ProductCard from '../components/ProductCard.jsx';
+import ProductModal from '../components/ProductModal.jsx';
 import Footer from '../components/Footer.jsx';
 import { productsApi, categoriesApi } from '../services/api.jsx';
 
 // Importing category color for tag colors
 import { preloadCategoryColors, getCachedCategoryColor } from '../components/categoryColors.jsx';
 import '../App.css';
+import '../styling/SearchProductsPage.css';
 
 const { Title } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
 
 const ItemsPerPage = 8;
 
-const getTagStyle = (isSelected, tagColor) => ({
-  backgroundColor: isSelected ? tagColor : `${tagColor}20`,
-  border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
-  color: isSelected ? '#000' : '#333',
-  fontWeight: isSelected ? 'bold' : 'normal',
-  marginBottom: '0.5rem',
-  cursor: 'pointer',
-  transform: isSelected ? 'scale(1.05)' : 'scale(1)',
-  transition: 'all 0.2s ease',
-  padding: '0.3rem 0.75rem',
-  borderRadius: '24px'
-});
-
+// Function to handle the Search Products Page
 const SearchProductsPage = () => {
   const [productSearch, setProductSearch] = useState('');
   const [allProducts, setAllProducts] = useState([]);
@@ -213,12 +205,34 @@ const SearchProductsPage = () => {
   const startIndex = (currentPage - 1) * ItemsPerPage;
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + ItemsPerPage);
 
+  if (loading) {
+    return (
+      <Layout className="search-page-layout">
+        <Header className="search-page-header">
+          <Row justify="space-between" align="middle">
+            <Col>
+              <Title level={3} className="search-page-title">ETHOS</Title>
+            </Col>
+            <Col>
+              <NavBar />
+            </Col>
+          </Row>
+        </Header>
+        <Content className="loading-container">
+          <Spin size="large" indicator={<LoadingOutlined className="loading-icon" spin />} />
+        </Content>
+      </Layout>
+    );
+  }
+
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ background: '#fff', padding: '0 2rem' }}>
+    <Layout className="search-page-layout">
+      <Header className="search-page-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+            <Link to="/">
+              <Title level={3} className="search-page-title">ETHOS</Title>
+            </Link>
           </Col>
           <Col>
             <NavBar />
@@ -226,59 +240,142 @@ const SearchProductsPage = () => {
         </Row>
       </Header>
 
-      <Content style={{ padding: '2rem' }}>
-          {/* Search Header */}
-             <section style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          <Title level={2}>Search Products</Title>
-          <Row gutter={16} justify="center" style={{ marginTop: '1rem' }}>
+      <Content className="search-page-content">
+        {error && (
+          <Alert
+            message="Error"
+            description={error}
+            type="error"
+            showIcon
+            closable
+            onClose={() => setError(null)}
+            className="error-alert"
+          />
+        )}
+
+        {/* Search Header */}
+        <section className="search-section">
+          <Title level={2} className="search-title">Search Products</Title>
+          <Row gutter={16} justify="center" className="search-input-container">
             <Col xs={24} sm={16} md={12}>
               <Input
                 placeholder="Search by name, description, or category..."
                 value={productSearch}
                 onChange={(e) => setProductSearch(e.target.value)}
+                prefix={<SearchOutlined />}
+                suffix={
+                  searchLoading ? (
+                    <LoadingOutlined spin />
+                  ) : (
+                    productSearch && (
+                      <ClearOutlined
+                        onClick={() => setProductSearch('')}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    )
+                  )
+                }
+                onPressEnter={handleSearch}
               />
             </Col>
             <Col>
-              <Button type="primary" onClick={handleSearch}>
+              <Button
+                type="primary"
+                icon={<SearchOutlined />}
+                loading={searchLoading}
+                onClick={handleSearch}
+                className="search-button"
+                disabled={!productSearch.trim() && selectedCategories.length === 0}
+              >
                 Search
               </Button>
             </Col>
             <Col>
-              <Button onClick={handleClear}>Clear</Button>
+              <Button
+                icon={<ClearOutlined />}
+                onClick={handleClear}
+                className="clear-button"
+                disabled={!productSearch && selectedCategories.length === 0}
+              >
+                Clear
+              </Button>
             </Col>
           </Row>
         </section>
 
-        {/* Categories Section */}
-        <section style={{ marginBottom: '2rem' }}>
-          <Title level={3}>Filter by Categories</Title>
-          <div style={{ marginTop: '1rem' }}>
-            {categories.length > 0 && colorCacheReady ? (
-              categories.map((category, index) => {
-                const catName = typeof category === 'string' ? category : category.name;
-                const isSelected = selectedCategories.includes(catName);
-                const tagColor = (catName && typeof catName === 'string')
-                  ? getCachedCategoryColor(catName) || '#d9d9d9'
-                  : '#d9d9d9';
+        {/* Tags Section */}
+        <section className="tags-section">
+          <Title level={3} className="tags-title">Filter by Categories</Title>
+          <div className="tags-container">
+            <div className="categories-scroll">
+              {categories.length > 0 && colorCacheReady ? (
+                <>
+                  {/* Original categories */}
+                  {categories.map((category, index) => {
+                    const catName = typeof category === 'string' ? category : category.name;
+                    const isSelected = selectedCategories.includes(catName);
+                    const tagColor = (catName && typeof catName === 'string')
+                      ? getCachedCategoryColor(catName) || '#d9d9d9'
+                      : '#d9d9d9';
 
-                return (
-                  <Tag
-                    key={category.id || index}
-                    onClick={() => handleCategoryClick(catName)}
-                    style={getTagStyle(isSelected, tagColor)}
-                  >
-                    {catName}
-                  </Tag>
-                );
-              })
-            ) : (
-              <Spin size="small" />
-            )}
+                    return (
+                      <div
+                        key={index}
+                        className="category-item"
+                        onClick={() => handleCategoryClick(catName)}
+                      >
+                        <Tag
+                          className={`category-tag ${isSelected ? 'category-tag-selected' : ''}`}
+                          style={{
+                            backgroundColor: isSelected ? tagColor : `${tagColor}20`,
+                            border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
+                            color: isSelected ? '#000' : '#333'
+                          }}
+                        >
+                          {catName}
+                        </Tag>
+                      </div>
+                    );
+                  })}
+
+                  {/* Duplicated categories for infinite scroll effect */}
+                  {categories.map((category, index) => {
+                    const catName = typeof category === 'string' ? category : category.name;
+                    const isSelected = selectedCategories.includes(catName);
+                    const tagColor = (catName && typeof catName === 'string')
+                      ? getCachedCategoryColor(catName) || '#d9d9d9'
+                      : '#d9d9d9';
+
+                    return (
+                      <div
+                        key={`dup-${index}`}
+                        className="category-item"
+                        onClick={() => handleCategoryClick(catName)}
+                      >
+                        <Tag
+                          className={`category-tag ${isSelected ? 'category-tag-selected' : ''}`}
+                          style={{
+                            backgroundColor: isSelected ? tagColor : `${tagColor}20`,
+                            border: isSelected ? `2px solid ${tagColor}` : `1px solid ${tagColor}40`,
+                            color: isSelected ? '#000' : '#333'
+                          }}
+                        >
+                          {catName}
+                        </Tag>
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <Spin size="small" />
+              )}
+            </div>
           </div>
 
+          {/* Selected tags */}
           {selectedCategories.length > 0 && (
-            <div style={{ marginTop: '1rem' }}>
-              <Typography.Text strong>Selected filters: </Typography.Text>
+            <div className="selected-filters-container">
+              <Typography.Text className="selected-filter-label">Selected filters: </Typography.Text>
               {selectedCategories.map((category, index) => {
                 const tagColor = (category && typeof category === 'string')
                   ? getCachedCategoryColor(category) || '#d9d9d9'
@@ -288,14 +385,11 @@ const SearchProductsPage = () => {
                     key={index}
                     closable
                     onClose={() => handleCategoryClick(category)}
+                    className="selected-tag"
                     style={{
                       backgroundColor: tagColor,
                       border: `2px solid ${tagColor}`,
-                      color: '#000',
-                      fontWeight: 'bold',
-                      marginBottom: '0.5rem',
-                      borderRadius: '24px',
-                      padding: '0.3rem 0.75rem',
+                      color: '#000'
                     }}
                   >
                     {category}
@@ -306,116 +400,141 @@ const SearchProductsPage = () => {
           )}
         </section>
 
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '2rem' }}>
-            <Spin size="large" />
-            <p style={{ marginTop: '1rem' }}>Loading products...</p>
-          </div>
-        )}
-
-        {error && (
-          <Alert
-            message="Error"
-            description={error}
-            type="error"
-            showIcon
-            style={{ marginBottom: '2rem' }}
-          />
-        )}
-
-        {!loading && !error && (
-          <section>
-            <Row justify="space-between" align="middle" style={{ marginBottom: '1rem' }}>
+        {/* Results Section */}
+        <section className="results-section">
+          <Row justify="space-between" align="middle" className="results-header">
+            <Col>
+              <Title level={3} className="results-title">
+                Search Results
+                {filteredProducts.length > 0 && (
+                  <Typography.Text type="secondary" className="results-count">
+                    ({filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found)
+                  </Typography.Text>
+                )}
+              </Title>
+            </Col>
+            {searchLoading && (
               <Col>
-                <Title level={3}>
-                  Search Results
-                  {filteredProducts.length > 0 && (
-                    <Typography.Text type="secondary" style={{ fontSize: '16px', fontWeight: 'normal' }}>
-                      ({filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found)
-                    </Typography.Text>
-                  )}
-                </Title>
+                <Spin size="small" />
               </Col>
-              {searchLoading && (
-                <Col>
-                  <Spin size="small" />
-                </Col>
-              )}
-            </Row>
+            )}
+          </Row>
 
-            {filteredProducts.length > 0 ? (
-              <>
-                <Row gutter={[16, 16]} justify="space-around">
-                  {paginatedProducts.map((product, index) => (
-                    <Col xs={24} sm={12} md={8} lg={6} key={product.id || `product-${index}`}>
+          {filteredProducts.length > 0 ? (
+            <>
+              <Row gutter={[16, 16]} justify="start">
+                {paginatedProducts.map((product, index) => (
+                  <Col xs={24} sm={12} md={8} lg={6} key={product.id || `product-${index}`}>
+                    <div className="product-card">
                       <ProductCard
                         onClick={() => handleProductClick(product)}
                         productTitle={product.title}
                         productImage={product.image}
                         productPrice={product.price}
                         productWebsite={product.website}
+                        productData={product}
                         showLink={true}
                       />
-                    </Col>
-                  ))}
-                </Row>
-
-                {/* Pagination */}
-                {filteredProducts.length > ItemsPerPage && (
-                  <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-                    <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
-                      <Button
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                      >
-                        Previous
-                      </Button>
-                      <span style={{ padding: '0 16px', color: '#666' }}>
-                        Page {currentPage} of {Math.ceil(filteredProducts.length / ItemsPerPage)}
-                      </span>
-                      <Button
-                        disabled={currentPage >= Math.ceil(filteredProducts.length / ItemsPerPage)}
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                      >
-                        Next
-                      </Button>
                     </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <Empty
-                description="No products matching your search."
-                style={{ margin: '2rem 0' }}
-              />
-            )}
-          </section>
-        )}
+                  </Col>
+                ))}
+              </Row>
+
+              {/* Pagination */}
+              {filteredProducts.length > ItemsPerPage && (
+                <div className="pagination-container">
+                  <Button
+                    className="pagination-button"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    Previous
+                  </Button>
+                  <span className="pagination-info">
+                    Page {currentPage} of {Math.ceil(filteredProducts.length / ItemsPerPage)}
+                  </span>
+                  <Button
+                    className="pagination-button"
+                    disabled={currentPage >= Math.ceil(filteredProducts.length / ItemsPerPage)}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : !searchLoading ? (
+            <Empty
+              description={
+                productSearch || selectedCategories.length > 0
+                  ? "No products match your search criteria"
+                  : "Start searching to discover ethical products"
+              }
+              className="empty-results"
+            />
+          ) : null}
+        </section>
       </Content>
 
       <AntFooter style={{ padding: 0 }}>
         <Footer />
       </AntFooter>
 
-        {/* Product Detail Modal */}
-      <Modal
-        title="Product Details"
-        open={isModalVisible}
-        onCancel={handleModalClose}
-        footer={null}
-        width={600}
+      {/* Product Detail Modal */}
+      <ProductModal
+        isOpen={isModalVisible}
+        onClose={handleModalClose}
+        title={selectedProduct?.title || "Product Details"}
       >
         {selectedProduct && (
-          <ProductCard
-            productImage={selectedProduct.image}
-            productTitle={selectedProduct.title}
-            productPrice={selectedProduct.price}
-            productWebsite={selectedProduct.website}
-            alt={selectedProduct.alt}
-            showLink={true}
-          />
+          <div style={{ padding: "20px" }}>
+            <Row gutter={[24, 24]}>
+              <Col xs={24} md={12}>
+                <div style={{
+                  width: '100%',
+                  height: '300px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#fafafa',
+                  borderRadius: '8px',
+                  overflow: 'hidden'
+                }}>
+                  <img
+                    src={selectedProduct.image || '/fallback.jpg'}
+                    alt={selectedProduct.title}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain'
+                    }}
+                  />
+                </div>
+              </Col>
+              <Col xs={24} md={12}>
+                <Title level={4}>{selectedProduct.title}</Title>
+                <Typography.Paragraph strong>{selectedProduct.price}</Typography.Paragraph>
+
+                {selectedProduct.description && (
+                  <Typography.Paragraph>{selectedProduct.description}</Typography.Paragraph>
+                )}
+
+                {selectedProduct.website && (
+                  <Button
+                    href={selectedProduct.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shop-now-button"
+                    style={{ marginTop: '16px' }}
+                  >
+                    Shop Now
+                  </Button>
+                )}
+              </Col>
+            </Row>
+          </div>
         )}
-      </Modal>
+      </ProductModal>
     </Layout>
   );
 };

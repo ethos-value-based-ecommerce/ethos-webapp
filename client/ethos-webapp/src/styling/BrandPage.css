@@ -171,35 +171,25 @@
 }
 
 .back-button:hover .anticon {
-  transform: translateX(-4px);
-}
-
-.brand-title {
-  margin: 0;
-  color: var(--dusty-rose);
-  font-weight: 800;
-  font-size: 36px !important;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  padding-top: 12px; /* Increased drop down */
-}
-
-a .brand-title {
   text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-a:hover .brand-title {
   transform: scale(1.05);
-  text-shadow: 0 0 10px rgba(165, 138, 137, 0.3);
+  margin: 0 auto;
+  max-width: 1000px;
+  width: 100%;
 }
 
-/* Hero Section */
+/* Brand Info Box */
+.brand-info-box {
+  margin: 0 auto;
+  max-width: 1000px;
+  width: 100%;
+}
+
 .brand-hero-section {
-  background: var(--background-primary);
-  padding: 40px 20px;
+/* Brand Card Wrapper */
+.brand-card-wrapper {
+  border: 1px solid var(--border-color);
   margin-bottom: 40px;
-  text-align: center;
 }
 
 /* Brand Card Wrapper */
@@ -216,16 +206,11 @@ a:hover .brand-title {
 
 
 /* Brand Details Section */
-.brand-section {
-  margin-bottom: 48px;
-}
 
 .section-title {
   color: var(--heading-text);
   margin-bottom: 24px;
   position: relative;
-  padding-bottom: 12px;
-}
 
 .section-title::after {
   content: '';
@@ -312,7 +297,6 @@ a:hover .brand-title {
   position: relative;
 }
 
-.product-image-container::after {
   content: '';
   position: absolute;
   top: 0;
@@ -321,20 +305,14 @@ a:hover .brand-title {
   bottom: 0;
   background: linear-gradient(to bottom, rgba(0,0,0,0) 70%, rgba(0,0,0,0.1) 100%);
   pointer-events: none;
-  transition: opacity 0.3s ease;
-}
 
 .product-card:hover .product-image-container::after {
   opacity: 0.6;
 }
 
 .product-details {
-  padding: 16px;
-  transition: background-color 0.3s ease;
-}
 
 
-.product-title {
   color: var(--heading-text);
   margin-bottom: 8px;
   font-size: 16px;
@@ -342,15 +320,54 @@ a:hover .brand-title {
   transition: color 0.3s ease;
 }
 
-
-.product-price {
-  color: var(--accent);
   font-weight: 600;
   margin-bottom: 12px;
   transition: transform 0.3s ease, color 0.3s ease;
 }
 
 
+/* Back button styling */
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  color: var(--dusty-rose);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+/* Back button styling */
+.back-button-container {
+  margin-bottom: 20px;
+}
+.back-button:hover {
+.back-button {
+  color: var(--dusty-rose);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  color: var(--button-hover);
+  transform: translateX(-5px);
+}
+
+.back-button .anticon {
+  margin-right: 8px;
+}
+
+  color: var(--button-hover);
+  transform: translateX(-5px);
+}
+
+.back-button .anticon {
+  margin-right: 8px;
+}
 
 
 .cta-button {
@@ -404,7 +421,7 @@ a:hover .brand-title {
 @media (max-width: 768px) {
   .brand-content {
     padding: 16px;
-  }
+}
 
   .brand-hero-section {
     padding: 32px 16px;
@@ -425,4 +442,5 @@ a:hover .brand-title {
   .section-title {
     font-size: 20px;
   }
+}
 }
