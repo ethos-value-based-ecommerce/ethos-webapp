@@ -10,7 +10,12 @@ const ProductModal = ({ isOpen, onClose, children, title }) => {
       footer={null}
       title={title || 'Product Details'}
       centered
-      destroyOnHidden
+      className="product-modal"
+      width={800}
+      styles={{
+        body: { padding: 0 },
+        mask: { backgroundColor: 'rgba(0, 0, 0, 0.65)' }
+      }}
     >
       {children}
     </Modal>
