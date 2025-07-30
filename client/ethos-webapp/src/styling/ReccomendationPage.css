@@ -1,0 +1,396 @@
+
+@import './colors.css';
+
+/* Quiz Styling */
+
+/* Animation Keyframes */
+@keyframes softFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animation Classes */
+.quiz-option {
+  transition: all 0.3s ease;
+  transform-origin: left;
+}
+
+.quiz-option:hover {
+  transform: translateX(5px);
+}
+
+.quiz-step-enter {
+  animation: softFadeIn 0.6s ease-out forwards;
+}
+
+.quiz-step-exit {
+  animation: softFadeIn 0.6s ease-out reverse forwards;
+}
+
+/* Modal Styling */
+.recommendation-modal {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.recommendation-modal-title {
+  color: var(--heading-text);
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Steps Component Styling */
+.quiz-steps {
+  display: flex !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  margin-bottom: 28px;
+  position: relative !important;
+}
+
+/* Fix alignment of steps */
+.ant-steps {
+  display: flex !important;
+  width: 100% !important;
+}
+
+/* Clear all default Ant Design Steps styles */
+.ant-steps * {
+  box-sizing: border-box;
+}
+
+/* Step Item Styling */
+.ant-steps-item {
+  flex: 1 !important;
+  min-width: auto !important;
+  margin-right: 0 !important;
+  padding: 0 !important;
+}
+
+/* Fix for the last step */
+.ant-steps-item:last-child {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+
+.ant-steps-item:last-child .ant-steps-item-container {
+  padding-right: 0 !important;
+}
+
+.ant-steps-item-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.ant-steps-item-title {
+  font-size: 11px !important;
+  text-align: center !important;
+  padding-right: 0 !important;
+  white-space: normal !important;
+  line-height: 1.2 !important;
+  margin-top: 8px !important;
+  max-width: 100% !important;
+}
+
+.ant-steps-item-title::after {
+  display: none !important;
+}
+
+/* Complete rewrite of dot steps styling */
+.ant-steps-dot {
+  display: flex !important;
+  width: 100% !important;
+}
+
+/* Step items */
+.ant-steps-dot .ant-steps-item {
+  flex: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Step container */
+.ant-steps-dot .ant-steps-item-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Dot styling */
+.ant-steps-dot .ant-steps-item-icon {
+  background: none !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative !important;
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* The actual dot */
+.ant-steps-dot .ant-steps-item-icon .ant-steps-icon-dot {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  display: block !important;
+  margin: 0 !important;
+}
+
+/* Current step dot */
+.ant-steps-dot .ant-steps-item-process .ant-steps-item-icon .ant-steps-icon-dot {
+  background-color: var(--lavender-gray) !important;
+  border: none !important;
+}
+
+/* Completed step dot */
+.ant-steps-dot .ant-steps-item-finish .ant-steps-item-icon .ant-steps-icon-dot {
+  background-color: var(--lavender-gray) !important;
+  opacity: 0.8 !important;
+  border: none !important;
+}
+
+/* Waiting step dot */
+.ant-steps-dot .ant-steps-item-wait .ant-steps-item-icon .ant-steps-icon-dot {
+  background-color: white !important;
+  border: 1px solid var(--lavender-gray) !important;
+}
+
+/* Create a continuous line behind all dots */
+.quiz-steps::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background-color: var(--lavender-gray);
+  z-index: 0;
+}
+
+/* Hide the default connecting lines */
+.ant-steps-dot .ant-steps-item-tail {
+  display: none !important;
+}
+
+/* Title styling */
+.ant-steps-dot .ant-steps-item-content {
+  width: 100% !important;
+  text-align: center !important;
+  padding: 0 !important;
+  margin-top: 8px !important;
+}
+
+.ant-steps-dot .ant-steps-item-title {
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  padding: 0 !important;
+  color: var(--body-text) !important;
+}
+
+.ant-steps-dot .ant-steps-item-process .ant-steps-item-title {
+  color: var(--lavender-gray) !important;
+  font-weight: 600 !important;
+}
+
+/* Hide the line after title */
+.ant-steps-dot .ant-steps-item-title::after {
+  display: none !important;
+}
+
+/* Override any blue in the progress button */
+.ant-btn-primary {
+  background-color: var(--dusty-rose) !important;
+  border-color: var(--dusty-rose) !important;
+}
+
+/* Form Elements Styling */
+.quiz-step-content {
+  animation: softFadeIn 0.6s ease-out forwards;
+  padding: 10px 0;
+}
+
+.quiz-question-title {
+  color: var(--heading-text);
+  margin-bottom: 16px;
+}
+
+.quiz-question-text {
+  color: var(--body-text);
+  font-size: 16px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.quiz-options-container {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Override checkbox and radio colors */
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: var(--dusty-rose) !important;
+  border-color: var(--dusty-rose) !important;
+}
+
+.ant-checkbox-wrapper:hover .ant-checkbox-inner,
+.ant-checkbox:hover .ant-checkbox-inner,
+.ant-checkbox-input:focus + .ant-checkbox-inner {
+  border-color: var(--dusty-rose) !important;
+}
+
+.ant-radio-checked .ant-radio-inner {
+  border-color: var(--dusty-rose) !important;
+}
+
+.ant-radio-inner::after {
+  background-color: var(--dusty-rose) !important;
+}
+
+.ant-radio-wrapper:hover .ant-radio-inner,
+.ant-radio:hover .ant-radio-inner,
+.ant-radio-input:focus + .ant-radio-inner {
+  border-color: var(--dusty-rose) !important;
+}
+
+/* Button Styling */
+.quiz-button-container {
+  margin-top: 32px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.quiz-back-button {
+  border-color: var(--border-color);
+}
+
+.quiz-next-button {
+  background-color: var(--dusty-rose) !important;
+  border-color: var(--dusty-rose) !important;
+}
+
+/* Reccomendation Page */
+
+.recommendation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.recommendation-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.recommendation-title {
+  color: var(--heading-text);
+  margin-bottom: 1rem;
+}
+
+.recommendation-description {
+  color: var(--body-text);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.recommendation-filters {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: var(--background-secondary);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.recommendation-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.recommendation-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+  animation: softFadeIn 0.8s ease-out forwards;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: var(--dusty-rose);
+}
+
+/* Staggered animation for recommendation cards */
+.recommendation-card:nth-child(1) { animation-delay: 0.1s; }
+.recommendation-card:nth-child(2) { animation-delay: 0.2s; }
+.recommendation-card:nth-child(3) { animation-delay: 0.3s; }
+.recommendation-card:nth-child(4) { animation-delay: 0.4s; }
+.recommendation-card:nth-child(5) { animation-delay: 0.5s; }
+.recommendation-card:nth-child(6) { animation-delay: 0.6s; }
+
+.recommendation-empty {
+  text-align: center;
+  padding: 3rem;
+  background-color: var(--background-secondary);
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.recommendation-loading {
+  text-align: center;
+  padding: 3rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .recommendation-container {
+    padding: 1rem;
+  }
+
+  .recommendation-results {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+}

@@ -8,6 +8,7 @@ import ProductCard from "../components/ProductCard.jsx";
 import Footer from "../components/Footer.jsx";
 import { recommendationsApi } from "../services/api.jsx";
 import "../App.css";
+import "../styling/FeedPage.css";
 
 // Magic strings as constants for easy changes later
 const BRANDS_TITLE = "Brands Recommended for You";
@@ -27,8 +28,23 @@ const FeedPage = () => {
   const [error, setError] = useState(null);
   const [recommendedBrands, setRecommendedBrands] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
+  const [showCelebration, setShowCelebration] = useState(false);
   const location = useLocation();
   const quizAnswers = location.state?.quizAnswers;
+  
+
+  // DEMO MODE: Always show celebration animation when the page loads
+  useEffect(() => {
+    console.log("DEMO MODE: Always showing celebration animation");
+    setShowCelebration(true);
+
+    // Hide celebration after animation completes
+    const timer = setTimeout(() => {
+      setShowCelebration(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -109,18 +125,115 @@ const FeedPage = () => {
     fetchRecommendations();
   }, [quizAnswers]);
 
+  // Render enhanced celebration animation
+  const renderConfetti = () => {
+    if (!showCelebration) return null;
+
+    // Create confetti elements with various shapes and colors
+    const confettiElements = [];
+    for (let i = 1; i <= 50; i++) {
+      const size = Math.floor(Math.random() * 12) + 5; // Random size between 5-17px
+      const type = i % 10 + 1; // Cycle through 10 different animation types
+      const shapeType = i % 4; // 0: square, 1: circle, 2: triangle, 3: star
+      const colorType = i % 6 + 1; // Cycle through 6 different colors
+
+      let shapeClass = 'confetti-square';
+      if (shapeType === 1) shapeClass = 'confetti-circle';
+      else if (shapeType === 2) shapeClass = 'confetti-triangle';
+      else if (shapeType === 3) shapeClass = 'confetti-star';
+
+      let style = {
+        width: `${size}px`,
+        height: `${size}px`,
+        left: `${Math.random() * 100}%`,
+        top: `-${size}px`,
+      };
+
+      confettiElements.push(
+        <div
+          key={`confetti-${i}`}
+          className={`confetti confetti-${type} ${shapeClass} confetti-color-${colorType}`}
+          style={style}
+        />
+      );
+    }
+
+    // Create sparkle elements
+    const sparkleElements = [];
+    for (let i = 1; i <= 12; i++) {
+      sparkleElements.push(
+        <div
+          key={`sparkle-${i}`}
+          className={`sparkle sparkle-${i % 6 + 1}`}
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+          }}
+        />
+      );
+    }
+
+    return (
+      <div className="celebration-container">
+        {confettiElements}
+        {sparkleElements}
+        <div className="celebration-message">
+          <h3>Congratulations!</h3>
+          <p>Your personalized recommendations are ready!</p>
+        </div>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
-      <Layout style={{ minHeight: "100vh" }}>
-        <Header style={{ background: "#fff", padding: "0 2rem" }}>
+      <Layout className="feed-layout">
+        <Header className="feed-header">
           <Row justify="space-between" align="middle">
-            <Col><Title level={3} style={{ margin: 0, color: "#000" }}>ETHOS</Title></Col>
+            <Col>
+              <Link to="/">
+                <Title level={2} className="home-title">ETHOS</Title>
+              </Link>
+            </Col>
             <Col><NavBar /></Col>
           </Row>
         </Header>
-        <Content style={{ padding: "2rem", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-          <p style={{ marginLeft: "1rem" }}>{LOADING_MESSAGE}</p>
+        <Content className="feed-content">
+          <div className="feed-loading">
+            <Spin indicator={<LoadingOutlined className="feed-loading-icon" spin />} />
+            <p className="feed-loading-text">{LOADING_MESSAGE}</p>
+
+            {/* Animated loading placeholders */}
+            <div className="loading-placeholder-container">
+              {/* Brands section placeholder */}
+              <div className="loading-section">
+                <div className="loading-section-title"></div>
+                <div className="loading-cards">
+                  {[...Array(4)].map((_, i) => (
+                    <div
+                      key={`brand-placeholder-${i}`}
+                      className="loading-card"
+                      style={{"--i": i}}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Products section placeholder */}
+              <div className="loading-section">
+                <div className="loading-section-title"></div>
+                <div className="loading-cards">
+                  {[...Array(4)].map((_, i) => (
+                    <div
+                      key={`product-placeholder-${i}`}
+                      className="loading-card"
+                      style={{"--i": i + 4}}
+                    ></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </Content>
       </Layout>
     );
@@ -128,15 +241,20 @@ const FeedPage = () => {
 
   if (error) {
     return (
-      <Layout style={{ minHeight: "100vh" }}>
-        <Header style={{ background: "#fff", padding: "0 2rem" }}>
+      <Layout className="feed-layout">
+        <Header className="feed-header">
           <Row justify="space-between" align="middle">
-            <Col><Title level={3} style={{ margin: 0, color: "#000" }}>ETHOS</Title></Col>
+            <Col>
+              <Link to="/">
+                <Title level={2} className="home-title">ETHOS</Title>
+              </Link>
+            </Col>
             <Col><NavBar /></Col>
           </Row>
         </Header>
-        <Content style={{ padding: "2rem" }}>
+        <Content className="feed-content">
           <Alert
+            className="feed-error"
             message="Error"
             description={error}
             type="error"
@@ -148,11 +266,15 @@ const FeedPage = () => {
   }
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Header style={{ background: "#fff", padding: "0 2rem" }}>
+    <Layout className="feed-layout">
+      {renderConfetti()}
+
+      <Header className="feed-header">
         <Row justify="space-between" align="middle">
           <Col>
-            <Title level={3} style={{ margin: 0, color: "#000" }}>ETHOS</Title>
+            <Link to="/">
+              <Title level={2} className="home-title">ETHOS</Title>
+            </Link>
           </Col>
           <Col>
             <NavBar />
@@ -160,22 +282,22 @@ const FeedPage = () => {
         </Row>
       </Header>
 
-      <Content style={{ padding: "2rem" }}>
+      <Content className="feed-content">
         {/* Page Header */}
-        <section style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <Title level={2}>{PAGE_TITLE}</Title>
-          <Paragraph>
+        <section>
+          <Title level={2} className="feed-title">{PAGE_TITLE}</Title>
+          <Paragraph className="feed-subtitle">
             {PAGE_SUBTITLE}
           </Paragraph>
         </section>
 
         {/* Brands Section */}
-        <section style={{ marginBottom: "3rem" }}>
-          <Title level={3}>{BRANDS_TITLE}</Title>
+        <section className="feed-section feed-brands-section">
+          <Title level={3} className="feed-section-title">{BRANDS_TITLE}</Title>
           {recommendedBrands.length > 0 ? (
-            <Row gutter={[16, 16]} justify="start">
+            <Row gutter={[24, 24]} justify="start">
               {recommendedBrands.map((brand) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={brand.id}>
+                <Col xs={24} sm={12} md={8} lg={6} key={brand.id} className="feed-card">
                   <Link to={`/brands/${brand.id}`} style={{ textDecoration: "none" }}>
                     <BrandCard brand={brand} />
                   </Link>
@@ -184,19 +306,19 @@ const FeedPage = () => {
             </Row>
           ) : (
             <Empty
+              className="feed-empty"
               description="No brand recommendations found based on your preferences"
-              style={{ margin: "2rem 0" }}
             />
           )}
         </section>
 
         {/* Products Section */}
-        <section>
-          <Title level={3}>{PRODUCTS_TITLE}</Title>
+        <section className="feed-section feed-products-section">
+          <Title level={3} className="feed-section-title">{PRODUCTS_TITLE}</Title>
           {allProducts.length > 0 ? (
-            <Row gutter={[16, 16]} justify="start">
+            <Row gutter={[24, 24]} justify="start">
               {allProducts.map((product, index) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={`product-${index}`}>
+                <Col xs={24} sm={12} md={8} lg={6} key={`product-${index}`} className="feed-card">
                   <ProductCard
                     productTitle={product.title || product.name}
                     productPrice={product.price}
@@ -210,8 +332,8 @@ const FeedPage = () => {
             </Row>
           ) : (
             <Empty
+              className="feed-empty"
               description="No product recommendations found based on your preferences"
-              style={{ margin: "2rem 0" }}
             />
           )}
         </section>

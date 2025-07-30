@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Modal, Steps, Checkbox, Radio, Button, Typography, message } from "antd";
+import "../styling/colors.css";
+import "../styling/ReccomendationPage.css";
 
-const { Step } = Steps;
 const { Title, Text } = Typography;
 
 // Defining the quiz steps and options.
@@ -117,9 +118,9 @@ const QuizModal = ({ isOpen, onClose, onSubmit }) => {
       // Close the modal first
       onClose();
 
-      // Then submit answers and navigate
+      // Then submit answers and navigate with justCompletedQuiz flag
       setTimeout(() => {
-        onSubmit(answers);
+        onSubmit(answers, true); // Pass true to indicate quiz was just completed
         console.log("Quiz completed, onSubmit called with answers:", answers);
       }, 100);
     }
@@ -133,45 +134,88 @@ const QuizModal = ({ isOpen, onClose, onSubmit }) => {
     <Modal
       open={isOpen}
       onCancel={onClose}
-      title="Brand Values Quiz"
+      title={<div className="recommendation-modal-title">Brand Values Quiz</div>}
       centered
-      width={600}
+      width={750}
       footer={null}
+      className="recommendation-modal"
+      styles={{
+        header: {
+          borderBottom: '1px solid var(--border-color)',
+          paddingBottom: '16px',
+          marginBottom: '8px'
+        },
+        body: {
+          padding: '24px 32px'
+        },
+        mask: {
+          backdropFilter: 'blur(4px)',
+          background: 'rgba(0, 0, 0, 0.45)'
+        }
+      }}
     >
-      <Steps current={current} size="small" style={{ marginBottom: 24 }}>
-        {quizSteps.map((s) => (
-          <Step key={s.key} title={s.title} />
-        ))}
-      </Steps>
+      <Steps
+        current={current}
+        size="small"
+        progressDot
+        items={quizSteps.map((s) => ({ title: s.title, key: s.key }))}
+        className="quiz-steps"
+      />
 
-      <div>
-        <Title level={4}>{step.title}</Title>
-        <Text>{step.question}</Text>
+      <div className="quiz-step-enter quiz-step-content" key={current}>
+        <Title level={4} className="quiz-question-title">{step.title}</Title>
+        <Text className="quiz-question-text">{step.question}</Text>
 
-        <div style={{ marginTop: 16 }}>
+        <div className="quiz-options-container">
           {step.multiple ? (
             <Checkbox.Group
-              options={step.options}
               value={answers[step.key]}
               onChange={handleChange}
-              style={{ display: "flex", flexDirection: "column", gap: 8 }}
-            />
+              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+            >
+              {step.options.map((option) => (
+                <Checkbox
+                  key={option.value}
+                  value={option.value}
+                  className="quiz-option"
+                >
+                  {option.label}
+                </Checkbox>
+              ))}
+            </Checkbox.Group>
           ) : (
             <Radio.Group
-              options={step.options}
               value={answers[step.key]}
               onChange={handleChange}
-              style={{ display: "flex", flexDirection: "column", gap: 8 }}
-            />
+              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+            >
+              {step.options.map((option) => (
+                <Radio
+                  key={option.value}
+                  value={option.value}
+                  className="quiz-option"
+                >
+                  {option.label}
+                </Radio>
+              ))}
+            </Radio.Group>
           )}
         </div>
       </div>
 
-      <div style={{ marginTop: 24, display: "flex", justifyContent: "space-between" }}>
-        <Button onClick={prev} disabled={current === 0}>
+      <div className="quiz-button-container">
+        <Button
+          onClick={prev}
+          disabled={current === 0}
+          className={current > 0 ? "quiz-option quiz-back-button" : "quiz-back-button"}
+        >
           Back
         </Button>
-        <Button type="primary" onClick={next}>
+        <Button
+          type="primary"
+          onClick={next}
+          className="quiz-option quiz-next-button"
+        >
           {current === quizSteps.length - 1 ? "Finish" : "Next"}
         </Button>
       </div>
