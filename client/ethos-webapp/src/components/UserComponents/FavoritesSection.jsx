@@ -39,51 +39,41 @@ const FavoritesSection = () => {
                 ) : favoriteBrands && favoriteBrands.length > 0 ? (
                     <Row gutter={[12, 12]}>
                         {favoriteBrands.slice(0, 6).map((brand) => (
-                            <Col key={brand.id} xs={12} sm={8} md={6} lg={4}>
+                            <Col key={brand.id} xs={24} sm={12} md={8} lg={6}>
                                 <Card
                                     hoverable
                                     size="small"
+                                    className="favorite-brand-card"
                                     cover={
-                                        <div style={{ height: '120px', overflow: 'hidden', position: 'relative' }}>
+                                        <div className="favorite-brand-image-container">
                                             <img
                                                 alt={brand.name}
                                                 src={brand.image}
-                                                style={{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    objectFit: 'cover'
-                                                }}
+                                                className="favorite-brand-image"
                                             />
-                                            <Button
-                                                type="text"
-                                                icon={<DeleteOutlined />}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleRemoveBrand(brand.id);
-                                                }}
-                                                style={{
-                                                    position: 'absolute',
-                                                    top: '4px',
-                                                    right: '4px',
-                                                    color: '#ff4d4f',
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                    border: 'none',
-                                                    borderRadius: '50%',
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '12px',
-                                                }}
-                                            />
+                                            <div className="favorite-brand-overlay">
+                                                <Button
+                                                    type="text"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveBrand(brand.id);
+                                                    }}
+                                                    className="favorite-remove-button"
+                                                />
+                                            </div>
                                         </div>
                                     }
-                                    styles={{ body: { padding: '8px 12px' } }}
+                                    styles={{
+                                        body: {
+                                            padding: '12px',
+                                            backgroundColor: 'var(--background-secondary)'
+                                        }
+                                    }}
                                 >
                                     <Card.Meta
                                         title={
-                                            <Text strong style={{ fontSize: '12px' }}>
+                                            <Text strong className="favorite-brand-name">
                                                 {brand.name}
                                             </Text>
                                         }
@@ -115,56 +105,46 @@ const FavoritesSection = () => {
                 ) : favoriteProducts && favoriteProducts.length > 0 ? (
                     <Row gutter={[12, 12]}>
                         {favoriteProducts.slice(0, 8).map((product) => (
-                            <Col key={product.id || product.title} xs={12} sm={8} md={6} lg={4}>
+                            <Col key={product.id || product.title} xs={24} sm={12} md={8} lg={6}>
                                 <Card
                                     hoverable
                                     size="small"
+                                    className="favorite-brand-card"
                                     cover={
-                                        <div style={{ height: '120px', overflow: 'hidden', position: 'relative' }}>
+                                        <div className="favorite-brand-image-container">
                                             <img
                                                 alt={product.name || product.title}
                                                 src={product.image}
-                                                style={{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    objectFit: 'cover'
-                                                }}
+                                                className="favorite-brand-image"
                                             />
-                                            <Button
-                                                type="text"
-                                                icon={<DeleteOutlined />}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleRemoveProduct(product);
-                                                }}
-                                                style={{
-                                                    position: 'absolute',
-                                                    top: '4px',
-                                                    right: '4px',
-                                                    color: '#ff4d4f',
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                    border: 'none',
-                                                    borderRadius: '50%',
-                                                    width: '24px',
-                                                    height: '24px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    fontSize: '12px',
-                                                }}
-                                            />
+                                            <div className="favorite-brand-overlay">
+                                                <Button
+                                                    type="text"
+                                                    icon={<DeleteOutlined />}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveProduct(product);
+                                                    }}
+                                                    className="favorite-remove-button"
+                                                />
+                                            </div>
                                         </div>
                                     }
-                                    styles={{ body: { padding: '8px 12px' } }}
+                                    styles={{
+                                        body: {
+                                            padding: '12px',
+                                            backgroundColor: 'var(--background-secondary)'
+                                        }
+                                    }}
                                 >
                                     <Card.Meta
                                         title={
-                                            <Text strong style={{ fontSize: '12px' }}>
+                                            <Text strong className="favorite-brand-name">
                                                 {product.name || product.title}
                                             </Text>
                                         }
                                         description={
-                                            <Text type="secondary" style={{ fontSize: '11px' }}>
+                                            <Text type="secondary" style={{ fontSize: '12px' }}>
                                                 {product.price}
                                             </Text>
                                         }
