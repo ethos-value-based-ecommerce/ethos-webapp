@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout, Typography, Card, Row, Col, Space, Button, Tabs, Table, Tag, message, Spin, Modal, Descriptions, Image } from 'antd';
+import '../styling/colors.css';
+import '../styling/AccountPages.css';
 import { HomeOutlined, LogoutOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
@@ -67,9 +69,9 @@ const BrandAccountPage = ({ user }) => {
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'approved': return 'green';
-            case 'pending': return 'orange';
-            case 'rejected': return 'red';
+            case 'approved': return 'var(--dusty-rose)';
+            case 'pending': return 'var(--lavender-gray)';
+            case 'rejected': return 'var(--error-color)';
             default: return 'default';
         }
     };
@@ -98,7 +100,16 @@ const BrandAccountPage = ({ user }) => {
             render: (categories) => (
                 <>
                     {categories.map(category => (
-                        <Tag key={category} color="blue">{category}</Tag>
+                        <Tag
+                            key={category}
+                            style={{
+                                backgroundColor: 'var(--light-taupe)',
+                                color: 'var(--body-text)',
+                                border: '1px solid var(--border-color)'
+                            }}
+                        >
+                            {category}
+                        </Tag>
                     ))}
                 </>
             )
@@ -134,16 +145,9 @@ const BrandAccountPage = ({ user }) => {
     ];
 
     return (
-        <Layout style={{ minHeight: '100vh', background: '#f5f5f5' }}>
+        <Layout className="account-layout">
             {/* Navigation Header */}
-            <Header
-                style={{
-                    background: '#fff',
-                    padding: '0 24px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    borderBottom: '1px solid #f0f0f0'
-                }}
-            >
+            <Header className="account-header">
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
@@ -157,20 +161,26 @@ const BrandAccountPage = ({ user }) => {
                                 level={3}
                                 style={{
                                     margin: 0,
-                                    color: 'black',
-                                    background: 'transparent'
+                                    color: 'var(--dusty-rose)',
+                                    background: 'transparent',
+                                    fontWeight: 800,
+                                    letterSpacing: '1.5px'
                                 }}
                             >
                                 ETHOS
                             </Title>
-                            <Text type="secondary">Brand Portal</Text>
+                            <Text style={{ color: 'var(--body-text)' }}>Brand Portal</Text>
                         </Space>
                     </Link>
 
                     {/* Navigation Buttons */}
                     <Space>
                         <Link to="/">
-                            <Button type="default" icon={<HomeOutlined />}>
+                            <Button
+                                type="default"
+                                icon={<HomeOutlined />}
+                                className="account-button-default"
+                            >
                                 Home
                             </Button>
                         </Link>
@@ -178,6 +188,7 @@ const BrandAccountPage = ({ user }) => {
                             type="default"
                             icon={<LogoutOutlined />}
                             onClick={handleLogout}
+                            className="account-button-default"
                         >
                             Logout
                         </Button>
@@ -185,23 +196,17 @@ const BrandAccountPage = ({ user }) => {
                 </div>
             </Header>
 
-            <Content style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+            <Content className="account-content">
                 {/* Welcome Header */}
                 <Card
-                    style={{
-                        marginBottom: '24px',
-                        borderRadius: '12px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        color: 'white'
-                    }}
+                    className="account-card brand-welcome-card scale-in"
                 >
                     <Row align="middle" justify="space-between">
                         <Col>
                             <Title level={2} style={{ margin: 0, color: 'white' }}>
                                 Welcome, {user?.name || 'Brand Partner'}!
                             </Title>
-                            <Paragraph style={{ margin: '8px 0 0 0', color: 'rgba(255,255,255,0.8)' }}>
+                            <Paragraph style={{ margin: '8px 0 0 0', color: 'rgba(255,255,255,0.9)' }}>
                                 Manage your brand submissions and track their approval status
                             </Paragraph>
                         </Col>
@@ -211,10 +216,11 @@ const BrandAccountPage = ({ user }) => {
                                     type="primary"
                                     size="large"
                                     icon={<PlusOutlined />}
+                                    className="pulse"
                                     style={{
-                                        background: 'rgba(255,255,255,0.2)',
-                                        borderColor: 'rgba(255,255,255,0.3)',
-                                        color: 'white'
+                                        background: 'white',
+                                        borderColor: 'var(--dusty-rose)',
+                                        color: 'var(--dusty-rose)'
                                     }}
                                 >
                                     Submit New Brand
@@ -227,38 +233,33 @@ const BrandAccountPage = ({ user }) => {
                 {/* Stats Cards */}
                 <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
                     <Col xs={24} sm={8}>
-                        <Card style={{ textAlign: 'center' }}>
-                            <Title level={2} style={{ color: '#52c41a', margin: '0 0 8px 0' }}>
+                        <Card className="account-card dashboard-card fade-in delay-100">
+                            <Title level={2} style={{ color: 'var(--dusty-rose)', margin: '0 0 8px 0' }}>
                                 {submittedBrands.filter(b => b.status === 'approved').length}
                             </Title>
-                            <Text type="secondary">Approved Brands</Text>
+                            <Text style={{ color: 'var(--body-text)' }}>Approved Brands</Text>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
-                        <Card style={{ textAlign: 'center' }}>
-                            <Title level={2} style={{ color: '#faad14', margin: '0 0 8px 0' }}>
+                        <Card className="account-card dashboard-card fade-in delay-200">
+                            <Title level={2} style={{ color: 'var(--lavender-gray)', margin: '0 0 8px 0' }}>
                                 {submittedBrands.filter(b => b.status === 'pending').length}
                             </Title>
-                            <Text type="secondary">Pending Review</Text>
+                            <Text style={{ color: 'var(--body-text)' }}>Pending Review</Text>
                         </Card>
                     </Col>
                     <Col xs={24} sm={8}>
-                        <Card style={{ textAlign: 'center' }}>
-                            <Title level={2} style={{ color: '#1890ff', margin: '0 0 8px 0' }}>
+                        <Card className="account-card dashboard-card fade-in delay-300">
+                            <Title level={2} style={{ color: 'var(--deep-taupe)', margin: '0 0 8px 0' }}>
                                 {submittedBrands.length}
                             </Title>
-                            <Text type="secondary">Total Submissions</Text>
+                            <Text style={{ color: 'var(--body-text)' }}>Total Submissions</Text>
                         </Card>
                     </Col>
                 </Row>
 
                 {/* Main Content */}
-                <Card
-                    style={{
-                        borderRadius: '12px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }}
-                >
+                <Card className="account-card fade-in delay-400">
                     <Tabs defaultActiveKey="1" size="large">
                         <TabPane tab="My Brand Submissions" key="1">
                             <div style={{ marginBottom: '16px' }}>
@@ -273,7 +274,16 @@ const BrandAccountPage = ({ user }) => {
                                     </Col>
                                     <Col>
                                         <Link to="/upload-brand">
-                                            <Button type="primary" icon={<PlusOutlined />}>
+                                            <Button
+                                                type="primary"
+                                                icon={<PlusOutlined />}
+                                                className="slide-in-right delay-200"
+                                                style={{
+                                                    backgroundColor: 'white',
+                                                    borderColor: 'var(--dusty-rose)',
+                                                    color: 'var(--dusty-rose)'
+                                                }}
+                                            >
                                                 Submit New Brand
                                             </Button>
                                         </Link>
@@ -328,7 +338,10 @@ const BrandAccountPage = ({ user }) => {
                                                 </a>
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Status">
-                                                <Tag color={getStatusColor(currentBrand.status)}>
+                                                <Tag
+                                                    color={getStatusColor(currentBrand.status)}
+                                                    style={{ color: currentBrand.status === 'pending' ? 'var(--body-text)' : 'white' }}
+                                                >
                                                     {currentBrand.status.toUpperCase()}
                                                 </Tag>
                                             </Descriptions.Item>
@@ -337,7 +350,16 @@ const BrandAccountPage = ({ user }) => {
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Categories">
                                                 {currentBrand.categories.map(category => (
-                                                    <Tag key={category} color="blue">{category}</Tag>
+                                                    <Tag
+                                                        key={category}
+                                                        style={{
+                                                            backgroundColor: 'var(--light-taupe)',
+                                                            color: 'var(--body-text)',
+                                                            border: '1px solid var(--border-color)'
+                                                        }}
+                                                    >
+                                                        {category}
+                                                    </Tag>
                                                 ))}
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Mission">
@@ -357,7 +379,11 @@ const BrandAccountPage = ({ user }) => {
                                 open={deleteModalVisible}
                                 onCancel={() => setDeleteModalVisible(false)}
                                 footer={[
-                                    <Button key="cancel" onClick={() => setDeleteModalVisible(false)}>
+                                    <Button
+                                        key="cancel"
+                                        onClick={() => setDeleteModalVisible(false)}
+                                        className="account-button-default"
+                                    >
                                         Cancel
                                     </Button>,
                                     <Button
@@ -379,7 +405,7 @@ const BrandAccountPage = ({ user }) => {
                             <div style={{ padding: '24px 0' }}>
                                 <Title level={4}>Brand Submission Guidelines</Title>
 
-                                <Card style={{ marginBottom: '16px' }}>
+                                <Card className="staggered-card" style={{ marginBottom: '16px' }}>
                                     <Title level={5}>✅ What We Look For</Title>
                                     <ul>
                                         <li>Clear commitment to ethical and sustainable practices</li>
@@ -390,7 +416,7 @@ const BrandAccountPage = ({ user }) => {
                                     </ul>
                                 </Card>
 
-                                <Card style={{ marginBottom: '16px' }}>
+                                <Card className="staggered-card" style={{ marginBottom: '16px' }}>
                                     <Title level={5}>📋 Submission Requirements</Title>
                                     <ul>
                                         <li>Complete brand information including name, website, and description</li>
@@ -399,9 +425,31 @@ const BrandAccountPage = ({ user }) => {
                                         <li>High-quality brand logo or image</li>
                                         <li>Valid website URL</li>
                                     </ul>
+
+                                    <Title level={5} style={{ marginTop: '16px' }}>Popular Categories</Title>
+                                    <div className="categories-container">
+                                        <div className="categories-scroll">
+                                            {['Beauty', 'Fashion', 'Home Goods', 'Accessories', 'Skincare', 'Wellness', 'Food & Beverage', 'Apparel', 'Footwear', 'Jewelry', 'Sustainable', 'Eco-Friendly', 'Vegan', 'Cruelty-Free', 'Organic', 'Fair Trade', 'Handmade', 'Recycled'].map((category) => (
+                                                <div key={category} className="category-item">
+                                                    <Tag className="category-tag" style={{ margin: '4px' }}>
+                                                        {category}
+                                                    </Tag>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div className="categories-scroll" style={{ marginLeft: '20px' }}>
+                                            {['Beauty', 'Fashion', 'Home Goods', 'Accessories', 'Skincare', 'Wellness', 'Food & Beverage', 'Apparel', 'Footwear', 'Jewelry', 'Sustainable', 'Eco-Friendly', 'Vegan', 'Cruelty-Free', 'Organic', 'Fair Trade', 'Handmade', 'Recycled'].map((category) => (
+                                                <div key={category} className="category-item">
+                                                    <Tag className="category-tag" style={{ margin: '4px' }}>
+                                                        {category}
+                                                    </Tag>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </Card>
 
-                                <Card>
+                                <Card className="staggered-card">
                                     <Title level={5}>⏱️ Review Process</Title>
                                     <ul>
                                         <li>Initial review within 3-5 business days</li>

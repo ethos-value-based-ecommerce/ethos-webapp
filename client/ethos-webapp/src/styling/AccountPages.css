@@ -1,0 +1,458 @@
+@import './colors.css';
+
+/* Account Page Layout */
+.account-layout {
+  min-height: 100vh;
+  background-color: var(--background-secondary);
+}
+
+/* Header Styling */
+.account-header {
+  background: var(--navbar-background);
+  padding: 0 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Content Area */
+.account-content {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Card Styling */
+.account-card {
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  border-color: var(--border-color);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.account-card-header {
+  background-color: var(--dusty-rose);
+  color: white;
+  padding: 20px;
+  border-radius: 16px 16px 0 0;
+}
+
+/* Tab Styling - Override Ant Design default blue color */
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--dusty-rose) !important;
+}
+
+.ant-tabs-ink-bar {
+  background-color: var(--dusty-rose) !important;
+}
+
+.ant-tabs-nav .ant-tabs-tab:hover {
+  color: var(--dusty-rose-light) !important;
+}
+
+.ant-tabs-tab {
+  color: var(--body-text) !important;
+}
+
+/* Card Tab Styling */
+.ant-tabs-card .ant-tabs-tab.ant-tabs-tab-active {
+  border-color: var(--dusty-rose) !important;
+  background: var(--dusty-rose-light) !important;
+}
+
+.ant-tabs-card .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--heading-text) !important;
+  font-weight: 600;
+}
+
+.ant-tabs-card .ant-tabs-tab {
+  border-color: var(--border-color) !important;
+  background: var(--background-secondary) !important;
+}
+
+.ant-tabs-card .ant-tabs-content {
+  border-color: var(--border-color) !important;
+}
+
+/* Button Styling */
+.account-button-primary {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: white !important;
+}
+
+.account-button-primary:hover {
+  background-color: var(--button-hover) !important;
+  border-color: var(--button-hover) !important;
+}
+
+.account-button-default {
+  border-color: var(--border-color) !important;
+  color: var(--body-text) !important;
+}
+
+.account-button-default:hover {
+  border-color: var(--dusty-rose) !important;
+  color: var(--dusty-rose) !important;
+}
+
+/* Avatar Styling */
+.account-avatar {
+  background-color: var(--dusty-rose) !important;
+  font-size: 32px;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card-icon {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+/* Brand Account Page Styling */
+.brand-welcome-card {
+  background: var(--dusty-rose) !important;
+  color: white !important;
+  border: none !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.2) 0%, transparent 70%);
+  z-index: 0;
+}
+
+.brand-welcome-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animations */
+@keyframes softFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.975);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes borderPulse {
+  0% {
+    border-color: var(--border-color);
+  }
+  50% {
+    border-color: var(--dusty-rose);
+  }
+  100% {
+    border-color: var(--border-color);
+  }
+}
+
+.soft-fade-in {
+  animation: softFadeIn 1.8s ease-out forwards;
+  will-change: opacity, transform;
+}
+
+.fade-in {
+  animation: softFadeIn 1.8s ease-out forwards;
+  will-change: opacity, transform;
+}
+
+.slide-in-right {
+  animation: slideInRight 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.slide-in-left {
+  animation: slideInLeft 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.scale-in {
+  animation: scaleIn 1.2s cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.pulse {
+  animation: pulse 3s infinite cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  will-change: transform;
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.2) 50%,
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s infinite linear;
+}
+
+.border-pulse {
+  animation: borderPulse 2.5s infinite cubic-bezier(0.455, 0.03, 0.515, 0.955);
+}
+
+/* Infinite Scroll Animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.categories-container {
+  display: flex;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  margin-top: 24px;
+  padding-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.categories-scroll {
+  display: flex;
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+  padding-right: 24px;
+}
+
+.categories-scroll:hover {
+  animation-play-state: paused;
+}
+
+.category-item {
+  cursor: pointer;
+  padding: 0;
+  border-radius: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0 12px 0 0;
+}
+
+.category-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(165, 138, 137, 0.2);
+}
+
+.category-tag {
+  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  color: var(--body-text);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Staggered Card Animations */
+.staggered-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: softFadeIn 1.8s ease-out forwards;
+  will-change: opacity, transform;
+}
+
+.staggered-card:nth-child(1) { animation-delay: 0.1s; }
+.staggered-card:nth-child(2) { animation-delay: 0.25s; }
+.staggered-card:nth-child(3) { animation-delay: 0.4s; }
+.staggered-card:nth-child(4) { animation-delay: 0.55s; }
+.staggered-card:nth-child(5) { animation-delay: 0.7s; }
+.staggered-card:nth-child(6) { animation-delay: 0.85s; }
+
+/* Animation Utilities */
+.delay-100 { animation-delay: 0.2s; }
+.delay-200 { animation-delay: 0.4s; }
+.delay-300 { animation-delay: 0.6s; }
+.delay-400 { animation-delay: 0.8s; }
+.delay-500 { animation-delay: 1.0s; }
+.delay-600 { animation-delay: 1.2s; }
+.delay-700 { animation-delay: 1.4s; }
+.delay-800 { animation-delay: 1.6s; }
+
+/* Favorite Brands Styling */
+.favorite-brand-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+}
+
+.favorite-brand-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-color: var(--dusty-rose);
+}
+
+.favorite-brand-image-container {
+  height: 200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.favorite-brand-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.favorite-brand-card:hover .favorite-brand-image {
+  transform: scale(1.05);
+}
+
+.favorite-brand-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px;
+}
+
+.favorite-brand-card:hover .favorite-brand-overlay {
+  opacity: 1;
+}
+
+.favorite-remove-button {
+  color: #ff4d4f !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+}
+
+.favorite-remove-button:hover {
+  background-color: #fff !important;
+  transform: scale(1.1);
+}
+
+.favorite-brand-name {
+  font-size: 16px;
+  color: var(--heading-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .account-content {
+    padding: 1rem;
+  }
+
+  .account-card {
+    margin-bottom: 16px;
+  }
+
+  .favorite-brand-image-container {
+    height: 160px;
+  }
+}
