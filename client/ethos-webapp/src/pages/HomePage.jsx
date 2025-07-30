@@ -105,13 +105,18 @@ const HomePage = () => {
     navigate('/login');
   };
 
-  const handleQuizSubmit = (answers) => {
+  const handleQuizSubmit = (answers, justCompleted = false) => {
     console.log('Quiz answers:', answers);
     // Save quiz completion status to localStorage
     localStorage.setItem('quizCompleted', 'true');
     setQuizCompleted(true);
-    // Navigate to the feed page with quiz answers
-    navigate('/feed', { state: { quizAnswers: answers } });
+    // Navigate to the feed page with quiz answers and justCompletedQuiz flag
+    navigate('/feed', {
+      state: {
+        quizAnswers: answers,
+        justCompletedQuiz: justCompleted
+      }
+    });
   };
 
   const handleViewRecommendations = () => {
