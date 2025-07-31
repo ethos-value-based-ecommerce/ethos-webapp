@@ -1,12 +1,15 @@
-import React, {useState} from 'react';
-import { Form, Input, Button, Layout, Typography, Row, Col, Card, message } from 'antd';
-import { UploadOutlined, SendOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import React from 'react';
+import { Form, Input, Button, Layout, Typography, Row, Col, Card, message, Modal, Image } from 'antd';
+import { UploadOutlined, SendOutlined, ArrowLeftOutlined, CheckCircleOutlined, RightOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 import Footer from '../components/Footer.jsx';
 import NavBar from '../components/NavBar.jsx';
 import { brandUploadApi } from '../services/api.jsx';
 import '../App.css';
+import '../styling/colors.css';
+import '../styling/BrandUploadPage.css';
+import '../styling/CongratsModal.css';
 
 const { Title, Paragraph } = Typography;
 const { Header, Content, Footer: AntFooter } = Layout;
@@ -15,12 +18,13 @@ const { Header, Content, Footer: AntFooter } = Layout;
 const BrandUploadPage = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const [loading, setLoading] = React.useState(false);
+    const [congratsVisible, setCongratsVisible] = React.useState(false);
+    const [submittedBrand, setSubmittedBrand] = React.useState(null);
 
     const handleBack = () => {
         navigate(-1); // Go back to previous page
     };
-
-    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (values) => {
         setLoading(true);
@@ -36,13 +40,19 @@ const BrandUploadPage = () => {
             const response = await brandUploadApi.upload(brandData);
 
             console.log('Brand submission successful:', response);
-            message.success('Brand submitted successfully! The website is being scraped for additional information.');
+
+            // Store the submitted brand data for the congrats modal
+            setSubmittedBrand({
+                name: values.brandName,
+                website: values.website,
+                logo_url: values.imgURL
+            });
+
+            // Show the congratulatory modal
+            setCongratsVisible(true);
 
             // Reset the form after successful submission
             form.resetFields();
-
-            // Navigate to the brand account page to see the submitted brand
-            navigate('/brand-account');
         } catch (error) {
             console.error('Error submitting brand:', error);
             message.error('Failed to submit brand. Please try again.');
@@ -51,12 +61,33 @@ const BrandUploadPage = () => {
         }
     };
 
+    const handleContinue = () => {
+        setCongratsVisible(false);
+        // Navigate to the brand account page to see the submitted brand
+        navigate('/brand-account');
+    };
+
+    // Confetti component for the congratulatory modal
+    const Confetti = () => (
+        <div className="confetti-container">
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+            <div className="confetti"></div>
+        </div>
+    );
+
     return (
-        <Layout style={{ minHeight: '100vh' }}>
-            <Header style={{ background: '#fff', padding: '0 2rem' }}>
+        <Layout className="brand-upload-layout">
+            <Header className="brand-upload-header">
                 <Row justify="space-between" align="middle">
                     <Col>
-                        <Title level={3} style={{ margin: 0, color: '#000' }}>ETHOS</Title>
+                        <Title level={3} style={{ margin: 0, color: 'var(--heading-text)' }}>ETHOS</Title>
                     </Col>
                     <Col>
                         <NavBar />
@@ -64,37 +95,27 @@ const BrandUploadPage = () => {
                 </Row>
             </Header>
 
-            <Content style={{ padding: '2rem', background: '#f5f5f5' }}>
+            <Content className="brand-upload-content">
                 <Row justify="center">
                     <Col xs={24} sm={20} md={16} lg={12} xl={10}>
-                        <Card
-                            style={{
-                                borderRadius: '12px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                border: 'none'
-                            }}
-                        >
-                            <div style={{ marginBottom: '1rem' }}>
+                        <Card className="brand-upload-card">
+                            <div>
                                 <Button
                                     type="text"
                                     icon={<ArrowLeftOutlined />}
                                     onClick={handleBack}
-                                    style={{
-                                        padding: '4px 8px',
-                                        fontSize: '14px',
-                                        color: '#666'
-                                    }}
+                                    className="back-button"
                                 >
                                     Back
                                 </Button>
                             </div>
 
-                            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                                <Title level={2} style={{ color: '#1890ff', marginBottom: '0.5rem' }}>
-                                    <UploadOutlined style={{ marginRight: '0.5rem' }} />
+                            <div className="page-header">
+                                <Title level={2} className="page-title">
+                                    <UploadOutlined className="submit-button-icon" />
                                     Submit Your Brand
                                 </Title>
-                                <Paragraph style={{ color: '#666', fontSize: '16px' }}>
+                                <Paragraph className="page-description">
                                     Share your ethical brand with our community and help others discover sustainable choices.
                                 </Paragraph>
                             </div>
@@ -104,18 +125,18 @@ const BrandUploadPage = () => {
                                 layout="vertical"
                                 onFinish={handleSubmit}
                                 size="large"
-                                style={{ marginTop: '1rem' }}
+                                className="brand-upload-form"
                             >
                                 <Row gutter={16}>
                                     <Col span={24}>
                                         <Form.Item
-                                            label={<span style={{ fontWeight: '600' }}>Brand Name</span>}
+                                            label={<span className="form-label">Brand Name</span>}
                                             name="brandName"
                                             rules={[{ required: true, message: 'Please enter the brand name' }]}
                                         >
                                             <Input
                                                 placeholder="Enter your brand name"
-                                                style={{ borderRadius: '8px' }}
+                                                className="form-input"
                                             />
                                         </Form.Item>
                                     </Col>
@@ -124,7 +145,7 @@ const BrandUploadPage = () => {
                                 <Row gutter={16}>
                                     <Col span={24}>
                                         <Form.Item
-                                            label={<span style={{ fontWeight: '600' }}>Brand Website</span>}
+                                            label={<span className="form-label">Brand Website</span>}
                                             name="website"
                                             rules={[
                                                 { required: true, message: 'Please enter the website URL' },
@@ -133,7 +154,7 @@ const BrandUploadPage = () => {
                                         >
                                             <Input
                                                 placeholder="https://yourbrand.com"
-                                                style={{ borderRadius: '8px' }}
+                                                className="form-input"
                                             />
                                         </Form.Item>
                                     </Col>
@@ -143,7 +164,7 @@ const BrandUploadPage = () => {
                                 <Row gutter={16}>
                                     <Col span={24}>
                                         <Form.Item
-                                            label={<span style={{ fontWeight: '600' }}>Logo / Brand Image</span>}
+                                            label={<span className="form-label">Logo / Brand Image</span>}
                                             name="imgURL"
                                             rules={[
                                                 { required: true, message: 'Please enter the image URL' },
@@ -152,26 +173,20 @@ const BrandUploadPage = () => {
                                         >
                                             <Input
                                                 placeholder="https://example.com/your-logo.jpg"
-                                                style={{ borderRadius: '8px' }}
+                                                className="form-input"
                                             />
                                         </Form.Item>
                                     </Col>
                                 </Row>
 
-                                <Form.Item style={{ textAlign: 'center', marginTop: '2rem' }}>
+                                <Form.Item className="submit-button-container">
                                     <Button
                                         type="primary"
                                         htmlType="submit"
                                         size="large"
                                         icon={<SendOutlined />}
                                         loading={loading}
-                                        style={{
-                                            borderRadius: '8px',
-                                            height: '48px',
-                                            minWidth: '200px',
-                                            fontSize: '16px',
-                                            fontWeight: '600'
-                                        }}
+                                        className="submit-button"
                                     >
                                         Submit Brand
                                     </Button>
@@ -185,6 +200,47 @@ const BrandUploadPage = () => {
             <AntFooter style={{ padding: 0 }}>
                 <Footer />
             </AntFooter>
+
+            {/* Congratulatory Modal */}
+            <Modal
+                open={congratsVisible}
+                footer={null}
+                closable={false}
+                width={500}
+                className="congrats-modal"
+                maskClosable={false}
+            >
+                <Confetti />
+                <CheckCircleOutlined className="success-icon" />
+                <Title level={2} className="congrats-title">
+                    Brand Submitted Successfully!
+                </Title>
+                <Paragraph className="congrats-message">
+                    Thank you for submitting your brand to ETHOS. Our system is now scraping additional information from your website.
+                </Paragraph>
+
+                {submittedBrand && (
+                    <div className="brand-preview">
+                        <Image
+                            src={submittedBrand.logo_url}
+                            alt={submittedBrand.name}
+                            className="brand-logo-preview"
+                            fallback="https://blocks.astratic.com/img/general-img-square.png"
+                        />
+                        <div className="brand-name-preview">{submittedBrand.name}</div>
+                        <div className="brand-website-preview">{submittedBrand.website}</div>
+                    </div>
+                )}
+
+                <Button
+                    type="primary"
+                    onClick={handleContinue}
+                    className="continue-button"
+                    icon={<RightOutlined />}
+                >
+                    Continue to Dashboard
+                </Button>
+            </Modal>
         </Layout>
     );
 };

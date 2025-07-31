@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout, Typography, Card, Row, Col, Space, Button, Tabs, Table, Tag, message, Spin, Modal, Descriptions, Image } from 'antd';
 import '../styling/colors.css';
 import '../styling/AccountPages.css';
+import '../styling/BrandViewModal.css';
 import { HomeOutlined, LogoutOutlined, PlusOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
@@ -98,20 +99,25 @@ const BrandAccountPage = ({ user }) => {
             dataIndex: 'categories',
             key: 'categories',
             render: (categories) => (
-                <>
+                <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '4px'
+                }}>
                     {categories.map(category => (
                         <Tag
                             key={category}
                             style={{
                                 backgroundColor: 'var(--light-taupe)',
                                 color: 'var(--body-text)',
-                                border: '1px solid var(--border-color)'
+                                border: '1px solid var(--border-color)',
+                                margin: '2px'
                             }}
                         >
                             {category}
                         </Tag>
                     ))}
-                </>
+                </div>
             )
         },
         {
@@ -309,38 +315,47 @@ const BrandAccountPage = ({ user }) => {
 
                             {/* View Brand Modal */}
                             <Modal
-                                title={currentBrand?.name ? `${currentBrand.name} Details` : "Brand Details"}
+                                title="Brand Details"
                                 open={viewModalVisible}
                                 onCancel={() => setViewModalVisible(false)}
                                 footer={[
-                                    <Button key="close" onClick={() => setViewModalVisible(false)}>
+                                    <Button
+                                        key="close"
+                                        onClick={() => setViewModalVisible(false)}
+                                        className="modal-close-button"
+                                    >
                                         Close
                                     </Button>
                                 ]}
                                 width={700}
+                                className="brand-view-modal"
                             >
                                 {currentBrand && (
                                     <div>
-                                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                                        <div className="brand-logo-container">
                                             <Image
                                                 src={currentBrand.logo_url}
                                                 alt={currentBrand.name}
-                                                style={{ maxHeight: '150px', objectFit: 'contain' }}
+                                                className="brand-logo"
                                                 fallback="https://blocks.astratic.com/img/general-img-square.png"
                                             />
                                         </div>
 
-                                        <Descriptions bordered column={1}>
+                                        <Descriptions bordered column={1} className="brand-descriptions">
                                             <Descriptions.Item label="Brand Name">{currentBrand.name}</Descriptions.Item>
                                             <Descriptions.Item label="Website">
-                                                <a href={currentBrand.website} target="_blank" rel="noopener noreferrer">
+                                                <a
+                                                    href={currentBrand.website}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="brand-website-link"
+                                                >
                                                     {currentBrand.website}
                                                 </a>
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Status">
                                                 <Tag
-                                                    color={getStatusColor(currentBrand.status)}
-                                                    style={{ color: currentBrand.status === 'pending' ? 'var(--body-text)' : 'white' }}
+                                                    className={`status-tag status-tag-${currentBrand.status}`}
                                                 >
                                                     {currentBrand.status.toUpperCase()}
                                                 </Tag>
@@ -349,24 +364,30 @@ const BrandAccountPage = ({ user }) => {
                                                 {currentBrand.submittedDate}
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Categories">
-                                                {currentBrand.categories.map(category => (
-                                                    <Tag
-                                                        key={category}
-                                                        style={{
-                                                            backgroundColor: 'var(--light-taupe)',
-                                                            color: 'var(--body-text)',
-                                                            border: '1px solid var(--border-color)'
-                                                        }}
-                                                    >
-                                                        {category}
-                                                    </Tag>
-                                                ))}
+                                                <div style={{
+                                                    display: 'flex',
+                                                    flexWrap: 'wrap',
+                                                    gap: '8px'
+                                                }}>
+                                                    {currentBrand.categories.map(category => (
+                                                        <Tag
+                                                            key={category}
+                                                            className="category-tag"
+                                                        >
+                                                            {category}
+                                                        </Tag>
+                                                    ))}
+                                                </div>
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Mission">
-                                                {currentBrand.mission || "No mission statement available"}
+                                                <div className="brand-text-content">
+                                                    {currentBrand.mission || "No mission statement available"}
+                                                </div>
                                             </Descriptions.Item>
                                             <Descriptions.Item label="Description">
-                                                {currentBrand.description || "No description available"}
+                                                <div className="brand-text-content">
+                                                    {currentBrand.description || "No description available"}
+                                                </div>
                                             </Descriptions.Item>
                                         </Descriptions>
                                     </div>
