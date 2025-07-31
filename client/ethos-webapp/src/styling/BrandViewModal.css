@@ -1,0 +1,230 @@
+
+@import './colors.css';
+
+/* Modal Animation */
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modalContentSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmerEffect {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes floatAnimation {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+/* Shake Animation */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+}
+
+/* Brand View Modal Styles */
+.brand-view-modal .ant-modal-content {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-color);
+  animation: modalFadeIn 0.4s ease-out;
+}
+
+.brand-view-modal .ant-modal-header {
+  background-color: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 24px;
+}
+
+.brand-view-modal .ant-modal-title {
+  color: var(--heading-text);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.brand-view-modal .ant-modal-body {
+  padding: 24px;
+  animation: modalContentSlideUp 0.5s ease-out;
+}
+
+.brand-view-modal .ant-modal-footer {
+  border-top: 1px solid var(--border-color);
+  padding: 16px 24px;
+  background-color: var(--background-secondary);
+}
+
+/* Logo Container */
+.brand-logo-container {
+  text-align: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.brand-logo {
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Descriptions Styling */
+.brand-descriptions {
+  border-radius: 8px;
+  overflow: hidden;
+  animation: modalContentSlideUp 0.7s ease-out;
+}
+
+.brand-descriptions .ant-descriptions-item-label {
+  background-color: var(--background-secondary);
+  color: var(--heading-text);
+  font-weight: 600;
+  padding: 12px 16px;
+  width: 150px;
+}
+
+.brand-descriptions .ant-descriptions-item-content {
+  padding: 12px 16px;
+  color: var(--body-text);
+}
+
+/* Status Tag Styling */
+.status-tag {
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-tag-approved {
+  background-color: var(--dusty-rose);
+  color: white;
+}
+
+.status-tag:hover {
+  animation: wiggle 0.5s ease-in-out;
+}
+
+.status-tag-pending {
+  background-color: var(--lavender-gray);
+  color: var(--body-text);
+}
+
+.status-tag-rejected {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+/* Category Tags */
+.category-tag {
+  margin: 4px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background-color: var(--light-taupe);
+  color: var(--body-text);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.category-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background-color: var(--rosy-beige);
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Text Content */
+.brand-text-content {
+  margin-top: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--body-text);
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.brand-text-content:hover {
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Website Link */
+.brand-website-link {
+  color: var(--dusty-rose);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brand-website-link:hover {
+  color: var(--button-hover);
+  text-decoration: underline;
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Close Button */
+.modal-close-button {
+  border-radius: 8px;
+  height: 40px;
+  min-width: 100px;
+  font-size: 16px;
+  font-weight: 500;
+  background-color: white;
+  border-color: var(--border-color);
+  color: var(--body-text);
+  transition: all 0.3s;
+}
+
+.modal-close-button:hover {
+  background-color: var(--background-secondary);
+  border-color: var(--dusty-rose);
+  color: var(--dusty-rose);
+  animation: wiggle 0.5s ease-in-out;
+}
+
+/* Shimmer Effect for Loading State */
+.shimmer-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmerEffect 2s infinite;
+}
